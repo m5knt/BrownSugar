@@ -1,69 +1,283 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Net;
 
-namespace BrownSugar {
+namespace ThunderEgg.BrownSugar {
 
     public static class ByteSugar {
-
-#if false
-        // [StructLayout(LayoutKind.Sequential)]
+        /// <summary>
+        /// 型のサイズを返す
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public static int ByteSize<T>(this T t) {
             return Marshal.SizeOf(t);
         }
-#endif
 
-        //
-        //
-        //
-
-        public static Int16 ToInt16(this byte[] bytes, int index) {
-            return BitConverter.ToInt16(bytes, index);
+        public static long DoubleToInt64Bits(this double value) {
+            return BitConverter.DoubleToInt64Bits(value);
         }
 
-        public static Int32 ToInt32(this byte[] bytes, int index) {
-            return BitConverter.ToInt32(bytes, index);
+        public static double Int64BitsToDouble(this long value) {
+            return BitConverter.Int64BitsToDouble(value);
+        }
+    }
+
+    public static class ByteOrder {
+
+        public static void AssignLittle(byte[] bytes, int index, sbyte val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
         }
 
-        public static UInt64 ToInt64(this byte[] bytes, int index) {
-            return BitConverter.ToUInt64(bytes, index);
+        public static void AssignLittle(byte[] bytes, int index, short val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
+            bytes[index + 1] = unchecked((byte)(val >> 8));
+        }
+
+        public static void AssignLittle(byte[] bytes, int index, int val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
+            bytes[index + 1] = unchecked((byte)(val >> 8));
+            bytes[index + 2] = unchecked((byte)(val >> 16));
+            bytes[index + 3] = unchecked((byte)(val >> 24));
+        }
+
+        public static void AssignLittle(byte[] bytes, int index, long val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
+            bytes[index + 1] = unchecked((byte)(val >> 8));
+            bytes[index + 2] = unchecked((byte)(val >> 16));
+            bytes[index + 3] = unchecked((byte)(val >> 24));
+            bytes[index + 4] = unchecked((byte)(val >> 32));
+            bytes[index + 5] = unchecked((byte)(val >> 40));
+            bytes[index + 6] = unchecked((byte)(val >> 48));
+            bytes[index + 7] = unchecked((byte)(val >> 56));
+        }
+
+        public static void AssignLittle(byte[] bytes, int index, byte val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
+        }
+
+        public static void AssignLittle(byte[] bytes, int index, ushort val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
+            bytes[index + 1] = unchecked((byte)(val >> 8));
+        }
+
+        public static void AssignLittle(byte[] bytes, int index, uint val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
+            bytes[index + 1] = unchecked((byte)(val >> 8));
+            bytes[index + 2] = unchecked((byte)(val >> 16));
+            bytes[index + 3] = unchecked((byte)(val >> 24));
+        }
+
+        public static void AssignLittle(byte[] bytes, int index, ulong val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
+            bytes[index + 1] = unchecked((byte)(val >> 8));
+            bytes[index + 2] = unchecked((byte)(val >> 16));
+            bytes[index + 3] = unchecked((byte)(val >> 24));
+            bytes[index + 4] = unchecked((byte)(val >> 32));
+            bytes[index + 5] = unchecked((byte)(val >> 40));
+            bytes[index + 6] = unchecked((byte)(val >> 48));
+            bytes[index + 7] = unchecked((byte)(val >> 56));
         }
 
         //
         //
         //
 
-        public static UInt16 ToUInt16(this byte[] bytes, int index) {
-            return BitConverter.ToUInt16(bytes, index);
+        public static void AssignBig(byte[] bytes, int index, sbyte val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
         }
 
-        public static UInt32 ToUInt32(this byte[] bytes, int index) {
-            return BitConverter.ToUInt32(bytes, index);
+        public static void AssignBig(byte[] bytes, int index, short val) {
+            bytes[index + 0] = unchecked((byte)(val >> 8));
+            bytes[index + 1] = unchecked((byte)(val >> 0));
         }
 
-        public static UInt64 ToUInt64(this byte[] bytes, int index) {
-            return BitConverter.ToUInt64(bytes, index);
+        public static void AssignBig(byte[] bytes, int index, int val) {
+            bytes[index + 0] = unchecked((byte)(val >> 24));
+            bytes[index + 1] = unchecked((byte)(val >> 16));
+            bytes[index + 2] = unchecked((byte)(val >> 8));
+            bytes[index + 3] = unchecked((byte)(val >> 0));
+        }
+
+        public static void AssignBig(byte[] bytes, int index, long val) {
+            bytes[index + 0] = unchecked((byte)(val >> 56));
+            bytes[index + 1] = unchecked((byte)(val >> 48));
+            bytes[index + 2] = unchecked((byte)(val >> 40));
+            bytes[index + 3] = unchecked((byte)(val >> 32));
+            bytes[index + 4] = unchecked((byte)(val >> 24));
+            bytes[index + 5] = unchecked((byte)(val >> 16));
+            bytes[index + 6] = unchecked((byte)(val >> 8));
+            bytes[index + 7] = unchecked((byte)(val >> 0));
+        }
+
+        public static void AssignBig(byte[] bytes, int index, byte val) {
+            bytes[index + 0] = unchecked((byte)(val >> 0));
+        }
+
+        public static void AssignBig(byte[] bytes, int index, ushort val) {
+            bytes[index + 0] = unchecked((byte)(val >> 8));
+            bytes[index + 1] = unchecked((byte)(val >> 0));
+        }
+
+        public static void AssignBig(byte[] bytes, int index, uint val) {
+            bytes[index + 0] = unchecked((byte)(val >> 24));
+            bytes[index + 1] = unchecked((byte)(val >> 16));
+            bytes[index + 2] = unchecked((byte)(val >> 8));
+            bytes[index + 3] = unchecked((byte)(val >> 0));
+        }
+
+        public static void AssignBig(byte[] bytes, int index, ulong val) {
+            bytes[index + 0] = unchecked((byte)(val >> 56));
+            bytes[index + 1] = unchecked((byte)(val >> 48));
+            bytes[index + 2] = unchecked((byte)(val >> 40));
+            bytes[index + 3] = unchecked((byte)(val >> 32));
+            bytes[index + 4] = unchecked((byte)(val >> 24));
+            bytes[index + 5] = unchecked((byte)(val >> 16));
+            bytes[index + 6] = unchecked((byte)(val >> 8));
+            bytes[index + 7] = unchecked((byte)(val >> 0));
         }
 
         //
         //
         //
 
-        public static float ToFloat(this byte[] value, int index) {
-            return BitConverter.ToSingle(value, index);
+        public static short ToInt16Big(byte[] bytes, int index) {
+            var val = unchecked((short)(
+                (ushort)bytes[index + 0] << 8 |
+                (ushort)bytes[index + 1] << 0 |
+                0));
+            return val;
         }
 
-        public static double ToDouble(this byte[] value, int index) {
-            return BitConverter.ToDouble(value, index);
+        public static int ToInt32Big(byte[] bytes, int index) {
+            var val = unchecked((int)(
+                (uint)bytes[index + 0] << 24 |
+                (uint)bytes[index + 1] << 16 |
+                (uint)bytes[index + 2] << 8 |
+                (uint)bytes[index + 3] << 0 |
+                0));
+            return val;
         }
 
-        //
-        //
-        //
+        public static long ToInt64Big(byte[] bytes, int index) {
+            var val = unchecked((long)(
+                (ulong)bytes[index + 0] << 56 |
+                (ulong)bytes[index + 1] << 48 |
+                (ulong)bytes[index + 2] << 40 |
+                (ulong)bytes[index + 3] << 32 |
+                (ulong)bytes[index + 4] << 24 |
+                (ulong)bytes[index + 5] << 16 |
+                (ulong)bytes[index + 6] << 8 |
+                (ulong)bytes[index + 7] << 0 |
+                0));
+            return val;
+        }
+
+
+        public static ushort ToUInt16Big(byte[] bytes, int index) {
+            var val = unchecked((ushort)(
+                (ushort)bytes[index + 0] << 8 |
+                (ushort)bytes[index + 1] << 0 |
+                0));
+            return val;
+        }
+
+        public static ulong ToUInt32Big(byte[] bytes, int index) {
+            var val = unchecked((uint)(
+                (uint)bytes[index + 0] << 24 |
+                (uint)bytes[index + 1] << 16 |
+                (uint)bytes[index + 2] << 8 |
+                (uint)bytes[index + 3] << 0 |
+                0));
+            return val;
+        }
+
+        public static ulong ToUInt64Big(byte[] bytes, int index) {
+            var val = unchecked((ulong)(
+                (ulong)bytes[index + 0] << 56 |
+                (ulong)bytes[index + 1] << 48 |
+                (ulong)bytes[index + 2] << 40 |
+                (ulong)bytes[index + 3] << 32 |
+                (ulong)bytes[index + 4] << 24 |
+                (ulong)bytes[index + 5] << 16 |
+                (ulong)bytes[index + 6] << 8 |
+                (ulong)bytes[index + 7] << 0 |
+                0));
+            return val;
+        }
+
+        /*
+         *
+         */
+
+        public static short ToInt16Little(byte[] bytes, int index) {
+            var val = unchecked((short)(
+                (ushort)bytes[index + 0] << 0 |
+                (ushort)bytes[index + 1] << 8 |
+                0));
+            return val;
+        }
+
+        public static int ToInt32Little(byte[] bytes, int index) {
+            var val = unchecked((int)(
+                (uint)bytes[index + 0] << 0 |
+                (uint)bytes[index + 1] << 8 |
+                (uint)bytes[index + 2] << 16 |
+                (uint)bytes[index + 3] << 24 |
+                0));
+            return val;
+        }
+
+        public static long ToInt64Little(byte[] bytes, int index) {
+            var val = unchecked((long)(
+                (ulong)bytes[index + 0] << 0 |
+                (ulong)bytes[index + 1] << 8 |
+                (ulong)bytes[index + 2] << 16 |
+                (ulong)bytes[index + 3] << 24 |
+                (ulong)bytes[index + 4] << 32 |
+                (ulong)bytes[index + 5] << 40 |
+                (ulong)bytes[index + 6] << 48 |
+                (ulong)bytes[index + 7] << 56 |
+                0));
+            return val;
+        }
+
+
+        public static ushort ToUInt16Little(byte[] bytes, int index) {
+            var val = unchecked((ushort)(
+                (ushort)bytes[index + 0] << 0 |
+                (ushort)bytes[index + 1] << 8 |
+                0));
+            return val;
+        }
+
+        public static ulong ToUInt32Little(byte[] bytes, int index) {
+            var val = unchecked((uint)(
+                (uint)bytes[index + 0] << 0 |
+                (uint)bytes[index + 1] << 8 |
+                (uint)bytes[index + 2] << 16 |
+                (uint)bytes[index + 3] << 24 |
+                0));
+            return val;
+        }
+
+        public static ulong ToUInt64Little(byte[] bytes, int index) {
+            var val = unchecked((ulong)(
+                (ulong)bytes[index + 0] << 0 |
+                (ulong)bytes[index + 1] << 8 |
+                (ulong)bytes[index + 2] << 16 |
+                (ulong)bytes[index + 3] << 24 |
+                (ulong)bytes[index + 4] << 32 |
+                (ulong)bytes[index + 5] << 40 |
+                (ulong)bytes[index + 6] << 48 |
+                (ulong)bytes[index + 7] << 56 |
+                0));
+            return val;
+        }
+
+        /*
+         *
+         */
 
     }
 }

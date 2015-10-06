@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace ThunderEgg.BrownSugar.Net {
 
-    public static class ByteOrder {
+    public static class NetOrder {
 
         /// <summary>
         /// ホストオーダー値からネットオーダー値にする
@@ -131,200 +131,63 @@ namespace ThunderEgg.BrownSugar.Net {
          *
          */
 
-        public static short ToHostInt16(byte[] net, int index) {
-            return BitConverter.ToInt16(net, index).ToHostOrder();
+        public static void Assign(byte[] bytes, int index, sbyte val) {
+            ByteOrder.AssignBig(bytes, index, val);
         }
 
-        public static int ToHostInt32(byte[] net, int index) {
-            return BitConverter.ToInt32(net, index).ToHostOrder();
+        public static void Assign(byte[] bytes, int index, short val) {
+            ByteOrder.AssignBig(bytes, index, val);
         }
 
-        public static long ToHostInt64(byte[] net, int index) {
-            return BitConverter.ToInt64(net, index).ToHostOrder();
+        public static void Assign(byte[] bytes, int index, int val) {
+            ByteOrder.AssignBig(bytes, index, val);
         }
 
-        public static ushort ToHostUInt16(byte[] net, int index) {
-            return BitConverter.ToUInt16(net, index).ToHostOrder();
+        public static void Assign(byte[] bytes, int index, long val) {
+            ByteOrder.AssignBig(bytes, index, val);
         }
 
-        public static uint ToHostUInt32(byte[] net, int index) {
-            return BitConverter.ToUInt32(net, index).ToHostOrder();
+        public static void Assign(byte[] bytes, int index, byte val) {
+            ByteOrder.AssignBig(bytes, index, val);
         }
 
-        public static ulong ToHostUInt64(byte[] net, int index) {
-            return BitConverter.ToUInt64(net, index).ToHostOrder();
+        public static void Assign(byte[] bytes, int index, ushort val) {
+            ByteOrder.AssignBig(bytes, index, val);
         }
 
-        public static double ToHostDouble(byte[] net, int index) {
-            var n = BitConverter.ToInt64(net, index).ToHostOrder();
-            return BitConverter.Int64BitsToDouble(n);
+        public static void Assign(byte[] bytes, int index, uint val) {
+            ByteOrder.AssignBig(bytes, index, val);
         }
 
-        /*
-				 *
-				 */
+        public static void Assign(byte[] bytes, int index, ulong val) {
+            ByteOrder.AssignBig(bytes, index, val);
+        }
+        //
+        //
+        //
 
-        /// <summary>
-        /// 値をビッグエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="p">書き出し位置</param>
-        /// <returns>次の書き出し位置</returns>
-        public unsafe static byte* CopyToNetOrder(this short value, byte* p) {
-            var q = p + sizeof(short);
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value);
-            return q;
+        public static short ToInt16(byte[] bytes, int index) {
+            return ByteOrder.ToInt16Big(bytes, index);
         }
 
-        /// <summary>
-        /// 値をビッグエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="p">書き出し位置</param>
-        /// <returns>次の書き出し位置</returns>
-        public unsafe static byte* CopyToNetOrder(this int value, byte* p) {
-            var q = p + sizeof(int);
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value);
-            return q;
+        public static int ToInt32(byte[] bytes, int index) {
+            return ByteOrder.ToInt32Big(bytes, index);
+        }
+        public static long ToInt64(byte[] bytes, int index) {
+            return ByteOrder.ToInt64Big(bytes, index);
         }
 
-        /// <summary>
-        /// 値をビッグエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="p">書き出し位置</param>
-        /// <returns>次の書き出し位置</returns>
-        public unsafe static byte* CopyToNetOrder(this long value, byte* p) {
-            var q = p + sizeof(long);
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value); value >>= 8;
-            *--p = unchecked((byte)value);
-            return q;
+        public static ushort ToUInt16(byte[] bytes, int index) {
+            return ByteOrder.ToUInt16Big(bytes, index);
         }
 
-        /// <summary>
-        /// 値をビッグエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="p">書き出し位置</param>
-        /// <returns>次の書き出し位置</returns>
-        public unsafe static byte* CopyToNetOrder(this ushort value, byte* p) {
-            return CopyToNetOrder(unchecked((short)value), p);
+        public static ulong ToUInt32(byte[] bytes, int index) {
+            return ByteOrder.ToUInt32Big(bytes, index);
         }
 
-        /// <summary>
-        /// 値をビッグエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="p">書き出し位置</param>
-        /// <returns>次の書き出し位置</returns>
-        public unsafe static byte* CopyToNetOrder(this uint value, byte* p) {
-            return CopyToNetOrder(unchecked((int)value), p);
+        public static ulong ToUInt64(byte[] bytes, int index) {
+            return ByteOrder.ToUInt64Big(bytes, index);
         }
 
-        /// <summary>
-        /// 値をビッグエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="p">書き出し位置</param>
-        /// <returns>次の書き出し位置</returns>
-        public unsafe static byte* CopyToNetOrder(this ulong value, byte* p) {
-            return CopyToNetOrder(unchecked((long)value), p);
-        }
-
-        /// <summary>
-        /// 値をビッグエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="p">書き出し位置</param>
-        /// <returns>次の書き出し位置</returns>
-        public unsafe static byte* CopyToNetOrder(this double value, byte* p) {
-            var n = BitConverter.DoubleToInt64Bits(value);
-            return CopyToNetOrder(n, p);
-        }
-
-        /*
-         *
-         */
-
-        /// <summary>
-        /// 値をネットワークエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="buffer">書き出しバッファ</param>
-        /// <param name="index">書き出しバッファ位置</param>
-        public static void CopyToNetOrder(this short value, byte[] buffer, int index) {
-            unsafe { fixed (byte* fix = &buffer[index]) CopyToNetOrder(value, fix); }
-        }
-
-        /// <summary>
-        /// 値をネットワークエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="buffer">書き出しバッファ</param>
-        /// <param name="index">書き出しバッファ位置</param>
-        public static void CopyToNetOrder(this int value, byte[] buffer, int index) {
-            unsafe { fixed (byte* fix = &buffer[index]) CopyToNetOrder(value, fix); }
-        }
-
-        /// <summary>
-        /// 値をネットワークエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="buffer">書き出しバッファ</param>
-        /// <param name="index">書き出しバッファ位置</param>
-        public static void CopyToNetOrder(this long value, byte[] buffer, int index) {
-            unsafe { fixed (byte* fix = &buffer[index]) CopyToNetOrder(value, fix); }
-        }
-
-        /// <summary>
-        /// 値をネットワークエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="buffer">書き出しバッファ</param>
-        /// <param name="index">書き出しバッファ位置</param>
-        public static void CopyToNetOrder(this ushort value, byte[] buffer, int index) {
-            unsafe { fixed (byte* fix = &buffer[index]) CopyToNetOrder(value, fix); }
-        }
-
-        /// <summary>
-        /// 値をネットワークエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="buffer">書き出しバッファ</param>
-        /// <param name="index">書き出しバッファ位置</param>
-        public static void CopyToNetOrder(this uint value, byte[] buffer, int index) {
-            unsafe { fixed (byte* fix = &buffer[index]) CopyToNetOrder(value, fix); }
-        }
-
-        /// <summary>
-        /// 値をネットワークエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="buffer">書き出しバッファ</param>
-        /// <param name="index">書き出しバッファ位置</param>
-        public static void CopyToNetOrder(this ulong value, byte[] buffer, int index) {
-            unsafe { fixed (byte* fix = &buffer[index]) CopyToNetOrder(value, fix); }
-        }
-
-        /// <summary>
-        /// 値をネットワークエンディアン順で書き出す
-        /// </summary>
-        /// <param name="value">値</param>
-        /// <param name="buffer">書き出しバッファ</param>
-        /// <param name="index">書き出しバッファ位置</param>
-        public static void CopyToNetOrder(this double value, byte[] buffer, int index) {
-            var n = BitConverter.DoubleToInt64Bits(value);
-            unsafe { fixed (byte* fix = &buffer[index]) CopyToNetOrder(n, fix); }
-        }
     }
 }
