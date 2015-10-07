@@ -12,6 +12,7 @@ using System.Threading;
  */
 
 namespace ThunderEgg.BrownSugar.Net {
+    using Byte;
 
     public static class NetOrder {
 
@@ -131,62 +132,64 @@ namespace ThunderEgg.BrownSugar.Net {
          *
          */
 
+        [Obsolete("Recommend bytes[N]=unchecked((byte)val);")]
         public static void Assign(byte[] bytes, int index, sbyte val) {
-            ByteOrder.AssignBig(bytes, index, val);
+            BigEndian.Assign(bytes, index, val);
         }
 
         public static void Assign(byte[] bytes, int index, short val) {
-            ByteOrder.AssignBig(bytes, index, val);
+            BigEndian.Assign(bytes, index, val);
         }
 
         public static void Assign(byte[] bytes, int index, int val) {
-            ByteOrder.AssignBig(bytes, index, val);
+            BigEndian.Assign(bytes, index, val);
         }
 
         public static void Assign(byte[] bytes, int index, long val) {
-            ByteOrder.AssignBig(bytes, index, val);
+            BigEndian.Assign(bytes, index, val);
         }
 
+        [Obsolete("Recommend bytes[N]=val;")]
         public static void Assign(byte[] bytes, int index, byte val) {
-            ByteOrder.AssignBig(bytes, index, val);
+            BigEndian.Assign(bytes, index, val);
         }
 
         public static void Assign(byte[] bytes, int index, ushort val) {
-            ByteOrder.AssignBig(bytes, index, val);
+            BigEndian.Assign(bytes, index, val);
         }
 
         public static void Assign(byte[] bytes, int index, uint val) {
-            ByteOrder.AssignBig(bytes, index, val);
+            BigEndian.Assign(bytes, index, val);
         }
 
         public static void Assign(byte[] bytes, int index, ulong val) {
-            ByteOrder.AssignBig(bytes, index, val);
+            BigEndian.Assign(bytes, index, val);
         }
         //
         //
         //
 
         public static short ToInt16(byte[] bytes, int index) {
-            return ByteOrder.ToInt16Big(bytes, index);
+            return BigEndian.ToInt16(bytes, index);
         }
 
         public static int ToInt32(byte[] bytes, int index) {
-            return ByteOrder.ToInt32Big(bytes, index);
+            return BigEndian.ToInt32(bytes, index);
         }
         public static long ToInt64(byte[] bytes, int index) {
-            return ByteOrder.ToInt64Big(bytes, index);
+            return BigEndian.ToInt64(bytes, index);
         }
 
         public static ushort ToUInt16(byte[] bytes, int index) {
-            return ByteOrder.ToUInt16Big(bytes, index);
+            return BigEndian.ToUInt16(bytes, index);
         }
 
         public static ulong ToUInt32(byte[] bytes, int index) {
-            return ByteOrder.ToUInt32Big(bytes, index);
+            return BigEndian.ToUInt32(bytes, index);
         }
 
         public static ulong ToUInt64(byte[] bytes, int index) {
-            return ByteOrder.ToUInt64Big(bytes, index);
+            return BigEndian.ToUInt64(bytes, index);
         }
 
     }
