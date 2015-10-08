@@ -36,8 +36,8 @@ namespace ThunderEgg.BrownSugar.Byte {
 
         public static ushort SwapByteOrder(this ushort value) {
             return unchecked((ushort)( //
-                (value & (ushort)0xff00) >> 8 |
-                (value & (ushort)0x00ff) << 8));
+                (value & 0xff00) >> 8 |
+                (value & 0x00ff) << 8));
         }
 
         public static uint SwapByteOrder(this uint value) {
@@ -66,8 +66,8 @@ namespace ThunderEgg.BrownSugar.Byte {
 
         public static short SwapByteOrder(this short value) {
             return unchecked((short)( //
-                (unchecked((ushort)value) & (ushort)0xff00) >> 8 |
-                (unchecked((ushort)value) & (ushort)0x00ff) << 8));
+                (value & 0xff00) >> 8 |
+                (value & 0x00ff) << 8));
         }
 
         public static int SwapByteOrder(this int value) {
