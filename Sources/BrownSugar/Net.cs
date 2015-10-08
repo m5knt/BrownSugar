@@ -19,55 +19,55 @@ namespace ThunderEgg.BrownSugar.Net {
         /// <summary>
         /// ホストオーダー値からネットオーダー値にする
         /// </summary>
-        /// <param name="val">ホストオーダー値</param>
+        /// <param name="value">ホストオーダー値</param>
         /// <returns>ネットオーダー値</returns>
-        public static short ToNetOrder(this short val) {
-            return IPAddress.HostToNetworkOrder(val);
+        public static short ToNetOrder(this short value) {
+            return IPAddress.HostToNetworkOrder(value);
         }
 
         /// <summary>
         /// ホストオーダー値からネットオーダー値にする
         /// </summary>
-        /// <param name="val">ホストオーダー値</param>
+        /// <param name="value">ホストオーダー値</param>
         /// <returns>ネットオーダー値</returns>
-        public static int ToNetOrder(this int val) {
-            return IPAddress.HostToNetworkOrder(val);
+        public static int ToNetOrder(this int value) {
+            return IPAddress.HostToNetworkOrder(value);
         }
 
         /// <summary>
         /// ホストオーダー値からネットオーダー値にする
         /// </summary>
-        /// <param name="val">ホストオーダー値</param>
+        /// <param name="value">ホストオーダー値</param>
         /// <returns>ネットオーダー値</returns>
-        public static long ToNetOrder(this long val) {
-            return IPAddress.HostToNetworkOrder(val);
+        public static long ToNetOrder(this long value) {
+            return IPAddress.HostToNetworkOrder(value);
         }
 
         /// <summary>
         /// ホストオーダー値からネットオーダー値にする
         /// </summary>
-        /// <param name="val">ホストオーダー値</param>
+        /// <param name="value">ホストオーダー値</param>
         /// <returns>ネットオーダー値</returns>
-        public static ushort ToNetOrder(this ushort val) {
-            return unchecked((ushort)(IPAddress.HostToNetworkOrder(unchecked((short)val))));
+        public static ushort ToNetOrder(this ushort value) {
+            return unchecked((ushort)(IPAddress.HostToNetworkOrder(unchecked((short)value))));
         }
 
         /// <summary>
         /// ホストオーダー値からネットオーダー値にする
         /// </summary>
-        /// <param name="val">ホストオーダー値</param>
+        /// <param name="value">ホストオーダー値</param>
         /// <returns>ネットオーダー値</returns>
-        public static uint ToNetOrder(this uint val) {
-            return unchecked((uint)(IPAddress.HostToNetworkOrder(unchecked((int)val))));
+        public static uint ToNetOrder(this uint value) {
+            return unchecked((uint)(IPAddress.HostToNetworkOrder(unchecked((int)value))));
         }
 
         /// <summary>
         /// ホストオーダー値からネットオーダー値にする
         /// </summary>
-        /// <param name="val">ホストオーダー値</param>
+        /// <param name="value">ホストオーダー値</param>
         /// <returns>ネットオーダー値</returns>
-        public static ulong ToNetOrder(this ulong val) {
-            return unchecked((ulong)(IPAddress.HostToNetworkOrder(unchecked((long)val))));
+        public static ulong ToNetOrder(this ulong value) {
+            return unchecked((ulong)(IPAddress.HostToNetworkOrder(unchecked((long)value))));
         }
 
         /*
@@ -77,55 +77,55 @@ namespace ThunderEgg.BrownSugar.Net {
         /// <summary>
         /// ネットオーダー値からホストオーダー値にする
         /// </summary>
-        /// <param name="val">ネットオーダー値</param>
+        /// <param name="value">ネットオーダー値</param>
         /// <returns>ホストオーダー値</returns>
-        public static short ToHostOrder(this short val) {
-            return IPAddress.NetworkToHostOrder(val);
+        public static short ToHostOrder(this short value) {
+            return IPAddress.NetworkToHostOrder(value);
         }
 
         /// <summary>
         /// ネットオーダー値からホストオーダー値にする
         /// </summary>
-        /// <param name="val">ネットオーダー値</param>
+        /// <param name="value">ネットオーダー値</param>
         /// <returns>ホストオーダー値</returns>
-        public static int ToHostOrder(this int val) {
-            return IPAddress.NetworkToHostOrder(val);
+        public static int ToHostOrder(this int value) {
+            return IPAddress.NetworkToHostOrder(value);
         }
 
         /// <summary>
         /// ネットオーダー値からホストオーダー値にする
         /// </summary>
-        /// <param name="val">ネットオーダー値</param>
+        /// <param name="value">ネットオーダー値</param>
         /// <returns>ホストオーダー値</returns>
-        public static long ToHostOrder(this long val) {
-            return IPAddress.NetworkToHostOrder(val);
+        public static long ToHostOrder(this long value) {
+            return IPAddress.NetworkToHostOrder(value);
         }
 
         /// <summary>
         /// ネットオーダー値からホストオーダー値にする
         /// </summary>
-        /// <param name="val">ネットオーダー値</param>
+        /// <param name="value">ネットオーダー値</param>
         /// <returns>ホストオーダー値</returns>
-        public static ushort ToHostOrder(this ushort val) {
-            return unchecked((ushort)(IPAddress.NetworkToHostOrder(unchecked((short)val))));
+        public static ushort ToHostOrder(this ushort value) {
+            return unchecked((ushort)(IPAddress.NetworkToHostOrder(unchecked((short)value))));
         }
 
         /// <summary>
         /// ネットオーダー値からホストオーダー値にする
         /// </summary>
-        /// <param name="val">ネットオーダー値</param>
+        /// <param name="value">ネットオーダー値</param>
         /// <returns>ホストオーダー値</returns>
-        public static uint ToHostOrder(this uint val) {
-            return unchecked((uint)(IPAddress.NetworkToHostOrder(unchecked((int)val))));
+        public static uint ToHostOrder(this uint value) {
+            return unchecked((uint)(IPAddress.NetworkToHostOrder(unchecked((int)value))));
         }
 
         /// <summary>
         /// ネットオーダー値からホストオーダー値にする
         /// </summary>
-        /// <param name="val">ネットオーダー値</param>
+        /// <param name="value">ネットオーダー値</param>
         /// <returns>ホストオーダー値</returns>
-        public static ulong ToHostOrder(this ulong val) {
-            return unchecked((ulong)(IPAddress.NetworkToHostOrder(unchecked((long)val))));
+        public static ulong ToHostOrder(this ulong value) {
+            return unchecked((ulong)(IPAddress.NetworkToHostOrder(unchecked((long)value))));
         }
 
         /*
@@ -133,37 +133,37 @@ namespace ThunderEgg.BrownSugar.Net {
          */
 
         [Obsolete("Recommend bytes[N]=unchecked((byte)val);")]
-        public static void Assign(byte[] bytes, int index, sbyte val) {
-            BigEndian.Assign(bytes, index, val);
+        public static void Assign(byte[] bytes, int index, sbyte value) {
+            BigEndian.Assign(bytes, index, value);
         }
 
-        public static void Assign(byte[] bytes, int index, short val) {
-            BigEndian.Assign(bytes, index, val);
+        public static void Assign(byte[] bytes, int index, short value) {
+            BigEndian.Assign(bytes, index, value);
         }
 
-        public static void Assign(byte[] bytes, int index, int val) {
-            BigEndian.Assign(bytes, index, val);
+        public static void Assign(byte[] bytes, int index, int value) {
+            BigEndian.Assign(bytes, index, value);
         }
 
-        public static void Assign(byte[] bytes, int index, long val) {
-            BigEndian.Assign(bytes, index, val);
+        public static void Assign(byte[] bytes, int index, long value) {
+            BigEndian.Assign(bytes, index, value);
         }
 
         [Obsolete("Recommend bytes[N]=val;")]
-        public static void Assign(byte[] bytes, int index, byte val) {
-            BigEndian.Assign(bytes, index, val);
+        public static void Assign(byte[] bytes, int index, byte value) {
+            BigEndian.Assign(bytes, index, value);
         }
 
-        public static void Assign(byte[] bytes, int index, ushort val) {
-            BigEndian.Assign(bytes, index, val);
+        public static void Assign(byte[] bytes, int index, ushort value) {
+            BigEndian.Assign(bytes, index, value);
         }
 
-        public static void Assign(byte[] bytes, int index, uint val) {
-            BigEndian.Assign(bytes, index, val);
+        public static void Assign(byte[] bytes, int index, uint value) {
+            BigEndian.Assign(bytes, index, value);
         }
 
-        public static void Assign(byte[] bytes, int index, ulong val) {
-            BigEndian.Assign(bytes, index, val);
+        public static void Assign(byte[] bytes, int index, ulong value) {
+            BigEndian.Assign(bytes, index, value);
         }
         //
         //
