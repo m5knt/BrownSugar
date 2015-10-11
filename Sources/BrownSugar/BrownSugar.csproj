@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{8AF748ED-157E-4434-8A24-59DF1D073AF0}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BrownSugar</RootNamespace>
     <AssemblyName>BrownSugar</AssemblyName>
@@ -59,13 +59,17 @@
     <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Float.cs" />
-    <Compile Include="Long.cs" />
-    <Compile Include="Double.cs" />
+    <Compile Include="Byte\BigEndian.cs" />
+    <Compile Include="Byte\LittleEndian.cs" />
+    <Compile Include="Byte\Swap.cs" />
+    <Compile Include="Byte\Cast.cs" />
+    <Compile Include="Char\Char.cs" />
+    <Compile Include="Collection\Dictionary.cs" />
+    <Compile Include="Math\Math.cs" />
+    <Compile Include="BrownSugar.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="Net.cs" />
-    <Compile Include="Byte.cs" />
-    <Compile Include="Dictionary.cs" />
+    <Compile Include="Byte\Byte.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
