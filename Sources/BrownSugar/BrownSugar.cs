@@ -15,10 +15,9 @@ using System.Net;
 /// </summary>
 namespace ThunderEgg.BrownSugar {
 
-    /// <summary>
-    /// 拡張メソッドによるシュガー
-    /// </summary>
-    public static partial class Sugar {
+    public static class Always {
+        public static bool True { get { return true; } }
+        public static bool False { get { return false; } }
     }
 
     //

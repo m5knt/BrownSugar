@@ -100,8 +100,16 @@ namespace Test {
             var buffer = new byte[] { 0x88, 0x99 };
             var std = Bench(5, (n) => {
                 BitConverter.ToInt16(buffer, 0);
+                BitConverter.ToInt16(buffer, 0);
+                BitConverter.ToInt16(buffer, 0);
+                BitConverter.ToInt16(buffer, 0);
+                BitConverter.ToInt16(buffer, 0);
             });
             var alt = Bench(5, (n) => {
+                LittleEndian.ToInt16(buffer, 0);
+                LittleEndian.ToInt16(buffer, 0);
+                LittleEndian.ToInt16(buffer, 0);
+                LittleEndian.ToInt16(buffer, 0);
                 LittleEndian.ToInt16(buffer, 0);
             });
             Assert.IsTrue(alt >= std);
@@ -112,8 +120,16 @@ namespace Test {
             var buffer = new byte[] { 0x88, 0x99, 0xaa, 0xbb };
             var std = Bench(5, (n) => {
                 BitConverter.ToInt32(buffer, 0);
+                BitConverter.ToInt32(buffer, 0);
+                BitConverter.ToInt32(buffer, 0);
+                BitConverter.ToInt32(buffer, 0);
+                BitConverter.ToInt32(buffer, 0);
             });
             var alt = Bench(5, (n) => {
+                LittleEndian.ToInt32(buffer, 0);
+                LittleEndian.ToInt32(buffer, 0);
+                LittleEndian.ToInt32(buffer, 0);
+                LittleEndian.ToInt32(buffer, 0);
                 LittleEndian.ToInt32(buffer, 0);
             });
             Assert.IsTrue(alt >= std);
@@ -121,40 +137,40 @@ namespace Test {
 
         [TestMethod]
         public void PerfLittleEndianLong() {
-            var buffer = new byte[] { 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-            {
+            var buffer = new byte[] { 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x11 };
+            if (Always.False) {
                 long t = 0;
                 var std = Bench(10, (n) => {
-                    t = BitConverter.ToInt64(buffer, 0);
-                    t = BitConverter.ToInt64(buffer, 0);
-                    t = BitConverter.ToInt64(buffer, 0);
-                    t = BitConverter.ToInt64(buffer, 0);
-                    t = BitConverter.ToInt64(buffer, 0);
+                    t = BitConverter.ToInt64(buffer, 1);
+                    t = BitConverter.ToInt64(buffer, 1);
+                    t = BitConverter.ToInt64(buffer, 1);
+                    t = BitConverter.ToInt64(buffer, 1);
+                    t = BitConverter.ToInt64(buffer, 1);
                 });
                 var alt = Bench(10, (n) => {
-                    t = LittleEndian.ToInt64(buffer, 0);
-                    t = LittleEndian.ToInt64(buffer, 0);
-                    t = LittleEndian.ToInt64(buffer, 0);
-                    t = LittleEndian.ToInt64(buffer, 0);
-                    t = LittleEndian.ToInt64(buffer, 0);
+                    t = LittleEndian.ToInt64(buffer, 1);
+                    t = LittleEndian.ToInt64(buffer, 1);
+                    t = LittleEndian.ToInt64(buffer, 1);
+                    t = LittleEndian.ToInt64(buffer, 1);
+                    t = LittleEndian.ToInt64(buffer, 1);
                 });
                 Assert.IsTrue(alt >= std); 
             }
             {
                 ulong t = 0;
-                var std = Bench(10, (n) => {
-                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 0));
-                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 0));
-                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 0));
-                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 0));
-                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 0));
+                var std = Bench(5, (n) => {
+                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
+                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
+                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
+                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
+                    t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
                 });
-                var alt = Bench(10, (n) => {
-                    t = LittleEndian.ToUInt64(buffer, 0);
-                    t = LittleEndian.ToUInt64(buffer, 0);
-                    t = LittleEndian.ToUInt64(buffer, 0);
-                    t = LittleEndian.ToUInt64(buffer, 0);
-                    t = LittleEndian.ToUInt64(buffer, 0);
+                var alt = Bench(5, (n) => {
+                    t = LittleEndian.ToUInt64(buffer, 1);
+                    t = LittleEndian.ToUInt64(buffer, 1);
+                    t = LittleEndian.ToUInt64(buffer, 1);
+                    t = LittleEndian.ToUInt64(buffer, 1);
+                    t = LittleEndian.ToUInt64(buffer, 1);
                 });
                 Assert.IsTrue(alt >= std);
             }
@@ -165,8 +181,16 @@ namespace Test {
             var buffer = new byte[] { 0x88, 0x99 };
             var std = Bench(5, (n) => {
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
             });
             var alt = Bench(5, (n) => {
+                BigEndian.ToInt16(buffer, 0);
+                BigEndian.ToInt16(buffer, 0);
+                BigEndian.ToInt16(buffer, 0);
+                BigEndian.ToInt16(buffer, 0);
                 BigEndian.ToInt16(buffer, 0);
             });
             Assert.IsTrue(alt >= std);
@@ -177,8 +201,16 @@ namespace Test {
             var buffer = new byte[] { 0x88, 0x99, 0xaa, 0xbb };
             var std = Bench(5, (n) => {
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
             });
             var alt = Bench(5, (n) => {
+                BigEndian.ToInt32(buffer, 0);
+                BigEndian.ToInt32(buffer, 0);
+                BigEndian.ToInt32(buffer, 0);
+                BigEndian.ToInt32(buffer, 0);
                 BigEndian.ToInt32(buffer, 0);
             });
             Assert.IsTrue(alt >= std);
@@ -189,8 +221,16 @@ namespace Test {
             var buffer = new byte[] { 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
             var std = Bench(5, (n) => {
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
+                IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
             });
             var alt = Bench(5, (n) => {
+                BigEndian.ToInt64(buffer, 0);
+                BigEndian.ToInt64(buffer, 0);
+                BigEndian.ToInt64(buffer, 0);
+                BigEndian.ToInt64(buffer, 0);
                 BigEndian.ToInt64(buffer, 0);
             });
             Assert.IsTrue(alt >= std);
