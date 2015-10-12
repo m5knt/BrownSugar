@@ -11,15 +11,13 @@ using System;
 
 namespace ThunderEgg.BrownSugar {
 
-    public static class LittleEndianSugar {
-    }
-
     /// <summary>
     /// リトルエンディアン順でバッファを操作します
     /// </summary>
     public static class LittleEndian {
 
-        public unsafe delegate byte* CallBack(byte* pointer);
+        /// <summary>ポインタを利用したバッファ操作を行うためのコールバック</summary>
+        public unsafe delegate void CallBack(byte* pointer);
 
         /// <summary>連続してリトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, CallBack callback) {
@@ -35,30 +33,27 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe byte* Assign(byte* pointer, byte value) {
-            *pointer++ = unchecked((byte)(value >> 0));
-            return pointer;
+        public static unsafe void Assign(byte* pointer, byte value) {
+            pointer[0] = value;
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe byte* Assign(byte* pointer, ushort value) {
-            pointer[0] = unchecked((byte)(value >> 0));
+        public static unsafe void Assign(byte* pointer, ushort value) {
+            pointer[0] = unchecked((byte)value);
             pointer[1] = unchecked((byte)(value >> 8));
-            return pointer + 2;
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe byte* Assign(byte* pointer, uint value) {
-            pointer[0] = unchecked((byte)(value >> 0));
+        public static unsafe void Assign(byte* pointer, uint value) {
+            pointer[0] = unchecked((byte)value);
             pointer[1] = unchecked((byte)(value >> 8));
             pointer[2] = unchecked((byte)(value >> 16));
             pointer[3] = unchecked((byte)(value >> 24));
-            return pointer + 4;
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe byte* Assign(byte* pointer, ulong value) {
-            pointer[0] = unchecked((byte)(value >> 0));
+        public static unsafe void Assign(byte* pointer, ulong value) {
+            pointer[0] = unchecked((byte)value);
             pointer[1] = unchecked((byte)(value >> 8));
             pointer[2] = unchecked((byte)(value >> 16));
             pointer[3] = unchecked((byte)(value >> 24));
@@ -66,34 +61,30 @@ namespace ThunderEgg.BrownSugar {
             pointer[5] = unchecked((byte)(value >> 40));
             pointer[6] = unchecked((byte)(value >> 48));
             pointer[7] = unchecked((byte)(value >> 56));
-            return pointer + 8;
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe byte* Assign(byte* pointer, sbyte value) {
-            *pointer++ = unchecked((byte)(value >> 0));
-            return pointer;
+        public static unsafe void Assign(byte* pointer, sbyte value) {
+            pointer[0] = unchecked((byte)value);
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe byte* Assign(byte* pointer, short value) {
-            pointer[0] = unchecked((byte)(value >> 0));
+        public static unsafe void Assign(byte* pointer, short value) {
+            pointer[0] = unchecked((byte)value);
             pointer[1] = unchecked((byte)(value >> 8));
-            return pointer + 2;
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe byte* Assign(byte* pointer, int value) {
-            pointer[0] = unchecked((byte)(value >> 0));
+        public static unsafe void Assign(byte* pointer, int value) {
+            pointer[0] = unchecked((byte)value);
             pointer[1] = unchecked((byte)(value >> 8));
             pointer[2] = unchecked((byte)(value >> 16));
             pointer[3] = unchecked((byte)(value >> 24));
-            return pointer + 4;
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe byte* Assign(byte* pointer, long value) {
-            pointer[0] = unchecked((byte)(value >> 0));
+        public static unsafe void Assign(byte* pointer, long value) {
+            pointer[0] = unchecked((byte)value);
             pointer[1] = unchecked((byte)(value >> 8));
             pointer[2] = unchecked((byte)(value >> 16));
             pointer[3] = unchecked((byte)(value >> 24));
@@ -101,13 +92,19 @@ namespace ThunderEgg.BrownSugar {
             pointer[5] = unchecked((byte)(value >> 40));
             pointer[6] = unchecked((byte)(value >> 48));
             pointer[7] = unchecked((byte)(value >> 56));
-            return pointer + 8;
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe byte* Assign(byte* pointer, double value) {
-            var n = BitConverter.DoubleToInt64Bits(value);
-            return Assign(pointer, n);
+        public static unsafe void Assign(byte* pointer, double value) {
+            var t = BitConverter.DoubleToInt64Bits(value);
+            pointer[0] = unchecked((byte)t);
+            pointer[1] = unchecked((byte)(t >> 8));
+            pointer[2] = unchecked((byte)(t >> 16));
+            pointer[3] = unchecked((byte)(t >> 24));
+            pointer[4] = unchecked((byte)(t >> 32));
+            pointer[5] = unchecked((byte)(t >> 40));
+            pointer[6] = unchecked((byte)(t >> 48));
+            pointer[7] = unchecked((byte)(t >> 56));
         }
 
         //
@@ -115,20 +112,19 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        [Obsolete("速度がほしいときは右記がお勧め : buffer[index]=unchecked((byte)value);")]
         public static void Assign(byte[] buffer, int index, byte value) {
-            buffer[index + 0] = unchecked((byte)(value >> 0));
+            buffer[index] = value;
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, ushort value) {
-            buffer[index + 0] = unchecked((byte)(value >> 0));
+            buffer[index] = unchecked((byte)value);
             buffer[index + 1] = unchecked((byte)(value >> 8));
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, uint value) {
-            buffer[index + 0] = unchecked((byte)(value >> 0));
+            buffer[index] = unchecked((byte)value);
             buffer[index + 1] = unchecked((byte)(value >> 8));
             buffer[index + 2] = unchecked((byte)(value >> 16));
             buffer[index + 3] = unchecked((byte)(value >> 24));
@@ -136,7 +132,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, ulong value) {
-            buffer[index + 0] = unchecked((byte)(value >> 0));
+            buffer[index] = unchecked((byte)value);
             buffer[index + 1] = unchecked((byte)(value >> 8));
             buffer[index + 2] = unchecked((byte)(value >> 16));
             buffer[index + 3] = unchecked((byte)(value >> 24));
@@ -148,18 +144,18 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, sbyte value) {
-            buffer[index + 0] = unchecked((byte)value);
+            buffer[index] = unchecked((byte)value);
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, short value) {
-            buffer[index + 0] = unchecked((byte)(value >> 0));
+            buffer[index] = unchecked((byte)value);
             buffer[index + 1] = unchecked((byte)(value >> 8));
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, int value) {
-            buffer[index + 0] = unchecked((byte)(value >> 0));
+            buffer[index] = unchecked((byte)value);
             buffer[index + 1] = unchecked((byte)(value >> 8));
             buffer[index + 2] = unchecked((byte)(value >> 16));
             buffer[index + 3] = unchecked((byte)(value >> 24));
@@ -167,7 +163,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, long value) {
-            buffer[index + 0] = unchecked((byte)(value >> 0));
+            buffer[index] = unchecked((byte)value);
             buffer[index + 1] = unchecked((byte)(value >> 8));
             buffer[index + 2] = unchecked((byte)(value >> 16));
             buffer[index + 3] = unchecked((byte)(value >> 24));
@@ -180,7 +176,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, double value) {
             var tmp = BitConverter.DoubleToInt64Bits(value);
-            buffer[index + 0] = unchecked((byte)(tmp >> 0));
+            buffer[index] = unchecked((byte)tmp);
             buffer[index + 1] = unchecked((byte)(tmp >> 8));
             buffer[index + 2] = unchecked((byte)(tmp >> 16));
             buffer[index + 3] = unchecked((byte)(tmp >> 24));
@@ -196,31 +192,31 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static byte ToUInt8(byte[] buffer, int index) {
-            return buffer[index + 0];
+            return buffer[index];
         }
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static ushort ToUInt16(byte[] buffer, int index) {
             return unchecked((ushort)(
-                buffer[index + 0] << 0 |
+                buffer[index] |
                 buffer[index + 1] << 8
                 ));
         }
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static uint ToUInt32(byte[] buffer, int index) {
-            return unchecked((uint)(
-                (uint)buffer[index + 0] << 0 |
+            return (
+                buffer[index] |
                 (uint)buffer[index + 1] << 8 |
                 (uint)buffer[index + 2] << 16 |
                 (uint)buffer[index + 3] << 24
-                ));
+                );
         }
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static ulong ToUInt64(byte[] buffer, int index) {
-            return unchecked((ulong)(
-                (ulong)buffer[index + 0] << 0 |
+            return (
+                buffer[index] |
                 (ulong)buffer[index + 1] << 8 |
                 (ulong)buffer[index + 2] << 16 |
                 (ulong)buffer[index + 3] << 24 |
@@ -228,7 +224,7 @@ namespace ThunderEgg.BrownSugar {
                 (ulong)buffer[index + 5] << 40 |
                 (ulong)buffer[index + 6] << 48 |
                 (ulong)buffer[index + 7] << 56
-                ));
+                );
         }
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
@@ -239,7 +235,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static short ToInt16(byte[] buffer, int index) {
             return unchecked((short)(
-                buffer[index + 0] << 0 |
+                buffer[index] |
                 buffer[index + 1] << 8
                 ));
         }
@@ -247,7 +243,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static int ToInt32(byte[] buffer, int index) {
             return unchecked((int)(
-                (uint)buffer[index + 0] << 0 |
+                buffer[index] |
                 (uint)buffer[index + 1] << 8 |
                 (uint)buffer[index + 2] << 16 |
                 (uint)buffer[index + 3] << 24
@@ -257,7 +253,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static long ToInt64(byte[] buffer, int index) {
             return unchecked((long)(
-                (ulong)buffer[index + 0] << 0 |
+                buffer[index] |
                 (ulong)buffer[index + 1] << 8 |
                 (ulong)buffer[index + 2] << 16 |
                 (ulong)buffer[index + 3] << 24 |
@@ -270,8 +266,9 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static double ToDouble(byte[] buffer, int index) {
-            return BitConverter.Int64BitsToDouble(unchecked((long)(
-                (ulong)buffer[index + 0] << 0 |
+            return BitConverter.Int64BitsToDouble(
+                unchecked((long)(
+                buffer[index] |
                 (ulong)buffer[index + 1] << 8 |
                 (ulong)buffer[index + 2] << 16 |
                 (ulong)buffer[index + 3] << 24 |

@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 
 namespace ThunderEgg.BrownSugar {
 
-    public static partial class Sugar {
+    public static class SugarByte {
 
         /// <summary>倍精度値をビットイメージとして収納します</summary>
         public static long DoubleToInt64Bits(this double value) {

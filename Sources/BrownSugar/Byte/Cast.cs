@@ -5,7 +5,7 @@
 
 namespace ThunderEgg.BrownSugar {
 
-    public static class CastSugar {
+    public static class SugarCast {
 
         // 同じ型なので不要
         // public static byte CastUInt8(this byte value) { return unchecked((byte)value); }
@@ -87,13 +87,9 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>アンセーフキャストをした値を返します</summary>
         public static ulong CastUInt64(this long value) { return unchecked((ulong)value); }
 
-    }
-
-    //
-    //
-    //
-
-    public static partial class Sugar {
+        //
+        //
+        //
 
         /// <summary>アンセーフキャストをした値を返します</summary>
         public static sbyte CastInt8(this byte value) { return unchecked((sbyte)value); }
