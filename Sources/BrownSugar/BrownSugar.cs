@@ -11,7 +11,7 @@ using System.Net;
  */
 
 /// <summary>
-/// バイト・ビットに関係するシンタックスシュガーを纏めています
+/// シュガーを纏めています
 /// </summary>
 namespace ThunderEgg.BrownSugar {
 
@@ -19,6 +19,41 @@ namespace ThunderEgg.BrownSugar {
     /// 拡張メソッドによるシュガー
     /// </summary>
     public static partial class Sugar {
+    }
+
+    //
+    //
+    //
+
+    public class BrownSugar {
+
+        public long Bench(int limit, Action<long> action) {
+            var now = DateTime.Now;
+            var count = 0L;
+            while ((DateTime.Now - now).TotalSeconds < limit) {
+                action(count);
+                ++count;
+            }
+            Console.WriteLine(action.Method.DeclaringType.ToString() + ":" + count.ToString());
+            return count;
+        }
+
+        public static void Main() {
+            Console.WriteLine(sizeof(bool));
+            var self = new BrownSugar();
+            var buffer = new byte[256];
+            var array = self.Bench(10, (i) => {
+                NetOrder.Assign(buffer, 0, i.CastUInt32());
+            });
+            unsafe {
+                fixed (byte* p = buffer) {
+                    var pp = p;
+                    var ptr = self.Bench(10, (i) => {
+                        NetOrder.Assign(pp, i.CastUInt32());
+                    });
+                }
+            }
+        }
     }
 }
 

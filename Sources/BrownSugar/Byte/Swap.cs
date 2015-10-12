@@ -3,10 +3,6 @@
  * @brief バイト・ビットに関係するシンタックスシュガーを纏めています
  */
 
-using System;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-
 /*
  *
  */

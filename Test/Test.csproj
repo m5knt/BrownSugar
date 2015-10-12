@@ -52,6 +52,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Bench.cs" />
+    <Compile Include="TestCast.cs" />
+    <Compile Include="TestByteSwap.cs" />
     <Compile Include="TestByte.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

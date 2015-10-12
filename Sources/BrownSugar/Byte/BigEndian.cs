@@ -15,94 +15,98 @@ namespace ThunderEgg.BrownSugar {
     public class NetOrder : BigEndian {
     }
 
-    /// <summary>ビッグエンディアン順でバッファ操作をします</summary>
+    /// <summary>
+    /// ビッグエンディアン順でバッファ操作をします
+    /// 配列版よりポインタ版の方が速度は速く
+    /// もちろんBitConverter.GetBytesで何かするより速いです
+    /// 1バイトアクセス系は遅いです
+    /// </summary>
     public class BigEndian {
 
-        /// <summary>ポインタを利用したバッファ操作を行うためのコールバック</summary>
-        public unsafe delegate void CallBack(byte* pointer);
-
-        /// <summary>連続してビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, CallBack callback) {
-            callback(buffer);
-        }
-
-        /// <summary>連続してビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte[] buffer, int index, CallBack callback) {
-            fixed (byte* fix = buffer)
-            {
-                callback(fix + index);
-            }
-        }
-
-        //
-        //
-        //
-
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* pointer, byte value) {
-            pointer[0] = value;
+        public static unsafe void Assign(byte* buffer, byte value) {
+            buffer[0] = value;
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* pointer, ushort value) {
-            pointer[0] = unchecked((byte)(value >> 8));
-            pointer[1] = unchecked((byte)value);
+        public static unsafe void Assign(byte* buffer, ushort value) {
+            buffer[0] = unchecked((byte)(value >> 8));
+            buffer[1] = unchecked((byte)value);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* pointer, uint value) {
-            pointer[0] = unchecked((byte)(value >> 24));
-            pointer[1] = unchecked((byte)(value >> 16));
-            pointer[2] = unchecked((byte)(value >> 8));
-            pointer[3] = unchecked((byte)value);
+        public static unsafe void Assign(byte* buffer, uint value) {
+            buffer[0] = unchecked((byte)(value >> 24));
+            buffer[1] = unchecked((byte)(value >> 16));
+            buffer[2] = unchecked((byte)(value >> 8));
+            buffer[3] = unchecked((byte)value);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* pointer, ulong value) {
-            pointer[0] = unchecked((byte)(value >> 56));
-            pointer[1] = unchecked((byte)(value >> 48));
-            pointer[2] = unchecked((byte)(value >> 40));
-            pointer[3] = unchecked((byte)(value >> 32));
-            pointer[4] = unchecked((byte)(value >> 24));
-            pointer[5] = unchecked((byte)(value >> 16));
-            pointer[6] = unchecked((byte)(value >> 8));
-            pointer[7] = unchecked((byte)value);
+        public static unsafe void Assign(byte* buffer, ulong value) {
+            buffer[0] = unchecked((byte)(value >> 56));
+            buffer[1] = unchecked((byte)(value >> 48));
+            buffer[2] = unchecked((byte)(value >> 40));
+            buffer[3] = unchecked((byte)(value >> 32));
+            buffer[4] = unchecked((byte)(value >> 24));
+            buffer[5] = unchecked((byte)(value >> 16));
+            buffer[6] = unchecked((byte)(value >> 8));
+            buffer[7] = unchecked((byte)value);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* pointer, sbyte value) {
-            pointer[0] = unchecked((byte)value);
+        public static unsafe void Assign(byte* buffer, sbyte value) {
+            buffer[0] = unchecked((byte)value);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* pointer, short value) {
-            pointer[0] = unchecked((byte)(value >> 8));
-            pointer[1] = unchecked((byte)value);
+        public static unsafe void Assign(byte* buffer, short value) {
+            buffer[0] = unchecked((byte)(value >> 8));
+            buffer[1] = unchecked((byte)value);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* pointer, int value) {
-            pointer[0] = unchecked((byte)(value >> 24));
-            pointer[1] = unchecked((byte)(value >> 16));
-            pointer[2] = unchecked((byte)(value >> 8));
-            pointer[3] = unchecked((byte)value);
+        public static unsafe void Assign(byte* buffer, int value) {
+            buffer[0] = unchecked((byte)(value >> 24));
+            buffer[1] = unchecked((byte)(value >> 16));
+            buffer[2] = unchecked((byte)(value >> 8));
+            buffer[3] = unchecked((byte)value);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* pointer, long value) {
-            pointer[0] = unchecked((byte)(value >> 56));
-            pointer[1] = unchecked((byte)(value >> 48));
-            pointer[2] = unchecked((byte)(value >> 40));
-            pointer[3] = unchecked((byte)(value >> 32));
-            pointer[4] = unchecked((byte)(value >> 24));
-            pointer[5] = unchecked((byte)(value >> 16));
-            pointer[6] = unchecked((byte)(value >> 8));
-            pointer[7] = unchecked((byte)value);
+        public static unsafe void Assign(byte* buffer, long value) {
+            buffer[0] = unchecked((byte)(value >> 56));
+            buffer[1] = unchecked((byte)(value >> 48));
+            buffer[2] = unchecked((byte)(value >> 40));
+            buffer[3] = unchecked((byte)(value >> 32));
+            buffer[4] = unchecked((byte)(value >> 24));
+            buffer[5] = unchecked((byte)(value >> 16));
+            buffer[6] = unchecked((byte)(value >> 8));
+            buffer[7] = unchecked((byte)value);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* pointer, double value) {
-            Assign(pointer, BitConverter.DoubleToInt64Bits(value));
+        public static unsafe void Assign(byte* buffer, bool value) {
+            buffer[0] = value ? (byte)1 : (byte)0;
+        }
+
+        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
+        public static unsafe void Assign(byte* buffer, char value) {
+            buffer[0] = unchecked((byte)(value >> 8));
+            buffer[1] = unchecked((byte)value);
+        }
+
+        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
+        public static unsafe void Assign(byte* buffer, double value) {
+            var n = BitConverter.DoubleToInt64Bits(value);
+            buffer[0] = unchecked((byte)(n >> 56));
+            buffer[1] = unchecked((byte)(n >> 48));
+            buffer[2] = unchecked((byte)(n >> 40));
+            buffer[3] = unchecked((byte)(n >> 32));
+            buffer[4] = unchecked((byte)(n >> 24));
+            buffer[5] = unchecked((byte)(n >> 16));
+            buffer[6] = unchecked((byte)(n >> 8));
+            buffer[7] = unchecked((byte)n);
         }
 
         //
@@ -196,7 +200,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
         public static ushort ToUInt16(byte[] buffer, int index) {
             return unchecked((ushort)(
-                buffer[index + 0] << 8 |
+                buffer[index] << 8 |
                 buffer[index + 1]
                 ));
         }
@@ -204,7 +208,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
         public static uint ToUInt32(byte[] buffer, int index) {
             return (
-                (uint)buffer[index + 0] << 24 |
+                (uint)buffer[index] << 24 |
                 (uint)buffer[index + 1] << 16 |
                 (uint)buffer[index + 2] << 8 |
                 buffer[index + 3]
@@ -214,7 +218,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
         public static ulong ToUInt64(byte[] buffer, int index) {
             return (
-                (ulong)buffer[index + 0] << 56 |
+                (ulong)buffer[index] << 56 |
                 (ulong)buffer[index + 1] << 48 |
                 (ulong)buffer[index + 2] << 40 |
                 (ulong)buffer[index + 3] << 32 |
@@ -259,6 +263,19 @@ namespace ThunderEgg.BrownSugar {
                 (ulong)buffer[index + 5] << 16 |
                 (ulong)buffer[index + 6] << 8 |
                 buffer[index + 7]
+                ));
+        }
+
+        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
+        public static bool ToBool(byte[] buffer, int index) {
+            return buffer[index] != 0;
+        }
+
+        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
+        public static char ToChar(byte[] buffer, int index) {
+            return unchecked((char)(
+                buffer[index] << 8 |
+                buffer[index + 1]
                 ));
         }
 
