@@ -6,7 +6,7 @@
 
 namespace ThunderEgg.BrownSugar {
 
-    public static partial class Sugar {
+    public static class SugarMath {
 
         /// <summary>無限大であるかを返す</summary>
         public static bool IsInfinity(this float value) {　return float.IsInfinity(value);　}

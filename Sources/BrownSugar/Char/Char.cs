@@ -12,7 +12,7 @@ using System.Globalization;
 
 namespace ThunderEgg.BrownSugar {
 
-    public static partial class Sugar {
+    public static class SugarChar {
 
         public static double GetNumericValue(this char c) {
             return char.GetNumericValue(c);
