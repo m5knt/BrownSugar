@@ -265,14 +265,14 @@ namespace ThunderEgg.BrownSugar {
 
         public static long ToInt64(byte[] buffer, int index) {
             return (long)(
-                (
-                (buffer[index + 0] | (uint)buffer[index + 1] << 8) |
-                (buffer[index + 2] | (uint)buffer[index + 3] << 8) << 16
-                ) |
                 (ulong)(
-                (buffer[index + 4] | (uint)buffer[index + 5] << 8) |
-                (buffer[index + 6] | (uint)buffer[index + 7] << 8) << 16
-                ) << 32);
+                (buffer[index + 6] | (uint)buffer[index + 7] << 8) << 16 |
+                (buffer[index + 4] | (uint)buffer[index + 5] << 8)
+                ) << 32) |
+                (
+                (buffer[index + 2] | (uint)buffer[index + 3] << 8) << 16 |
+                (buffer[index + 0] | (uint)buffer[index + 1] << 8)
+                );
         }
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
