@@ -62,7 +62,6 @@
   <ItemGroup>
     <Compile Include="Byte\BigEndian.cs" />
     <Compile Include="Byte\LittleEndian.cs" />
-    <Compile Include="Byte\Swap.cs" />
     <Compile Include="Byte\Cast.cs" />
     <Compile Include="Char\Char.cs" />
     <Compile Include="Collection\Dictionary.cs" />

@@ -16,7 +16,9 @@ using System.Net;
 namespace ThunderEgg.BrownSugar {
 
     public static class Always {
+        /// <summary>常に真</summary>
         public static bool True { get { return true; } }
+        /// <summary>常に偽</summary>
         public static bool False { get { return false; } }
     }
 

@@ -10,6 +10,7 @@ namespace Test {
     [TestClass]
     public class TestByte {
 
+#if false
         public long Bench(int limit, Action<long> action) {
             var now = DateTime.Now;
             var count = 0L;
@@ -20,7 +21,7 @@ namespace Test {
             Console.WriteLine(action.Method.DeclaringType.ToString() + ":" + count.ToString());
             return count;
         }
-
+#endif
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public class Hoge {
             public int i;
@@ -34,18 +35,24 @@ namespace Test {
 
         [TestMethod]
         public unsafe void TestMisc() {
-            var src = new Hoge {
+            Assert.AreEqual(sizeof(decimal), 16);
+            var source = new Hoge {
                 i = unchecked((int)0x8899aabb),
                 s = unchecked((short)0x8899),
                 b = unchecked((sbyte)0x88),
             };
-            var dst = new byte[src.ByteSize()];
-            HostOrder.Assign(dst, 0, src);
+            var buffer = new byte[source.MarshalSize()];
+            ByteOrder.Assign(buffer, 0, source);
+            var extract = ByteOrder.To<Hoge>(buffer, 0);
+            source.SequenceEqual(extract);
+            Array
+#if false
             Assert.AreEqual(LittleEndian.ToUInt32(dst, 0), 0x8899aabb);
             Assert.AreEqual(LittleEndian.ToUInt16(dst, 4), 0x8899);
             Assert.AreEqual(LittleEndian.ToUInt8(dst, 5), 0x88);
             var restore = new Hoge();
             HostOrder.CopyTo(dst, 0, restore);
+#endif
 
             //            var n  = new Hoge().SizeOf();
             //            Console.WriteLine(n);
@@ -78,7 +85,8 @@ namespace Test {
                 Assert.AreEqual(ss.ToHostOrder(), unchecked((short)0x9988));
                 Assert.AreEqual(si.ToHostOrder(), unchecked((int)0xbbaa9988));
                 Assert.AreEqual(sl.ToHostOrder(), unchecked((long)0xffeeddccbbaa9988));
-            } else {
+            }
+            else {
                 Assert.AreEqual(us.ToNetOrder(), us);
                 Assert.AreEqual(ui.ToNetOrder(), ui);
                 Assert.AreEqual(ul.ToNetOrder(), ul);
@@ -98,14 +106,14 @@ namespace Test {
         [TestMethod]
         public void PerfLittleEndianShort() {
             var buffer = new byte[] { 0x88, 0x99 };
-            var std = Bench(5, (n) => {
+            var std = Bench.Run(5, (n) => {
                 BitConverter.ToInt16(buffer, 0);
                 BitConverter.ToInt16(buffer, 0);
                 BitConverter.ToInt16(buffer, 0);
                 BitConverter.ToInt16(buffer, 0);
                 BitConverter.ToInt16(buffer, 0);
             });
-            var alt = Bench(5, (n) => {
+            var alt = Bench.Run(5, (n) => {
                 LittleEndian.ToInt16(buffer, 0);
                 LittleEndian.ToInt16(buffer, 0);
                 LittleEndian.ToInt16(buffer, 0);
@@ -118,14 +126,14 @@ namespace Test {
         [TestMethod]
         public void PerfLittleEndianInt() {
             var buffer = new byte[] { 0x88, 0x99, 0xaa, 0xbb };
-            var std = Bench(5, (n) => {
+            var std = Bench.Run(5, (n) => {
                 BitConverter.ToInt32(buffer, 0);
                 BitConverter.ToInt32(buffer, 0);
                 BitConverter.ToInt32(buffer, 0);
                 BitConverter.ToInt32(buffer, 0);
                 BitConverter.ToInt32(buffer, 0);
             });
-            var alt = Bench(5, (n) => {
+            var alt = Bench.Run(5, (n) => {
                 LittleEndian.ToInt32(buffer, 0);
                 LittleEndian.ToInt32(buffer, 0);
                 LittleEndian.ToInt32(buffer, 0);
@@ -140,32 +148,32 @@ namespace Test {
             var buffer = new byte[] { 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, 0x11 };
             if (Always.False) {
                 long t = 0;
-                var std = Bench(10, (n) => {
+                var std = Bench.Run(10, (n) => {
                     t = BitConverter.ToInt64(buffer, 1);
                     t = BitConverter.ToInt64(buffer, 1);
                     t = BitConverter.ToInt64(buffer, 1);
                     t = BitConverter.ToInt64(buffer, 1);
                     t = BitConverter.ToInt64(buffer, 1);
                 });
-                var alt = Bench(10, (n) => {
+                var alt = Bench.Run(10, (n) => {
                     t = LittleEndian.ToInt64(buffer, 1);
                     t = LittleEndian.ToInt64(buffer, 1);
                     t = LittleEndian.ToInt64(buffer, 1);
                     t = LittleEndian.ToInt64(buffer, 1);
                     t = LittleEndian.ToInt64(buffer, 1);
                 });
-                Assert.IsTrue(alt >= std); 
+                Assert.IsTrue(alt >= std);
             }
             {
                 ulong t = 0;
-                var std = Bench(5, (n) => {
+                var std = Bench.Run(5, (n) => {
                     t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
                     t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
                     t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
                     t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
                     t = unchecked((ulong)BitConverter.ToInt64(buffer, 1));
                 });
-                var alt = Bench(5, (n) => {
+                var alt = Bench.Run(5, (n) => {
                     t = LittleEndian.ToUInt64(buffer, 1);
                     t = LittleEndian.ToUInt64(buffer, 1);
                     t = LittleEndian.ToUInt64(buffer, 1);
@@ -179,14 +187,14 @@ namespace Test {
         [TestMethod]
         public void PerfBigEndianShort() {
             var buffer = new byte[] { 0x88, 0x99 };
-            var std = Bench(5, (n) => {
+            var std = Bench.Run(5, (n) => {
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt16(buffer, 0));
             });
-            var alt = Bench(5, (n) => {
+            var alt = Bench.Run(5, (n) => {
                 BigEndian.ToInt16(buffer, 0);
                 BigEndian.ToInt16(buffer, 0);
                 BigEndian.ToInt16(buffer, 0);
@@ -199,14 +207,14 @@ namespace Test {
         [TestMethod]
         public void PerfBigEndianInt() {
             var buffer = new byte[] { 0x88, 0x99, 0xaa, 0xbb };
-            var std = Bench(5, (n) => {
+            var std = Bench.Run(5, (n) => {
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt32(buffer, 0));
             });
-            var alt = Bench(5, (n) => {
+            var alt = Bench.Run(5, (n) => {
                 BigEndian.ToInt32(buffer, 0);
                 BigEndian.ToInt32(buffer, 0);
                 BigEndian.ToInt32(buffer, 0);
@@ -219,14 +227,14 @@ namespace Test {
         [TestMethod]
         public void PerfBigEndianLong() {
             var buffer = new byte[] { 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-            var std = Bench(5, (n) => {
+            var std = Bench.Run(5, (n) => {
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
                 IPAddress.NetworkToHostOrder(BitConverter.ToInt64(buffer, 0));
             });
-            var alt = Bench(5, (n) => {
+            var alt = Bench.Run(5, (n) => {
                 BigEndian.ToInt64(buffer, 0);
                 BigEndian.ToInt64(buffer, 0);
                 BigEndian.ToInt64(buffer, 0);
@@ -307,7 +315,7 @@ namespace Test {
                     0x00, 0x40, // '@'
                 };
                 var tmp = new byte[src.Length];
-                fixed(byte* p = tmp)
+                fixed (byte* p = tmp)
                 {
                     BigEndian.Assign(p + 0, (byte)0x88);
                     BigEndian.Assign(p + 1, (ushort)0x9988);
@@ -325,53 +333,104 @@ namespace Test {
             }
         }
 
+        public void Clear(byte[] buffer) {
+            buffer.Initialize();
+        }
+
         [TestMethod]
         public void TestLitleEndian() {
-            {
-                var src = new byte[] { 0x80, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
-                Assert.AreEqual(LittleEndian.ToUInt8(src, 1), (byte)0x88);
-                Assert.AreEqual(LittleEndian.ToUInt16(src, 1), (ushort)0x9988);
-                Assert.AreEqual(LittleEndian.ToUInt32(src, 1), (uint)0xbbaa9988);
-                Assert.AreEqual(LittleEndian.ToUInt64(src, 1), (ulong)0xffeeddccbbaa9988);
-                Assert.AreEqual(LittleEndian.ToInt8(src, 1), unchecked((sbyte)0x88));
-                Assert.AreEqual(LittleEndian.ToInt16(src, 1), unchecked((short)0x9988));
-                Assert.AreEqual(LittleEndian.ToInt32(src, 1), unchecked((int)0xbbaa9988));
-                Assert.AreEqual(LittleEndian.ToInt64(src, 1), unchecked((long)0xffeeddccbbaa9988));
 
-                byte[] tmp;
-                tmp = new byte[1 + 1];
-                LittleEndian.Assign(tmp, 1, (byte)0x88);
-                Assert.IsTrue(tmp.Skip(1).Take(1).SequenceEqual(src.Skip(1).Take(1)));
-                tmp = new byte[2 + 1];
-                LittleEndian.Assign(tmp, 1, (ushort)0x9988);
-                Assert.IsTrue(tmp.Skip(1).Take(2).SequenceEqual(src.Skip(1).Take(2)));
-                tmp = new byte[4 + 1];
-                LittleEndian.Assign(tmp, 1, (uint)0xbbaa9988);
-                Assert.IsTrue(tmp.Skip(1).Take(4).SequenceEqual(src.Skip(1).Take(4)));
-                tmp = new byte[8 + 1];
-                LittleEndian.Assign(tmp, 1, (ulong)0xffeeddccbbaa9988);
-                Assert.IsTrue(tmp.Skip(1).Take(8).SequenceEqual(src.Skip(1).Take(8)));
+            var aligned = new byte[] {
+                0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, // long
+                0x88, 0x99, 0xaa, 0xbb, // int
+                0x88, 0x99, // short
+                0x88,       // byte
+                0x00,       // bool
+                0x40, 0x00, // char
+            };
+            var offset = new byte[] {
+                0x00,
+                0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff, // long
+                0x88, 0x99, 0xaa, 0xbb, // int
+                0x88, 0x99, // short
+                0x88,       // byte
+                0x00,       // bool
+                0x40, 0x00, // char
+            };
 
-                tmp = new byte[1 + 1];
-                LittleEndian.Assign(tmp, 1, unchecked((sbyte)0x88));
-                Assert.IsTrue(tmp.Skip(1).Take(1).SequenceEqual(src.Skip(1).Take(1)));
-                tmp = new byte[2 + 1];
-                LittleEndian.Assign(tmp, 1, unchecked((short)0x9988));
-                Assert.IsTrue(tmp.Skip(1).Take(2).SequenceEqual(src.Skip(1).Take(2)));
-                tmp = new byte[4 + 1];
-                LittleEndian.Assign(tmp, 1, unchecked((int)0xbbaa9988));
-                Assert.IsTrue(tmp.Skip(1).Take(4).SequenceEqual(src.Skip(1).Take(4)));
-                tmp = new byte[8 + 1];
-                LittleEndian.Assign(tmp, 1, unchecked((long)0xffeeddccbbaa9988));
-                Assert.IsTrue(tmp.Skip(1).Take(8).SequenceEqual(src.Skip(1).Take(8)));
-
-                LittleEndian.Assign(tmp, 0, '@');
-                Assert.IsTrue(tmp.Skip(0).Take(2).SequenceEqual(new byte[] { 0x40, 0x00 }));
-                Assert.AreEqual(LittleEndian.ToChar(tmp, 0), '@');
-
-                LittleEndian.Assign(tmp, 0, 1.1);
-                Assert.AreEqual(LittleEndian.ToDouble(tmp, 0), 1.1);
+            // 読み込みの確認
+            for (var i = 0; i < 2; ++i) {
+                var src = i == 0 ? aligned : offset;
+                Assert.AreEqual(LittleEndian.ToUInt64(src, 0 + i), (ulong)0xffeeddccbbaa9988);
+                Assert.AreEqual(LittleEndian.ToUInt32(src, 8 + i), (uint)0xbbaa9988);
+                Assert.AreEqual(LittleEndian.ToUInt16(src, 12 + i), (ushort)0x9988);
+                Assert.AreEqual(LittleEndian.ToUInt8(src, 14 + i), (byte)0x88);
+                Assert.AreEqual(LittleEndian.ToInt64(src, 0 + i), unchecked((long)0xffeeddccbbaa9988));
+                Assert.AreEqual(LittleEndian.ToInt32(src, 8 + i), unchecked((int)0xbbaa9988));
+                Assert.AreEqual(LittleEndian.ToInt16(src, 12 + i), unchecked((short)0x9988));
+                Assert.AreEqual(LittleEndian.ToInt8(src, 14 + i), unchecked((sbyte)0x88));
             }
+
+            // ポインタ系書き込みの確認 あまり厳密ではない
+            var buffer = new byte[offset.Length];
+            unsafe
+            {
+                fixed (byte* pointer = buffer)
+                for (var i = 0; i < 2; ++i) {
+                    var p = pointer + i;
+                    buffer.Initialize();
+                    LittleEndian.Assign(p + 0, (ulong)0xffeeddccbbaa9988);
+                    LittleEndian.Assign(p + 8, (uint)0xbbaa9988);
+                    LittleEndian.Assign(p + 12, (ushort)0x9988);
+                    LittleEndian.Assign(p + 14, (byte)0x88);
+                    LittleEndian.Assign(p + 15, false);
+                    LittleEndian.Assign(p + 16, '@');
+                    Assert.IsTrue(buffer.Skip(i).Take(17).SequenceEqual(aligned.Take(17)));
+                    LittleEndian.Assign(p + 0, unchecked((long)0xffeeddccbbaa9988));
+                    buffer.Initialize();
+                    LittleEndian.Assign(p + 8, unchecked((int)0xbbaa9988));
+                    LittleEndian.Assign(p + 12, unchecked((short)0x9988));
+                    LittleEndian.Assign(p + 14, unchecked((sbyte)0x88));
+                    LittleEndian.Assign(p + 15, false);
+                    LittleEndian.Assign(p + 16, '@');
+                    Assert.IsTrue(buffer.Skip(i).Take(17).SequenceEqual(aligned.Take(17)));
+                    LittleEndian.Assign(p, 1.1f);
+                    LittleEndian.Assign(p, 1.2);
+                    LittleEndian.Assign(p, 1.3m);
+                }
+            }
+            for (var i = 0; i < 2; ++i) {
+                buffer.Initialize();
+                LittleEndian.Assign(buffer, i + 0, (ulong)0xffeeddccbbaa9988);
+                LittleEndian.Assign(buffer, i + 8, (uint)0xbbaa9988);
+                LittleEndian.Assign(buffer, i + 12, (ushort)0x9988);
+                LittleEndian.Assign(buffer, i + 14, (byte)0x88);
+                LittleEndian.Assign(buffer, i + 15, false);
+                LittleEndian.Assign(buffer, i + 16, '@');
+                Assert.IsTrue(buffer.Skip(i).Take(17).SequenceEqual(aligned.Take(17)));
+                //
+                buffer.Initialize();
+                LittleEndian.Assign(buffer, i + 0, unchecked((long)0xffeeddccbbaa9988));
+                LittleEndian.Assign(buffer, i + 8, unchecked((int)0xbbaa9988));
+                LittleEndian.Assign(buffer, i + 12, unchecked((short)0x9988));
+                LittleEndian.Assign(buffer, i + 14, unchecked((sbyte)0x88));
+                LittleEndian.Assign(buffer, i + 15, false);
+                LittleEndian.Assign(buffer, i + 16, '@');
+                Assert.IsTrue(buffer.Skip(i).Take(17).SequenceEqual(aligned.Take(17)));
+                //
+                LittleEndian.Assign(buffer, i + 0, 1.1f);
+                LittleEndian.Assign(buffer, i + 0, 1.2);
+                LittleEndian.Assign(buffer, i + 0, 1.3m);
+            }
+
+#if false
+            {
+                LittleEndian.Assign(tmp, 0, '@');
+                    Assert.IsTrue(tmp.Skip(0).Take(2).SequenceEqual(new byte[] { 0x40, 0x00 }));
+                    Assert.AreEqual(LittleEndian.ToChar(tmp, 0), '@');
+
+                    LittleEndian.Assign(tmp, 0, 1.1);
+                    Assert.AreEqual(LittleEndian.ToDouble(tmp, 0), 1.1);
 
             unsafe
             {
@@ -405,6 +464,7 @@ namespace Test {
                 }
                 Assert.IsTrue(tmp.SequenceEqual(src)); 
             }
+#endif
         }
-    }
+        }
 }
