@@ -22,30 +22,10 @@ namespace Test {
             return count;
         }
 #endif
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public class Hoge {
-            public int i;
-            public short s;
-            public sbyte b;
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
-            public string str = "01234567890";
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
-            public double[] array = new double[10];
-        }
 
         [TestMethod]
         public unsafe void TestMisc() {
-            Assert.AreEqual(sizeof(decimal), 16);
-            var source = new Hoge {
-                i = unchecked((int)0x8899aabb),
-                s = unchecked((short)0x8899),
-                b = unchecked((sbyte)0x88),
-            };
-            var buffer = new byte[source.MarshalSize()];
-            ByteOrder.Assign(buffer, 0, source);
-            var extract = ByteOrder.To<Hoge>(buffer, 0);
-            source.SequenceEqual(extract);
-            Array
+
 #if false
             Assert.AreEqual(LittleEndian.ToUInt32(dst, 0), 0x8899aabb);
             Assert.AreEqual(LittleEndian.ToUInt16(dst, 4), 0x8899);
@@ -102,7 +82,26 @@ namespace Test {
                 Assert.AreEqual(sl.ToHostOrder(), sl);
             }
         }
-
+#if false
+        [TestMethod]
+        public unsafe void PerfShort() {
+            var buf = new byte[3];
+            var fix = stackalloc byte[3];
+            var std = Bench.Run(5, (n) => {
+                //BitConverter.Assign(fix, unchecked((short)0x8899));
+            });
+            var alt = Bench.Run(5, (n) => {
+                for(var i = 0; i < 2; ++i) {
+                    LittleEndian.Assign(fix, unchecked((short)0x8899));
+                    LittleEndian.Assign(fix, unchecked((short)0x8899));
+                    LittleEndian.Assign(fix, unchecked((short)0x8899));
+                    LittleEndian.Assign(fix, unchecked((short)0x8899));
+                    LittleEndian.Assign(fix, unchecked((short)0x8899));
+                }
+            });
+            Assert.IsTrue(alt >= std);
+        }
+#endif
         [TestMethod]
         public void PerfLittleEndianShort() {
             var buffer = new byte[] { 0x88, 0x99 };

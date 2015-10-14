@@ -101,9 +101,22 @@ namespace ThunderEgg.BrownSugar {
 
     public static class ByteOrder {
 
+        // 処理を簡潔にするためbool
+        /// <summary>バイトオーダーの種類</summary>
+        public const bool LittleEndian = true;
+        /// <summary>バイトオーダーの種類</summary>
+        public const bool BigEndian = false;
+
+        [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
+        public class ByteOrderAttribute : Attribute {
+            public bool IsLittleEndian { get; private set; }
+            public ByteOrderAttribute(bool is_le) {
+                IsLittleEndian = is_le;
+            }
+        }
+
         /// <summary>マーシャルなオブジェクトをバッファへ書き込み</summary>
         public static void Assign<T>(byte[] buffer, int index, T data)
-            where T : class //
         {
             if (Marshal.SizeOf(data) > (buffer.Length - index)) {
                 throw new Exception();
@@ -114,9 +127,7 @@ namespace ThunderEgg.BrownSugar {
                 {
                     Marshal.StructureToPtr(data, new IntPtr(fix + index), false);
                 }
-//                if (BitConverter.IsLittleEndian) {
-//                    SwapByteOrder(typeof(T), buffer, index);
-//                }
+                //SwapByteOrder(buffer, index, typeof(T));
             }
         }
 
@@ -124,9 +135,7 @@ namespace ThunderEgg.BrownSugar {
         public static T To<T>(byte[] buffer, int index) {
             var tmp = new byte[buffer.Length - index];
             Buffer.BlockCopy(buffer, index, tmp, 0, tmp.Length);
-//            if (BitConverter.IsLittleEndian) {
-//                SwapByteOrder(typeof(T), tmp, index);
-//            }
+            //SwapByteOrder(buffer, index, typeof(T));
             unsafe
             {
                 fixed (byte* fix = tmp)
@@ -137,48 +146,34 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>型情報をもとにバイトオーダーを反転させます</summary>
-        static void SwapByteOrder(Type type, byte[] buffer, int index) {
+        static void SwapByteOrder(byte[] buffer, int index, Type type) {
             var fields = type.GetFields();
             for (var i = 0; i < fields.Length; ++i) {
                 var f = fields[i];
                 if (f.IsStatic) {
                     continue;
                 }
-                else if (f.FieldType == typeof(string)) {
-                    // TODO ごにょ enum もごにょ
-                }
-                // 子の確認
+                // TODO 配列..
                 bool has_child = false;
-                {
-                    var child = f.FieldType.GetFields();
-                    for (var j = 0; !has_child && j < child.Length; ++j) {
-                        has_child = !child[j].IsStatic;
-                    }
+                // 子の確認
+                var child = f.FieldType.GetFields();
+                for (var j = 0; !has_child && j < child.Length; ++j) {
+                    has_child = !child[j].IsStatic;
                 }
                 var offset = Marshal.OffsetOf(type, f.Name).ToInt32();
                 if (has_child) {
-                    SwapByteOrder(f.FieldType, buffer, index + offset);
+                    SwapByteOrder(buffer, index + offset, f.FieldType);
                 }
                 else {
-                    Array.Reverse(buffer, index + offset, Marshal.SizeOf(f.FieldType));
+                    var size = Marshal.SizeOf(f.FieldType);
+                    if (size > 1) {
+                        Array.Reverse(buffer, index + offset, size);
+                    }
                 }
             }
         }
 
 #if false
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class ByteOrderAttribute : Attribute {
-        public bool IsLittleEndian { get; private set; }
-        public ByteOrderAttribute(ByteOrderType bo) {
-            IsLittleEndian = (bo == ByteOrderType.LittleEndian);
-        }
-    }
-
-    public enum ByteOrderType {
-        BigEndian,
-        LittleEndian
-    }
 
         /// <summary>バイトオーダーを調整します</summary>
         static void Adjust(Type type, byte[] buffer, int index) {
