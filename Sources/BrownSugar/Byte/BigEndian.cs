@@ -15,13 +15,116 @@ namespace ThunderEgg.BrownSugar {
     public class NetOrder : BigEndian {
     }
 
-    /// <summary>
-    /// ビッグエンディアン順でバッファ操作をします
-    /// 配列版よりポインタ版の方が速度は速く
-    /// もちろんBitConverter.GetBytesで何かするより速いです
-    /// 1バイトアクセス系は遅いです
-    /// </summary>
+    /// <summary>ビッグエンディアン順でバッファ操作をします</summary>
     public class BigEndian {
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe byte ToUInt8(byte* p) {
+            return p[0];
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe ushort ToUInt16(byte* p) {
+            return (ushort)(p[0] << 8 | p[1]);
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe uint ToUInt32(byte* p) {
+            // il 24 bytes
+            return unchecked((uint)((((p[0] << 8 | p[1]) << 8) | p[2]) << 8 | p[3]));
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe ulong ToUInt64(byte* p) {
+            if ((((int)p) & 7) == 0) {
+                return HostOrder.IsBigEndian ?
+                    ((ulong*)p)[0] : ((ulong*)p)[0].SwapByteOrder();
+            }
+            // il 55 bytes
+            return (ulong)
+                ((((uint)p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
+                ((((uint)p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]);
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe sbyte ToInt8(byte* p) {
+            return ((sbyte*)p)[0];
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe short ToInt16(byte* p) {
+            return (short)(p[0] << 8 | p[1]);
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe int ToInt32(byte* p) {
+            // il 24 bytes
+            return ((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3];
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe long ToInt64(byte* p) {
+            if ((((int)p) & 7) == 0) {
+                return HostOrder.IsBigEndian ?
+                    ((long*)p)[0] : ((long*)p)[0].SwapByteOrder();
+            }
+            // il 52 bytes
+            return unchecked((long)
+                ((((uint)p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
+                ((((uint)p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]));
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe bool ToBoolean(byte* p) {
+            return p[0] != 0;
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe char ToChar(byte* p) {
+            return (char)(p[0] << 8 | p[1]);
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe float ToSingle(byte* p) {
+            if (((int)p & 3) == 0) {
+                if (HostOrder.IsBigEndian) {
+                    return ((float*)p)[0];
+                }
+                else {
+                    float tmp;
+                    ((uint*)&tmp)[0] = ((uint*)p)[0].SwapByteOrder();
+                    return tmp;
+                }
+            }
+            else {
+                float tmp;
+                ((byte*)&tmp)[0] = p[0];
+                ((byte*)&tmp)[1] = p[1];
+                ((byte*)&tmp)[2] = p[2];
+                ((byte*)&tmp)[3] = p[3];
+                return tmp;
+            }
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe double ToDouble(byte* p) {
+            if ((((int)p) & 7) == 0) {
+                if (HostOrder.IsBigEndian) {
+                    return ((double*)p)[0];
+                }
+                else {
+                    return BitConverter.Int64BitsToDouble(((long*)p)[0].SwapByteOrder());
+                }
+            }
+            return BitConverter.Int64BitsToDouble((
+                (long)(((((p[0] << 8 | p[1]) << 8) | p[2]) << 8 | p[3]) << 32) |
+                (uint)(((((p[4] << 8 | p[5]) << 8) | p[6]) << 8 | p[7]))
+                ));
+        }
+
+        //
+        //
+        //
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, byte value) {
@@ -86,14 +189,22 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, bool value) {
-            buffer[0] = value ? (byte)1 : (byte)0;
+        public static unsafe void Assign(byte* p, bool value) {
+            ((bool*)p)[0] = value;
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, char value) {
             buffer[0] = unchecked((byte)(value >> 8));
             buffer[1] = unchecked((byte)value);
+        }
+
+        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
+        public static unsafe void Assign(byte* buffer, float value) {
+            buffer[0] = ((byte*)&value)[0];
+            buffer[1] = ((byte*)&value)[1];
+            buffer[2] = ((byte*)&value)[2];
+            buffer[3] = ((byte*)&value)[3];
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>

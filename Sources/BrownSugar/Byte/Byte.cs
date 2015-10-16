@@ -99,6 +99,16 @@ namespace ThunderEgg.BrownSugar {
     //
     //
 
+    public static class HostOrder {
+        public static bool IsLittleEndian { get; private set; }
+        public static bool IsBigEndian { get; private set; }
+
+        static HostOrder() {
+            IsLittleEndian = BitConverter.IsLittleEndian;
+            IsBigEndian = !BitConverter.IsLittleEndian;
+        }
+    }
+
     public static class ByteOrder {
 
         // 処理を簡潔にするためbool

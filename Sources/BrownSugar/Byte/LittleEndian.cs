@@ -11,13 +11,132 @@ using System;
 
 namespace ThunderEgg.BrownSugar {
 
-    /// <summary>
-    /// リトルエンディアン順でバッファを操作します
-    /// 配列版よりポインタ版の方が速度は速く
-    /// </summary>
+    /// <summary>リトルエンディアン順でバッファを操作します</summary>
     public static class LittleEndian {
 
-		/// <summary>リトルエンディアン順でバッファに書き込みます</summary>
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe byte ToUInt8(byte* p) {
+            return p[0];
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe ushort ToUInt16(byte* p) {
+            return unchecked((ushort)(p[1] << 8 | p[0]));
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe uint ToUInt32(byte* p) {
+            // il 24 bytes 
+            return (((uint)p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0];
+#if false
+            // il 25 bytes 
+            return (
+                (((uint)p[3] << 8) | p[2]) << 16 |
+                (((uint)p[1] << 8) | p[0])
+                );
+#endif
+#if false
+            // il 26 bytes 
+            return (
+                ((uint)p[3] << 24) |
+                ((uint)p[2] << 16) |
+                ((uint)p[1] << 8) |
+                p[0]);
+#endif
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe ulong ToUInt64(byte* p) {
+            if ((((int)p) & 7) == 0) {
+                var t = ((ulong*)p)[0];
+                return HostOrder.IsLittleEndian ? t : t.SwapByteOrder();
+            }
+            // il 55 bytes
+            return (ulong)
+                ((((uint)p[7] << 8 | p[6]) << 8 | p[5]) << 8 | p[4]) << 32 |
+                ((((uint)p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0]);
+        }
+
+        //
+        //
+        //
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe sbyte ToInt8(byte* p) {
+            return unchecked((sbyte)p[0]);
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe short ToInt16(byte* p) {
+            return unchecked((short)(p[1] << 8 | p[0]));
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe int ToInt32(byte* p) {
+            return ((p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0];
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe long ToInt64(byte* p) {
+            if ((((int)p) & 7) == 0) {
+                var t = ((long*)p)[0];
+                return HostOrder.IsLittleEndian ? t : t.SwapByteOrder();
+            }
+            // il 55
+            return unchecked((long)
+                ((((uint)p[7] << 8 | p[6]) << 8 | p[5]) << 8 | p[4]) << 32 |
+                ((((uint)p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0]));
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe bool ToBoolean(byte* p) {
+            return p[0] != 0;
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe char ToChar(byte* p) {
+            return unchecked((char)(p[1] << 8 | p[0]));
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe float ToSingle(byte* p) {
+            if (((int)p & 3) == 0) {
+                if (HostOrder.IsLittleEndian) {
+                    return ((float*)p)[0];
+                }
+                else {
+                    float tmp;
+                    ((uint*)&tmp)[0] = ((uint*)p)[0].SwapByteOrder();
+                    return tmp;
+                }
+            }
+            else {
+                float tmp;
+                ((byte*)&tmp)[0] = p[0];
+                ((byte*)&tmp)[1] = p[1];
+                ((byte*)&tmp)[2] = p[2];
+                ((byte*)&tmp)[3] = p[3];
+                return tmp;
+            }
+        }
+
+        /// <summary>リトルエンディアン順で値を読み込みます</summary>
+        public static unsafe double ToDouble(byte* p) {
+            if ((((int)p) & 7) == 0) {
+                if (HostOrder.IsLittleEndian) {
+                    return ((double*)p)[0];
+                }
+                else {
+                    return BitConverter.Int64BitsToDouble(((long*)p)[0].SwapByteOrder());
+                 }
+            }
+            return BitConverter.Int64BitsToDouble((
+                (long)(((((p[7] << 8 | p[6]) << 8) | p[5]) << 8 | p[4]) << 32) |
+                (uint)(((((p[3] << 8 | p[2]) << 8) | p[1]) << 8 | p[0]))
+                ));
+        }
+
+        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, byte value) {
             buffer[0] = value;
         }
@@ -39,7 +158,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, ulong value) {
             if ((((int)buffer) & 7) == 0) {
-                *(ulong*)(buffer) = BitConverter.IsLittleEndian ?
+                *(ulong*)(buffer) = HostOrder.IsLittleEndian ?
                     value : value.SwapByteOrder();
                 return;
             }
@@ -76,7 +195,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, long value) {
             if ((((int)buffer) & 7) == 0) {
-                *(long*)(buffer) = BitConverter.IsLittleEndian ?
+                *(long*)(buffer) = HostOrder.IsLittleEndian ?
                     value : value.SwapByteOrder();
                 return;
             }
@@ -114,7 +233,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, double value) {
             if ((((int)buffer) & 7) == 0) {
-                *(long*)(buffer) = BitConverter.IsLittleEndian ?
+                *(long*)(buffer) = HostOrder.IsLittleEndian ?
                     ((long*)&value)[0] : ((long*)&value)[0].SwapByteOrder();
                 return;
             }
@@ -133,7 +252,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, decimal value) {
             if ((((int)buffer) & 7) == 0) {
-                if (BitConverter.IsLittleEndian) {
+                if (HostOrder.IsLittleEndian) {
                     ((ulong*)buffer)[0] = ((ulong*)&value)[0];
                     ((ulong*)buffer)[1] = ((ulong*)&value)[1];
                     return;
@@ -167,137 +286,6 @@ namespace ThunderEgg.BrownSugar {
         //
         //
 
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe byte ToUInt8(byte* buffer) {
-            return buffer[0];
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe ushort ToUInt16(byte* pointer) {
-            return unchecked((ushort)(
-                pointer[0] |
-                pointer[1] << 8
-                ));
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe uint ToUInt32(byte* pointer) {
-            if ((((int)pointer) & 3) == 0) {
-                return BitConverter.IsLittleEndian ?
-                    ((uint*)pointer)[0] : ((uint*)pointer)[0].SwapByteOrder();
-            }
-            return (
-                pointer[0] |
-                (uint)pointer[1] << 8 |
-                (uint)pointer[2] << 16 |
-                (uint)pointer[3] << 24
-                );
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe ulong ToUInt64(byte* pointer) {
-            if ((((int)pointer) & 7) == 0) {
-                return BitConverter.IsLittleEndian ?
-                    ((ulong*)pointer)[0] : ((ulong*)pointer)[0].SwapByteOrder();
-            }
-            return ((ulong)(
-                ((uint)pointer[7] << 8 | pointer[6]) << 16 |
-                ((uint)pointer[5] << 8 | pointer[4])
-                ) << 32) |
-                (
-                ((uint)pointer[3] << 8 | pointer[2]) << 16 |
-                ((uint)pointer[1] << 8 | pointer[0])
-                );
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe sbyte ToInt8(byte* buffer) {
-            return unchecked((sbyte)buffer[0]);
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe short ToInt16(byte* pointer) {
-            return unchecked((short)(
-                pointer[0] |
-                pointer[1] << 8
-                ));
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe int ToInt32(byte* pointer) {
-            if ((((int)pointer) & 3) == 0) {
-                return BitConverter.IsLittleEndian ?
-                    ((int*)pointer)[0] : ((int*)pointer)[0].SwapByteOrder();
-            }
-            return unchecked((int)(
-                pointer[0] |
-                (uint)pointer[1] << 8 |
-                (uint)pointer[2] << 16 |
-                (uint)pointer[3] << 24
-                ));
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe long ToInt64(byte* pointer) {
-            if ((((int)pointer) & 7) == 0) {
-                return BitConverter.IsLittleEndian ?
-                    ((long*)pointer)[0] : ((long*)pointer)[0].SwapByteOrder();
-            }
-            return (long)(
-                (ulong)(
-                (pointer[6] | (uint)pointer[7] << 8) << 16 |
-                (pointer[4] | (uint)pointer[5] << 8)
-                ) << 32) |
-                (
-                (pointer[2] | (uint)pointer[3] << 8) << 16 |
-                (pointer[0] | (uint)pointer[1] << 8)
-                );
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe bool ToBoolean(byte* pointer) {
-            return pointer[0] != 0 ? true : false;
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe char ToChar(byte* pointer) {
-            return unchecked((char)(
-                pointer[0] |
-                pointer[1] << 8
-                ));
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe float ToSingle(byte* pointer) {
-            if ((((int)pointer) & 3) == 0 && BitConverter.IsLittleEndian) {
-                return ((float*)pointer)[0];
-            }
-            float value;
-            byte* v = (byte*)&value;
-            v[0] = pointer[0];
-            v[1] = pointer[1];
-            v[2] = pointer[2];
-            v[3] = pointer[3];
-            return value;
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe double ToDouble(byte* pointer) {
-            if ((((int)pointer) & 7) == 0) {
-                return BitConverter.Int64BitsToDouble(BitConverter.IsLittleEndian ?
-                    ((long*)pointer)[0] : ((long*)pointer)[0].SwapByteOrder());
-            }
-            return BitConverter.Int64BitsToDouble((long)(
-                (ulong)(
-                (pointer[6] | (uint)pointer[7] << 8) << 16 |
-                (pointer[4] | (uint)pointer[5] << 8)
-                ) << 32) |
-                (
-                (pointer[2] | (uint)pointer[3] << 8) << 16 |
-                (pointer[0] | (uint)pointer[1] << 8)
-                ));
-        }
-
         //
         //
         //
@@ -326,7 +314,7 @@ namespace ThunderEgg.BrownSugar {
             fixed (byte* pointer = &buffer[index])
             {
                 if ((((int)pointer) & 7) == 0) {
-                    *(ulong*)(pointer) = BitConverter.IsLittleEndian ?
+                    *(ulong*)(pointer) = HostOrder.IsLittleEndian ?
                         value : value.SwapByteOrder();
                     return;
                 }

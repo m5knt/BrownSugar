@@ -64,7 +64,7 @@
     <Compile Include="Byte\LittleEndian.cs" />
     <Compile Include="Byte\Cast.cs" />
     <Compile Include="Char\Char.cs" />
-    <Compile Include="Collection\Dictionary.cs" />
+    <Compile Include="Collection\Collection.cs" />
     <Compile Include="Math\Math.cs" />
     <Compile Include="BrownSugar.cs" />
     <Compile Include="Test.cs" />

@@ -53,6 +53,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Bench.cs" />
+    <Compile Include="TestEndian.cs" />
     <Compile Include="PerfEndian.cs" />
     <Compile Include="TestMarshal.cs" />
     <Compile Include="TestCast.cs" />

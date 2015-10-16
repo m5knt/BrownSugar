@@ -3,6 +3,8 @@
  * @brief キャスト回り
  */
 
+using System.Collections.Generic;
+
 namespace ThunderEgg.BrownSugar {
 
     public static class SugarCast {
@@ -170,6 +172,21 @@ namespace ThunderEgg.BrownSugar {
         public static long ToInt64(this int value) { return unchecked(/*(long)*/value); }
         // 同じ型なので不要
         //public static long CastInt64(this long value) { return unchecked((long)value); }
+
+        //
+        //
+        //
+
+		// /// <summary>アンセーフキャストした値を返します</summary>
+		// public static float ToSingle(this float value) { return unchecked(/*(float)*/value); }
+		/// <summary>アンセーフキャストした値を返します</summary>
+		public static float ToSingle(this double value) { return unchecked((float)value); }
+
+		/// <summary>型昇格した値を返します</summary>
+		public static double ToDouble(this float value) { return unchecked(/*(double)*/value); }
+		// /// <summary>型昇格した値を返します</summary>
+		// public static double ToDouble(this double value) { return unchecked(/*(double)*/value); }
+
     }
 }
 
