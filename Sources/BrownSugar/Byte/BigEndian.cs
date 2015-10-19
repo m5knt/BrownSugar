@@ -19,14 +19,72 @@ namespace ThunderEgg.BrownSugar {
     public class BigEndian {
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
-        public static unsafe byte ToUInt8(byte* p) {
-            return p[0];
+        public static unsafe byte ToUInt8(byte* buffer) {
+            return buffer[0];
         }
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
-        public static unsafe ushort ToUInt16(byte* p) {
-            return (ushort)(p[0] << 8 | p[1]);
+        public static unsafe sbyte ToInt8(byte* buffer) {
+            return ((sbyte*)buffer)[0];
         }
+
+        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
+        public static byte ToUInt8(byte[] buffer, int index) {
+            return buffer[index];
+        }
+
+        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
+        public static sbyte ToInt8(byte[] buffer, int index) {
+            return unchecked((sbyte)buffer[index]);
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe bool ToBoolean(byte* buffer) {
+            return buffer[0] != 0;
+        }
+
+        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
+        public static bool ToBoolean(byte[] buffer, int index) {
+            return buffer[index] != 0;
+        }
+
+        //
+        //
+        //
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe ushort ToUInt16(byte* b) {
+            return unchecked((ushort)(b[0] << 8 | b[1])); // 11
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe short ToInt16(byte* b) {
+            return unchecked((short)(b[0] << 8 | b[1]));
+        }
+
+        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
+        public static unsafe char ToChar(byte* b) {
+            return unchecked((char)(b[0] << 8 | b[1]));
+        }
+
+        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
+        public static ushort ToUInt16(byte[] b, int i) {
+            return unchecked((ushort)(b[i] << 8 | b[i + 1])); // 13
+        }
+
+        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
+        public static short ToInt16(byte[] b, int i) {
+            return unchecked((short)(b[i] << 8 | b[i + 1]));
+        }
+
+        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
+        public static char ToChar(byte[] b, int i) {
+            return unchecked((char)(b[i] << 8 | b[i + 1]));
+        }
+
+        //
+        //
+        //
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe uint ToUInt32(byte* p) {
@@ -37,23 +95,19 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe ulong ToUInt64(byte* p) {
             if ((((int)p) & 7) == 0) {
-                return HostOrder.IsBigEndian ?
-                    ((ulong*)p)[0] : ((ulong*)p)[0].SwapByteOrder();
+                if (!BitConverter.IsLittleEndian) {
+                    return ((ulong*)p)[0];
+                }
+                else {
+                    return (ulong)
+                        ((((uint)p[7] << 8 | p[6]) << 8 | p[5]) << 8 | p[4]) << 32 |
+                        ((((uint)p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0]);
+                }
             }
             // il 55 bytes
             return (ulong)
                 ((((uint)p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
                 ((((uint)p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]);
-        }
-
-        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
-        public static unsafe sbyte ToInt8(byte* p) {
-            return ((sbyte*)p)[0];
-        }
-
-        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
-        public static unsafe short ToInt16(byte* p) {
-            return (short)(p[0] << 8 | p[1]);
         }
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
@@ -65,8 +119,14 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe long ToInt64(byte* p) {
             if ((((int)p) & 7) == 0) {
-                return HostOrder.IsBigEndian ?
-                    ((long*)p)[0] : ((long*)p)[0].SwapByteOrder();
+                if (!BitConverter.IsLittleEndian) {
+                    return ((long*)p)[0];
+                } else {
+                    // il 52 bytes
+                    return unchecked((long)
+                        ((((uint)p[7] << 8 | p[6]) << 8 | p[5]) << 8 | p[4]) << 32 |
+                        ((((uint)p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0]));
+                }
             }
             // il 52 bytes
             return unchecked((long)
@@ -75,19 +135,9 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
-        public static unsafe bool ToBoolean(byte* p) {
-            return p[0] != 0;
-        }
-
-        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
-        public static unsafe char ToChar(byte* p) {
-            return (char)(p[0] << 8 | p[1]);
-        }
-
-        /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe float ToSingle(byte* p) {
             if (((int)p & 3) == 0) {
-                if (HostOrder.IsBigEndian) {
+                if (!BitConverter.IsLittleEndian) {
                     return ((float*)p)[0];
                 }
                 else {
@@ -109,7 +159,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe double ToDouble(byte* p) {
             if ((((int)p) & 7) == 0) {
-                if (HostOrder.IsBigEndian) {
+                if (!BitConverter.IsLittleEndian) {
                     return ((double*)p)[0];
                 }
                 else {
@@ -117,8 +167,8 @@ namespace ThunderEgg.BrownSugar {
                 }
             }
             return BitConverter.Int64BitsToDouble((
-                (long)(((((p[0] << 8 | p[1]) << 8) | p[2]) << 8 | p[3]) << 32) |
-                (uint)(((((p[4] << 8 | p[5]) << 8) | p[6]) << 8 | p[7]))
+                (long)(((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
+                (uint)(((p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7])
                 ));
         }
 
@@ -304,19 +354,6 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static byte ToUInt8(byte[] buffer, int index) {
-            return buffer[index];
-        }
-
-        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static ushort ToUInt16(byte[] buffer, int index) {
-            return unchecked((ushort)(
-                buffer[index] << 8 |
-                buffer[index + 1]
-                ));
-        }
-
-        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
         public static uint ToUInt32(byte[] buffer, int index) {
             return (
                 (uint)buffer[index] << 24 |
@@ -327,82 +364,87 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static ulong ToUInt64(byte[] buffer, int index) {
-            return (
-                (ulong)buffer[index] << 56 |
-                (ulong)buffer[index + 1] << 48 |
-                (ulong)buffer[index + 2] << 40 |
-                (ulong)buffer[index + 3] << 32 |
-                (ulong)buffer[index + 4] << 24 |
-                (ulong)buffer[index + 5] << 16 |
-                (ulong)buffer[index + 6] << 8 |
-                buffer[index + 7]
-                );
+        public static unsafe ulong ToUInt64(byte[] buffer, int index) {
+            fixed(byte* p = &buffer[index])
+            {
+                if ((((int)p) & 7) == 0) {
+                    if (!BitConverter.IsLittleEndian) {
+                        return ((ulong*)p)[0];
+                    } else {
+                        return (ulong)
+                           ((((uint)p[7] << 8 | p[6]) << 8 | p[5]) << 8 | p[4]) << 32 |
+                           ((((uint)p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0]);
+                    }
+                }
+                // il 55 bytes
+                return (ulong)
+                    ((((uint)p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
+                    ((((uint)p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]);
+            }
         }
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static sbyte ToInt8(byte[] buffer, int index) {
-            return unchecked((sbyte)buffer[index]);
+        public static unsafe int ToInt32(byte[] buffer, int index) {
+            fixed(byte* p = &buffer[index])
+            {
+                return ((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3];
+            }
         }
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static short ToInt16(byte[] buffer, int index) {
-            return unchecked((short)(
-                buffer[index] << 8 |
-                buffer[index + 1]
-                ));
+        public static unsafe long ToInt64(byte[] buffer, int index) {
+            fixed (byte* p = &buffer[index])
+            {
+                if ((index & 7) == 0) {
+                    if (!BitConverter.IsLittleEndian) {
+                        return ((long*)p)[0];
+                    }
+                    else {
+                        return unchecked((long)
+                            ((((uint)p[7] << 8 | p[6]) << 8 | p[5]) << 8 | p[4]) << 32 |
+                            ((((uint)p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0]));
+
+                    }
+                }
+                // il 52 bytes
+                return unchecked((long)
+                    ((((uint)p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
+                    ((((uint)p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]));
+            }
         }
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static int ToInt32(byte[] buffer, int index) {
-            return unchecked((int)(
-                (uint)buffer[index] << 24 |
-                (uint)buffer[index + 1] << 16 |
-                (uint)buffer[index + 2] << 8 |
-                buffer[index + 3]
-                ));
+        public static unsafe float ToSingle(byte[] buffer, int index) {
+            if ((index & 3) == 0) {
+                fixed (byte* fix = buffer)
+                {
+                    var p = fix + index;
+                    if (!BitConverter.IsLittleEndian) {
+                        return ((float*)p)[0];
+                    }
+                    else {
+                        float tmp;
+                        ((uint*)&tmp)[0] = ((uint*)p)[0].SwapByteOrder();
+                        return tmp;
+                    }
+                }
+            }
+            else {
+                float tmp;
+                ((byte*)&tmp)[0] = buffer[0];
+                ((byte*)&tmp)[1] = buffer[1];
+                ((byte*)&tmp)[2] = buffer[2];
+                ((byte*)&tmp)[3] = buffer[3];
+                return tmp;
+            }
         }
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static long ToInt64(byte[] buffer, int index) {
-            return unchecked((long)(
-                (ulong)buffer[index] << 56 |
-                (ulong)buffer[index + 1] << 48 |
-                (ulong)buffer[index + 2] << 40 |
-                (ulong)buffer[index + 3] << 32 |
-                (ulong)buffer[index + 4] << 24 |
-                (ulong)buffer[index + 5] << 16 |
-                (ulong)buffer[index + 6] << 8 |
-                buffer[index + 7]
-                ));
-        }
-
-        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static bool ToBool(byte[] buffer, int index) {
-            return buffer[index] != 0;
-        }
-
-        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static char ToChar(byte[] buffer, int index) {
-            return unchecked((char)(
-                buffer[index] << 8 |
-                buffer[index + 1]
-                ));
-        }
-
-        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static double ToDouble(byte[] buffer, int index) {
+        public static double ToDouble(byte[] p, int i) {
             return BitConverter.Int64BitsToDouble(
-                unchecked((long)(
-                (ulong)buffer[index] << 56 |
-                (ulong)buffer[index + 1] << 48 |
-                (ulong)buffer[index + 2] << 40 |
-                (ulong)buffer[index + 3] << 32 |
-                (ulong)buffer[index + 4] << 24 |
-                (ulong)buffer[index + 5] << 16 |
-                (ulong)buffer[index + 6] << 8 |
-                buffer[index + 7]
-                )));
+                (long)(((p[i + 0] << 8 | p[i + 1]) << 8 | p[i + 2]) << 8 | p[i + 3]) << 32 |
+                (uint)(((p[i + 4] << 8 | p[i + 5]) << 8 | p[i + 6]) << 8 | p[i + 7])
+                );
         }
     }
 }
