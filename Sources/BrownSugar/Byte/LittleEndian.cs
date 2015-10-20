@@ -12,41 +12,7 @@ using System;
 namespace ThunderEgg.BrownSugar {
 
     /// <summary>リトルエンディアン順でバッファを操作します</summary>
-    public static class LittleEndian {
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe byte ToUInt8(byte* buffer) {
-            return buffer[0];
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe sbyte ToInt8(byte* buffer) {
-            return ((sbyte*)buffer)[0];
-        }
-
-        /// <summary>リトルエンディアン順でバッファ読み込み</summary>
-        public static byte ToUInt8(byte[] buffer, int index) {
-            return buffer[index];
-        }
-
-        /// <summary>リトルエンディアン順でバッファ読み込み</summary>
-        public static sbyte ToInt8(byte[] buffer, int index) {
-            return unchecked((sbyte)buffer[index]);
-        }
-
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe bool ToBoolean(byte* buffer) {
-            return buffer[0] != 0;
-        }
-
-        /// <summary>リトルエンディアン順でバッファ読み込み</summary>
-        public static bool ToBoolean(byte[] buffer, int index) {
-            return buffer[index] != 0;
-        }
-
-        //
-        //
-        //
+    public class LittleEndian : NoByteOrder {
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
         public static unsafe ushort ToUInt16(byte* b) {
@@ -84,17 +50,12 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
         public static unsafe uint ToUInt32(byte* p) {
-            // il 24 bytes 
-            return (((uint)p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0]; // 24
-#if false
-            // il 26 bytes 
-            return (((uint)p[3] << 24) | ((uint)p[2] << 16) | ((uint)p[1] << 8) | p[0]);
-#endif
+            return (((uint)p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0];
         }
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
-        public static uint ToUInt32(byte[] p, int i) {
-            return (p[i] | (uint)p[i + 1] << 8 | (uint)p[i + 2] << 16 | (uint)p[i + 3] << 24);
+        public static unsafe uint ToUInt32(byte[] p, int i) {
+            return (((uint)p[i + 3] << 8 | p[i + 2]) << 8 | p[i + 1]) << 8 | p[i];
         }
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
@@ -103,61 +64,20 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
-        public static int ToInt32(byte[] b, int i) {
-            return unchecked((int)(
-                b[i] |
-                (uint)b[i + 1] << 8 |
-                (uint)b[i + 2] << 16 |
-                (uint)b[i + 3] << 24
-                ));
+        public static int ToInt32(byte[] p, int i) {
+            return ((p[i + 3] << 8 | p[i + 2]) << 8 | p[i + 1]) << 8 | p[i];
         }
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
         public static unsafe float ToSingle(byte* p) {
-            if (((int)p & 3) == 0) {
-                if (BitConverter.IsLittleEndian) {
-                    return ((float*)p)[0];
-                }
-                else {
-                    float tmp;
-                    ((uint*)&tmp)[0] = ((uint*)p)[0].SwapByteOrder();
-                    return tmp;
-                }
-            }
-            else {
-                float tmp;
-                ((byte*)&tmp)[0] = p[0];
-                ((byte*)&tmp)[1] = p[1];
-                ((byte*)&tmp)[2] = p[2];
-                ((byte*)&tmp)[3] = p[3];
-                return tmp;
-            }
+            var tmp = ((p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0];
+            return ((float*)&tmp)[0];
         }
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe float ToSingle(byte[] buffer, int index) {
-            if ((index & 3) == 0) {
-                fixed (byte* fix = buffer)
-                {
-                    var p = fix + index;
-                    if (BitConverter.IsLittleEndian) {
-                        return ((float*)p)[0];
-                    }
-                    else {
-                        float tmp;
-                        ((uint*)&tmp)[0] = ((uint*)p)[0].SwapByteOrder();
-                        return tmp;
-                    }
-                }
-            }
-            else {
-                float tmp;
-                ((byte*)&tmp)[0] = buffer[0];
-                ((byte*)&tmp)[1] = buffer[1];
-                ((byte*)&tmp)[2] = buffer[2];
-                ((byte*)&tmp)[3] = buffer[3];
-                return tmp;
-            }
+        public static unsafe float ToSingle(byte[] p, int index) {
+            var tmp = ((p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0];
+            return ((float*)&tmp)[0];
         }
 
         //
@@ -258,11 +178,6 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, byte value) {
-            buffer[0] = value;
-        }
-
-        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, ushort value) {
             buffer[0] = (byte)value;
             buffer[1] = (byte)(value >> 8);
@@ -295,11 +210,6 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, sbyte value) {
-            buffer[0] = (byte)value;
-        }
-
-        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, short value) {
             buffer[0] = (byte)value;
             buffer[1] = (byte)(value >> 8);
@@ -329,11 +239,6 @@ namespace ThunderEgg.BrownSugar {
             buffer[5] = v[5];
             buffer[6] = v[6];
             buffer[7] = v[7];
-        }
-
-        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, bool value) {
-            buffer[0] = ((byte*)&value)[0];
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
@@ -374,11 +279,6 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, byte value) {
-            buffer[index] = value;
-        }
-
-        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, ushort value) {
             buffer[index] = unchecked((byte)value);
             buffer[index + 1] = unchecked((byte)(value >> 8));
@@ -414,11 +314,6 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, sbyte value) {
-            buffer[index] = unchecked((byte)value);
-        }
-
-        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static void Assign(byte[] buffer, int index, short value) {
             buffer[index] = unchecked((byte)value);
             buffer[index + 1] = unchecked((byte)(value >> 8));
@@ -438,11 +333,6 @@ namespace ThunderEgg.BrownSugar {
             {
                 fixed (byte* p = &buffer[index]) Assign(p, value);
             }
-        }
-
-        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, bool value) {
-            buffer[index] = value ? (byte)1 : (byte)0;
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
