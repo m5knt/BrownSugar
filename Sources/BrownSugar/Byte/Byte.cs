@@ -115,36 +115,6 @@ namespace ThunderEgg.BrownSugar {
             }
         }
 
-        /// <summary>マーシャルなオブジェクトをバッファへ書き込み</summary>
-        public static void Assign<T>(byte[] buffer, int index, T data)
-        {
-            if (Marshal.SizeOf(data) > (buffer.Length - index)) {
-                throw new Exception();
-            }
-            unsafe
-            {
-                fixed (byte* fix = buffer)
-                {
-                    Marshal.StructureToPtr(data, new IntPtr(fix + index), false);
-                }
-                //SwapByteOrder(buffer, index, typeof(T));
-            }
-        }
-
-        /// <summary>マーシャルなオブジェクトの読み込み</summary>
-        public static T To<T>(byte[] buffer, int index) {
-            var tmp = new byte[buffer.Length - index];
-            Buffer.BlockCopy(buffer, index, tmp, 0, tmp.Length);
-            //SwapByteOrder(buffer, index, typeof(T));
-            unsafe
-            {
-                fixed (byte* fix = tmp)
-                {
-                    return (T)Marshal.PtrToStructure(new IntPtr(fix), typeof(T));
-                }
-            }
-        }
-
         /// <summary>型情報をもとにバイトオーダーを反転させます</summary>
         static void SwapByteOrder(byte[] buffer, int index, Type type) {
             var fields = type.GetFields();
