@@ -10,16 +10,88 @@ namespace Test {
     [TestClass]
     public class PerfEndianAll {
 
+        public PerfEndian PerfEndian = new PerfEndian();
+
         [TestMethod]
-        public void PerfLittleEndian() {
-            var test = new PerfEndian();
-            test.PerfLittleEndian();
+        public void LittleEndian2Bytes() {
+            PerfEndian.LittleEndianToUInt16();
+            PerfEndian.LittleEndianToInt16();
+            PerfEndian.LittleEndianToChar();
         }
 
         [TestMethod]
-        public void PerfBigEndian() {
-            var test = new PerfEndian();
-            test.PerfBigEndian();
+        public void BigEndian2Bytes() {
+            PerfEndian.BigEndianToUInt16();
+            PerfEndian.BigEndianToInt16();
+            PerfEndian.BigEndianToChar();
+        }
+
+        [TestMethod]
+        public void LittleEndian4Bytes() {
+            PerfEndian.LittleEndianToUInt32();
+            PerfEndian.LittleEndianToInt32();
+            PerfEndian.LittleEndianToSingle();
+        }
+
+        [TestMethod]
+        public void BigEndian4Bytes() {
+            PerfEndian.BigEndianToUInt32();
+            PerfEndian.BigEndianToInt32();
+            PerfEndian.BigEndianToSingle();
+        }
+
+        [TestMethod]
+        public void LittleEndian8Bytes() {
+            PerfEndian.LittleEndianToUInt64();
+            PerfEndian.LittleEndianToInt64();
+            PerfEndian.LittleEndianToDouble();
+        }
+
+        [TestMethod]
+        public void BigEndian8Bytes() {
+            PerfEndian.BigEndianToUInt64();
+            PerfEndian.BigEndianToInt64();
+            PerfEndian.BigEndianToDouble();
+        }
+
+        [TestMethod]
+        public void LittleEndian() {
+            Console.WriteLine("1");
+            PerfEndian.LittleEndianToBoolean();
+            Console.WriteLine("2");
+            PerfEndian.LittleEndianToUInt16();
+            PerfEndian.LittleEndianToInt16();
+            PerfEndian.LittleEndianToChar();
+            /**/
+            Console.WriteLine("4");
+            PerfEndian.LittleEndianToUInt32();
+            PerfEndian.LittleEndianToInt32();
+            PerfEndian.LittleEndianToSingle();
+            /**/
+            Console.WriteLine("8");
+            PerfEndian.LittleEndianToUInt64();
+            PerfEndian.LittleEndianToInt64();
+            PerfEndian.LittleEndianToDouble();
+        }
+
+        [TestMethod]
+        public void BigEndian() {
+            Console.WriteLine("1");
+            PerfEndian.BigEndianToBoolean();
+            Console.WriteLine("2");
+            PerfEndian.BigEndianToUInt16();
+            PerfEndian.BigEndianToInt16();
+            PerfEndian.BigEndianToChar();
+            /**/
+            Console.WriteLine("4");
+            PerfEndian.BigEndianToUInt32();
+            PerfEndian.BigEndianToInt32();
+            PerfEndian.BigEndianToSingle();
+            /**/
+            Console.WriteLine("8");
+            PerfEndian.BigEndianToUInt64();
+            PerfEndian.BigEndianToInt64();
+            PerfEndian.BigEndianToDouble();
         }
     }
 
@@ -27,46 +99,8 @@ namespace Test {
     [TestClass]
     public class PerfEndian {
 
-        const double Limit = 60;
+        const double Limit = 2;
         const int Boost = 100;
-
-        public void PerfLittleEndian() {
-            Console.WriteLine("1");
-            PerfLittleEndianToBoolean();
-            Console.WriteLine("2");
-            PerfLittleEndianToUInt16();
-            PerfLittleEndianToInt16();
-            PerfLittleEndianToChar();
-            /**/
-            Console.WriteLine("4");
-            PerfLittleEndianToUInt32();
-            PerfLittleEndianToInt32();
-            PerfLittleEndianToSingle();
-            /**/
-            Console.WriteLine("8");
-            PerfLittleEndianToUInt64();
-            PerfLittleEndianToInt64();
-            PerfLittleEndianToDouble();
-        }
-
-        public void PerfBigEndian() {
-            Console.WriteLine("1");
-            PerfBigEndianToBoolean();
-            Console.WriteLine("2");
-            PerfBigEndianToUInt16();
-            PerfBigEndianToInt16();
-            PerfBigEndianToChar();
-            /**/
-            Console.WriteLine("4");
-            PerfBigEndianToUInt32();
-            PerfBigEndianToInt32();
-            PerfBigEndianToSingle();
-            /**/
-            Console.WriteLine("8");
-            PerfBigEndianToUInt64();
-            PerfBigEndianToInt64();
-            PerfBigEndianToDouble();
-        }
 
         [TestMethod]
         public unsafe void PerfInt32() {
@@ -97,7 +131,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToUInt16() {
+        public unsafe void LittleEndianToUInt16() {
             var ret = Duel(Limit, "PerfLittleEndianToUInt16",
                 (b, i) => { BitConverter.ToUInt16(b, i); },
                 (b, i) => { LittleEndian.ToUInt16(b, i); },
@@ -106,7 +140,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToInt16() {
+        public unsafe void LittleEndianToInt16() {
             var ret = Duel(Limit, "PerfLittleEndianToInt16",
                 (b, i) => { BitConverter.ToInt16(b, i); },
                 (b, i) => { LittleEndian.ToInt16(b, i); },
@@ -115,7 +149,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToUInt32() {
+        public unsafe void LittleEndianToUInt32() {
             var ret = Duel(Limit, "PerfLittleEndianToUInt32",
                 (b, i) => { BitConverter.ToUInt32(b, i); },
                 (b, i) => { LittleEndian.ToUInt32(b, i); },
@@ -124,7 +158,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToInt32() {
+        public unsafe void LittleEndianToInt32() {
             var ret = Duel(Limit, "PerfLittleEndianToInt32",
                 (b, i) => { BitConverter.ToInt32(b, i); },
                 (b, i) => { LittleEndian.ToInt32(b, i); },
@@ -133,7 +167,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToUInt64() {
+        public unsafe void LittleEndianToUInt64() {
             var ret = Duel(Limit, "PerfLittleEndianToUInt64",
                 (b, i) => { BitConverter.ToUInt64(b, i); },
                 (b, i) => { LittleEndian.ToUInt64(b, i); },
@@ -142,7 +176,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToInt64() {
+        public unsafe void LittleEndianToInt64() {
             var ret = Duel(Limit, "PerfLittleEndianToInt64",
                 (b, i) => { BitConverter.ToInt64(b, i); },
                 (b, i) => { LittleEndian.ToInt64(b, i); },
@@ -151,7 +185,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToBoolean() {
+        public unsafe void LittleEndianToBoolean() {
             var ret = Duel(Limit, "PerfLittleEndianToBoolean",
                 (b, i) => { BitConverter.ToBoolean(b, i); },
                 (b, i) => { LittleEndian.ToBoolean(b, i); },
@@ -160,7 +194,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToChar() {
+        public unsafe void LittleEndianToChar() {
             var ret = Duel(Limit, "PerfLittleEndianToChar",
                 (b, i) => { BitConverter.ToChar(b, i); },
                 (b, i) => { LittleEndian.ToChar(b, i); },
@@ -169,7 +203,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToSingle() {
+        public unsafe void LittleEndianToSingle() {
             var ret = Duel(Limit, "PerfLittleEndianToSingle",
                 (b, i) => { BitConverter.ToSingle(b, i); },
                 (b, i) => { LittleEndian.ToSingle(b, i); },
@@ -178,7 +212,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfLittleEndianToDouble() {
+        public unsafe void LittleEndianToDouble() {
             var ret = Duel(Limit, "PerfLittleEndianToDouble",
                 (b, i) => { BitConverter.ToDouble(b, i); },
                 (b, i) => { LittleEndian.ToDouble(b, i); },
@@ -196,7 +230,7 @@ namespace Test {
         //
 
         [TestMethod]
-        public unsafe void PerfBigEndianToUInt16() {
+        public unsafe void BigEndianToUInt16() {
             var ret = Duel(Limit, "PerfBigEndianToUInt16",
                 (b, i) => { var n = unchecked((ushort)IPAddress.NetworkToHostOrder(unchecked((short)BitConverter.ToUInt16(b, i)))); },
                 (b, i) => { var n = BigEndian.ToUInt16(b, i); },
@@ -205,7 +239,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfBigEndianToInt16() {
+        public unsafe void BigEndianToInt16() {
             var ret = Duel(Limit, "PerfBigEndianToInt16",
                 (b, i) => { IPAddress.NetworkToHostOrder(BitConverter.ToInt16(b, i)); },
                 (b, i) => { BigEndian.ToInt16(b, i); },
@@ -214,7 +248,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfBigEndianToUInt32() {
+        public unsafe void BigEndianToUInt32() {
             var ret = Duel(Limit, "PerfBigEndianToUInt32",
                 (b, i) => { var n = unchecked((uint)IPAddress.NetworkToHostOrder(unchecked((int)BitConverter.ToUInt32(b, i)))); },
                 (b, i) => { var n = BigEndian.ToUInt32(b, i); },
@@ -223,7 +257,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfBigEndianToInt32() {
+        public unsafe void BigEndianToInt32() {
             var ret = Duel(Limit, "PerfBigEndianToInt32",
                 (b, i) => { IPAddress.NetworkToHostOrder(BitConverter.ToInt32(b, i)); },
                 (b, i) => { BigEndian.ToInt32(b, i); },
@@ -232,7 +266,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfBigEndianToUInt64() {
+        public unsafe void BigEndianToUInt64() {
             var ret = Duel(Limit, "PerfBigEndianToUInt64",
                 (b, i) => { var n = unchecked((ulong)IPAddress.NetworkToHostOrder(unchecked((long)BitConverter.ToUInt64(b, i)))); },
                 (b, i) => { var n = BigEndian.ToUInt64(b, i); },
@@ -241,7 +275,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfBigEndianToInt64() {
+        public unsafe void BigEndianToInt64() {
             var ret = Duel(Limit, "PerfBigEndianToInt64",
                 (b, i) => { IPAddress.NetworkToHostOrder(BitConverter.ToInt64(b, i)); },
                 (b, i) => { BigEndian.ToInt64(b, i); },
@@ -250,7 +284,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfBigEndianToBoolean() {
+        public unsafe void BigEndianToBoolean() {
             var ret = Duel(Limit, "PerfBigEndianToBoolean",
                 (b, i) => { BitConverter.ToBoolean(b, i); },
                 (b, i) => { BigEndian.ToBoolean(b, i); },
@@ -259,7 +293,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfBigEndianToChar() {
+        public unsafe void BigEndianToChar() {
             var ret = Duel(Limit, "PerfBigEndianToChar",
                 (b, i) => { var n = unchecked((char)IPAddress.NetworkToHostOrder(unchecked((ushort)BitConverter.ToChar(b, i)))); },
                 (b, i) => { var n = BigEndian.ToChar(b, i); },
@@ -268,7 +302,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfBigEndianToSingle() {
+        public unsafe void BigEndianToSingle() {
             var ret = Duel(Limit, "PerfBigEndianToSingle",
                 (b, i) => { BitConverter.ToSingle(b, i); },
                 (b, i) => { BigEndian.ToSingle(b, i); },
@@ -277,7 +311,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public unsafe void PerfBigEndianToDouble() {
+        public unsafe void BigEndianToDouble() {
             var ret = Duel(Limit, "PerfBigEndianToDouble",
                 (b, i) => { BitConverter.Int64BitsToDouble(IPAddress.NetworkToHostOrder(BitConverter.ToInt64(b, i))); },
                 (b, i) => { BigEndian.ToDouble(b, i); },

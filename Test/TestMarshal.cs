@@ -80,11 +80,11 @@ namespace Test {
         public unsafe void TestMarshalClass() {
             var src = new MarshalClass();
             var srcbin = new byte[src.MarshalSize()];
-            ByteOrder.Assign(srcbin, 0, src);
+            HostOrder.Assign(srcbin, 0, src);
             /**/
-            var ext = ByteOrder.To<MarshalClass>(srcbin, 0);
+            var ext = HostOrder.To<MarshalClass>(srcbin, 0);
             var extbin = new byte[ext.MarshalSize()];
-            ByteOrder.Assign(extbin, 0, ext);
+            HostOrder.Assign(extbin, 0, ext);
             /**/
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
         }
@@ -93,11 +93,11 @@ namespace Test {
         public unsafe void TestMarshalFixed() {
             var src = MarshalFixed.Create();
             var srcbin = new byte[src.MarshalSize()];
-            ByteOrder.Assign(srcbin, 0, src);
+            HostOrder.Assign(srcbin, 0, src);
             /**/
-            var ext = ByteOrder.To<MarshalFixed>(srcbin, 0);
+            var ext = HostOrder.To<MarshalFixed>(srcbin, 0);
             var extbin = new byte[ext.MarshalSize()];
-            ByteOrder.Assign(extbin, 0, ext);
+            HostOrder.Assign(extbin, 0, ext);
             /**/
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
         }
