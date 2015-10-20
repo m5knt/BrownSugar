@@ -3,6 +3,13 @@
  * @brief ホストオーダー順のバッファ操作
  */
 
+using System;
+using System.Runtime.InteropServices;
+
+//
+//
+//
+
 namespace ThunderEgg.BrownSugar {
 
     /// <summary>アライメント済みのバッファをホストオーダー順で操作</summary>
@@ -149,7 +156,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
         public static unsafe void Assign(byte[] buffer, int index, char value) {
             fixed (byte* b = &buffer[index])
-            *(char*)b = value
+            *(char*)b = value;
         }
 
         //
@@ -227,4 +234,64 @@ namespace ThunderEgg.BrownSugar {
         }
 
     }
+
+    public static class HostOrder {
+
+        /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
+        public static void Assign<T>(byte[] buffer, int index, T obj) {
+            int length = Marshal.SizeOf(typeof(T));
+            if (index < 0 || (index + length) > buffer.Length) {
+                throw new IndexOutOfRangeException();
+            }
+            unsafe
+            {
+                fixed (byte* fix = buffer)
+                {
+                    Marshal.StructureToPtr(obj, new IntPtr(fix + index), false);
+                }
+            }
+        }
+
+        /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
+        public static byte[] GetBytes<T>(T obj) {
+            int length = Marshal.SizeOf(typeof(T));
+            var buffer = new byte[length];
+            Assign(buffer, 0, obj);
+            return buffer;
+        }
+
+        /// <summary>バッファからオブジェクトを復元する</summary>
+        public static void To<T>(byte[] buffer, int index, T obj)
+            where T : class {
+            var type = typeof(T);
+            int length = Marshal.SizeOf(type);
+            if (index < 0 || (index + length) > buffer.Length) {
+                throw new IndexOutOfRangeException();
+            }
+            unsafe
+            {
+                fixed (byte* fix = &buffer[index])
+                {
+                    Marshal.PtrToStructure(new IntPtr(fix), obj);
+                }
+            }
+        }
+
+        /// <summary>バッファからオブジェクトを復元する</summary>
+        public static T To<T>(byte[] buffer, int index) {
+            var type = typeof(T);
+            int length = Marshal.SizeOf(type);
+            if (index < 0 || (index + length) > buffer.Length) {
+                throw new IndexOutOfRangeException();
+            }
+            unsafe
+            {
+                fixed (byte* fix = buffer)
+                {
+                    return (T)Marshal.PtrToStructure(new IntPtr(fix + index), type);
+                }
+            }
+        }
+    }
+
 }
