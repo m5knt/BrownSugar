@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Byte\BigEndian.cs" />
-    <Compile Include="Byte\ByteOrder.cs" />
+    <Compile Include="Byte\OneByte.cs" />
     <Compile Include="Byte\Cast.cs" />
     <Compile Include="Byte\HostOrder.cs" />
     <Compile Include="Byte\LittleEndian.cs" />

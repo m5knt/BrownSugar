@@ -13,36 +13,36 @@ using System.Runtime.InteropServices;
 namespace ThunderEgg.BrownSugar {
 
     /// <summary>アライメント済みのバッファをホストオーダー順で操作</summary>
-    public class HostOrderAligned : NoByteOrder {
+    public class HostOrderAligned : OneByte {
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
-        public static unsafe ushort ToUInt16(byte* b) {
-            return *(ushort*)b;
+        public static unsafe ushort ToUInt16(byte* buffer) {
+            return *(ushort*)buffer;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
-        public static unsafe short ToInt16(byte* b) {
-            return *(short*)b;
+        public static unsafe short ToInt16(byte* buffer) {
+            return *(short*)buffer;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
-        public static unsafe char ToChar(byte* b) {
-            return *(char*)b;
+        public static unsafe char ToChar(byte* buffer) {
+            return *(char*)buffer;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
         public static unsafe ushort ToUInt16(byte[] buffer, int index) {
-            fixed (byte* b = &buffer[index]) return *(ushort*)b;
+            fixed (byte* p = &buffer[index]) return *(ushort*)p;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
         public static unsafe short ToInt16(byte[] buffer, int index) {
-            fixed (byte* b = &buffer[index]) return *(short*)b;
+            fixed (byte* p = &buffer[index]) return *(short*)p;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
         public static unsafe char ToChar(byte[] buffer, int index) {
-            fixed (byte* b = &buffer[index]) return *(char*)b;
+            fixed (byte* p = &buffer[index]) return *(char*)p;
         }
 
         //
@@ -50,33 +50,33 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
-        public static unsafe uint ToUInt32(byte* b) {
-            return *(uint*)b;
+        public static unsafe uint ToUInt32(byte* buffer) {
+            return *(uint*)buffer;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
-        public static unsafe int ToInt32(byte* b) {
-            return *(int*)b;
+        public static unsafe int ToInt32(byte* buffer) {
+            return *(int*)buffer;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
-        public static unsafe float ToSingle(byte* b) {
-            return *(float*)b;
+        public static unsafe float ToSingle(byte* buffer) {
+            return *(float*)buffer;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
         public static unsafe uint ToUInt32(byte[] buffer, int index) {
-            fixed (byte* b = &buffer[index]) return *(uint*)b;
+            fixed (byte* p = &buffer[index]) return *(uint*)p;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
         public static unsafe int ToInt32(byte[] buffer, int index) {
-            fixed (byte* b = &buffer[index]) return *(int*)b;
+            fixed (byte* p = &buffer[index]) return *(int*)p;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
         public static unsafe float ToSingle(byte[] buffer, int index) {
-            fixed (byte* b = &buffer[index]) return *(float*)b;
+            fixed (byte* p = &buffer[index]) return *(float*)p;
         }
 
         //
@@ -84,33 +84,33 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
-        public static unsafe ulong ToUInt64(byte* b) {
-            return *(ulong*)b;
+        public static unsafe ulong ToUInt64(byte* buffer) {
+            return *(ulong*)buffer;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
-        public static unsafe long ToInt64(byte* b) {
-            return *(long*)b;
+        public static unsafe long ToInt64(byte* buffer) {
+            return *(long*)buffer;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
-        public static unsafe double ToDouble(byte* b) {
-            return *(double*)b;
+        public static unsafe double ToDouble(byte* buffer) {
+            return *(double*)buffer;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
         public static unsafe ulong ToUInt64(byte[] buffer, int index) {
-            fixed (byte* b = &buffer[index]) return *(ulong*)b;
+            fixed (byte* p = &buffer[index]) return *(ulong*)p;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
         public static unsafe long ToInt64(byte[] buffer, int index) {
-            fixed (byte* b = &buffer[index]) return *(long*)b;
+            fixed (byte* p = &buffer[index]) return *(long*)p;
         }
 
         /// <summary>アライメント済みバッファ位置の値をホストオーダー順で取得</summary>
         public static unsafe double ToDouble(byte[] buffer, int index) {
-            fixed (byte* b = &buffer[index]) return *(double*)b;
+            fixed (byte* p = &buffer[index]) return *(double*)p;
         }
 
         //
@@ -118,33 +118,33 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
-        public static unsafe void Assign(byte* b, ushort value) {
-            *(ushort*)b = value;
+        public static unsafe void Assign(byte* buffer, ushort value) {
+            *(ushort*)buffer = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
-        public static unsafe void Assign(byte* b, short value) {
-            *(short*)b = value;
+        public static unsafe void Assign(byte* buffer, short value) {
+            *(short*)buffer = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
-        public static unsafe void Assign(byte* b, char value) {
-            *(char*)b = value;
+        public static unsafe void Assign(byte* buffer, char value) {
+            *(char*)buffer = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
         public static unsafe void Assign(byte[] buffer, int index, ushort value) {
-            fixed (byte* b = &buffer[index]) *(ushort*)b = value;
+            fixed (byte* p = &buffer[index]) *(ushort*)p = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
         public static unsafe void Assign(byte[] buffer, int index, short value) {
-            fixed (byte* b = &buffer[index]) *(short*)b = value;
+            fixed (byte* p = &buffer[index]) *(short*)p = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
         public static unsafe void Assign(byte[] buffer, int index, char value) {
-            fixed (byte* b = &buffer[index]) *(char*)b = value;
+            fixed (byte* p = &buffer[index]) *(char*)p = value;
         }
 
         //
@@ -152,18 +152,18 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
-        public static unsafe void Assign(byte* b, uint value) {
-            *(uint*)b = value;
+        public static unsafe void Assign(byte* buffer, uint value) {
+            *(uint*)buffer = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
-        public static unsafe void Assign(byte* b, int value) {
-            *(int*)b = value;
+        public static unsafe void Assign(byte* buffer, int value) {
+            *(int*)buffer = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
-        public static unsafe void Assign(byte* b, float value) {
-            *(float*)b = value;
+        public static unsafe void Assign(byte* buffer, float value) {
+            *(float*)buffer = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
@@ -202,12 +202,12 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
         public static unsafe void Assign(byte[] buffer, int index, ulong value) {
-            fixed (byte* b = &buffer[index]) *(ulong*)b = value;
+            fixed (byte* p = &buffer[index]) *(ulong*)p = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
         public static unsafe void Assign(byte[] buffer, int index, long value) {
-            fixed (byte* b = &buffer[index]) *(long*)b = value;
+            fixed (byte* p = &buffer[index]) *(long*)p = value;
         }
 
         /// <summary>アライメント済みバッファ位置に値をホストオーダー順で書く</summary>
@@ -220,7 +220,7 @@ namespace ThunderEgg.BrownSugar {
     //
     //
 
-    public static class HostOrder {
+    public class HostOrder {
 
         /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
         public static void Assign<T>(byte[] buffer, int index, T obj) {

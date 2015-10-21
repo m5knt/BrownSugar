@@ -13,6 +13,13 @@ namespace Test {
         public PerfEndian PerfEndian = new PerfEndian();
 
         [TestMethod]
+        public void NoEndianByte() {
+            PerfEndian.NoByteOrderToUInt8();
+            PerfEndian.NoByteOrderToInt8();
+            PerfEndian.NoByteOrderToBoolean();
+        }
+
+        [TestMethod]
         public void LittleEndian2Bytes() {
             PerfEndian.LittleEndianToUInt16();
             PerfEndian.LittleEndianToInt16();
@@ -128,6 +135,33 @@ namespace Test {
                 }
             });
             Console.WriteLine("type 3 : " + result);
+        }
+
+        [TestMethod]
+        public unsafe void NoByteOrderToUInt8() {
+            var ret = Duel(Limit, "ToUInt8",
+                (b, i) => { BitConverter.ToBoolean(b, i); },
+                (b, i) => { LittleEndian.ToUInt8(b, i); },
+                (b) => { LittleEndian.ToUInt8(b); });
+            Assert.IsTrue(ret);
+        }
+
+        [TestMethod]
+        public unsafe void NoByteOrderToInt8() {
+            var ret = Duel(Limit, "ToInt8",
+                (b, i) => { BitConverter.ToBoolean(b, i); },
+                (b, i) => { LittleEndian.ToInt8(b, i); },
+                (b) => { LittleEndian.ToInt8(b); });
+            Assert.IsTrue(ret);
+        }
+
+        [TestMethod]
+        public unsafe void NoByteOrderToBoolean() {
+            var ret = Duel(Limit, "ToInt8",
+                (b, i) => { BitConverter.ToBoolean(b, i); },
+                (b, i) => { LittleEndian.ToBoolean(b, i); },
+                (b) => { LittleEndian.ToBoolean(b); });
+            Assert.IsTrue(ret);
         }
 
         [TestMethod]

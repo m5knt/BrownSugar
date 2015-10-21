@@ -10,7 +10,7 @@
 namespace ThunderEgg.BrownSugar {
 
     /// <summary>バイトオーダー不要のバッファ操作回り</summary>
-    public class NoByteOrder {
+    public class OneByte {
 
         /// <summary>ポインタ位置の値を取得/遅いです</summary>
         public static unsafe byte ToUInt8(byte* b) {
@@ -46,17 +46,17 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ポインタ位置に値を書/遅いですく</summary>
         public static unsafe void Assign(byte* buffer, byte value) {
-            buffer[0] = value;
+            *buffer = value;
         }
 
         /// <summary>ポインタ位置に値を書く/遅いです</summary>
         public static unsafe void Assign(byte* buffer, sbyte value) {
-            buffer[0] = unchecked((byte)value);
+            *buffer = unchecked((byte)value);
         }
 
         /// <summary>ポインタ位置に値を書く/遅いです</summary>
         public static unsafe void Assign(byte* buffer, bool value) {
-            buffer[0] = value ? (byte)0 : (byte)1;
+            *buffer = value ? (byte)0 : (byte)1;
         }
 
         /// <summary>バッファ位置に値を書く/遅いです</summary>
