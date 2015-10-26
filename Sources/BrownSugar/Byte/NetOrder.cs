@@ -12,7 +12,7 @@ using System;
 namespace ThunderEgg.BrownSugar {
 
     /// <summary>バッファをネットワークバイトオーダー順で操作します</summary>
-    public class NetOrder : BigEndian {
+    public class NetOrder : BigEndianAny {
     }
 
     //

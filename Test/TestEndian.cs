@@ -41,29 +41,29 @@ namespace Test {
                 var src = i == 0 ? Aligned : Offset;
                 fixed (byte* p = src)
                 {
-                    Assert.AreEqual(LittleEndian.ToUInt8(p + i + 14), (byte)0x88);
-                    Assert.AreEqual(LittleEndian.ToUInt16(p + i + 12), (ushort)0x9988);
-                    Assert.AreEqual(LittleEndian.ToUInt32(p + i + 8), (uint)0xbbaa9988);
-                    Assert.AreEqual(LittleEndian.ToUInt64(p + i + 0), (ulong)0xffeeddccbbaa9988);
-                    Assert.AreEqual(LittleEndian.ToInt8(p + i + 14), unchecked((sbyte)0x88));
-                    Assert.AreEqual(LittleEndian.ToInt32(p + i + 8), unchecked((int)0xbbaa9988));
-                    Assert.AreEqual(LittleEndian.ToInt16(p + i + 12), unchecked((short)0x9988));
-                    Assert.AreEqual(LittleEndian.ToInt64(p + i + 0), unchecked((long)0xffeeddccbbaa9988));
-                    Assert.AreEqual(LittleEndian.ToBoolean(p + i + 15), false);
-                    Assert.AreEqual(LittleEndian.ToChar(p + i + 16), '@');
-                    LittleEndian.Assign(p + i + 20, 1.1f);
-                    LittleEndian.Assign(p + i + 24, 2.2);
-                    Assert.AreEqual(LittleEndian.ToSingle(p + i + 20), 1.1f);
-                    Assert.AreEqual(LittleEndian.ToDouble(p + i + 24), 2.2);
+                    Assert.AreEqual(LittleEndianAny.ToUInt8(p + i + 14), (byte)0x88);
+                    Assert.AreEqual(LittleEndianAny.ToUInt16(p + i + 12), (ushort)0x9988);
+                    Assert.AreEqual(LittleEndianAny.ToUInt32(p + i + 8), (uint)0xbbaa9988);
+                    Assert.AreEqual(LittleEndianAny.ToUInt64(p + i + 0), (ulong)0xffeeddccbbaa9988);
+                    Assert.AreEqual(LittleEndianAny.ToInt8(p + i + 14), unchecked((sbyte)0x88));
+                    Assert.AreEqual(LittleEndianAny.ToInt32(p + i + 8), unchecked((int)0xbbaa9988));
+                    Assert.AreEqual(LittleEndianAny.ToInt16(p + i + 12), unchecked((short)0x9988));
+                    Assert.AreEqual(LittleEndianAny.ToInt64(p + i + 0), unchecked((long)0xffeeddccbbaa9988));
+                    Assert.AreEqual(LittleEndianAny.ToBoolean(p + i + 15), false);
+                    Assert.AreEqual(LittleEndianAny.ToChar(p + i + 16), '@');
+                    LittleEndianAny.Assign(p + i + 20, 1.1f);
+                    LittleEndianAny.Assign(p + i + 24, 2.2);
+                    Assert.AreEqual(LittleEndianAny.ToSingle(p + i + 20), 1.1f);
+                    Assert.AreEqual(LittleEndianAny.ToDouble(p + i + 24), 2.2);
                 }
-                Assert.AreEqual(LittleEndian.ToUInt64(src, 0 + i), (ulong)0xffeeddccbbaa9988);
-                Assert.AreEqual(LittleEndian.ToUInt32(src, 8 + i), (uint)0xbbaa9988);
-                Assert.AreEqual(LittleEndian.ToUInt16(src, 12 + i), (ushort)0x9988);
-                Assert.AreEqual(LittleEndian.ToUInt8(src, 14 + i), (byte)0x88);
-                Assert.AreEqual(LittleEndian.ToInt64(src, 0 + i), unchecked((long)0xffeeddccbbaa9988));
-                Assert.AreEqual(LittleEndian.ToInt32(src, 8 + i), unchecked((int)0xbbaa9988));
-                Assert.AreEqual(LittleEndian.ToInt16(src, 12 + i), unchecked((short)0x9988));
-                Assert.AreEqual(LittleEndian.ToInt8(src, 14 + i), unchecked((sbyte)0x88));
+                Assert.AreEqual(LittleEndianAny.ToUInt64(src, 0 + i), (ulong)0xffeeddccbbaa9988);
+                Assert.AreEqual(LittleEndianAny.ToUInt32(src, 8 + i), (uint)0xbbaa9988);
+                Assert.AreEqual(LittleEndianAny.ToUInt16(src, 12 + i), (ushort)0x9988);
+                Assert.AreEqual(LittleEndianAny.ToUInt8(src, 14 + i), (byte)0x88);
+                Assert.AreEqual(LittleEndianAny.ToInt64(src, 0 + i), unchecked((long)0xffeeddccbbaa9988));
+                Assert.AreEqual(LittleEndianAny.ToInt32(src, 8 + i), unchecked((int)0xbbaa9988));
+                Assert.AreEqual(LittleEndianAny.ToInt16(src, 12 + i), unchecked((short)0x9988));
+                Assert.AreEqual(LittleEndianAny.ToInt8(src, 14 + i), unchecked((sbyte)0x88));
             }
         }
 
@@ -75,29 +75,29 @@ namespace Test {
                 var src = i == 0 ? Aligned : Offset;
                 fixed (byte* p = src)
                 {
-                    Assert.AreEqual(BigEndian.ToUInt64(p + i + 0), (ulong)0x8899aabbccddeeff);
-                    Assert.AreEqual(BigEndian.ToUInt32(p + i + 8), (uint)0x8899aabb);
-                    Assert.AreEqual(BigEndian.ToUInt16(p + i + 12), (ushort)0x8899);
-                    Assert.AreEqual(BigEndian.ToUInt8(p + i + 14), (byte)0x88);
-                    Assert.AreEqual(BigEndian.ToInt64(p + i + 0), unchecked((long)0x8899aabbccddeeff));
-                    Assert.AreEqual(BigEndian.ToInt32(p + i + 8), unchecked((int)0x8899aabb));
-                    Assert.AreEqual(BigEndian.ToInt16(p + i + 12), unchecked((short)0x8899));
-                    Assert.AreEqual(BigEndian.ToInt8(p + i + 14), unchecked((sbyte)0x88));
-                    Assert.AreEqual(BigEndian.ToBoolean(p + i + 15), false);
-                    Assert.AreEqual(BigEndian.ToChar(p + i + 16), (char)('@' << 8));
-                    BigEndian.Assign(p + i + 20, 1.1f);
-                    BigEndian.Assign(p + i + 24, 2.2);
-                    Assert.AreEqual(BigEndian.ToSingle(p + i + 20), 1.1f);
-                    Assert.AreEqual(BigEndian.ToDouble(p + i + 24), 2.2);
+                    Assert.AreEqual(BigEndianAny.ToUInt64(p + i + 0), (ulong)0x8899aabbccddeeff);
+                    Assert.AreEqual(BigEndianAny.ToUInt32(p + i + 8), (uint)0x8899aabb);
+                    Assert.AreEqual(BigEndianAny.ToUInt16(p + i + 12), (ushort)0x8899);
+                    Assert.AreEqual(BigEndianAny.ToUInt8(p + i + 14), (byte)0x88);
+                    Assert.AreEqual(BigEndianAny.ToInt64(p + i + 0), unchecked((long)0x8899aabbccddeeff));
+                    Assert.AreEqual(BigEndianAny.ToInt32(p + i + 8), unchecked((int)0x8899aabb));
+                    Assert.AreEqual(BigEndianAny.ToInt16(p + i + 12), unchecked((short)0x8899));
+                    Assert.AreEqual(BigEndianAny.ToInt8(p + i + 14), unchecked((sbyte)0x88));
+                    Assert.AreEqual(BigEndianAny.ToBoolean(p + i + 15), false);
+                    Assert.AreEqual(BigEndianAny.ToChar(p + i + 16), (char)('@' << 8));
+                    BigEndianAny.Assign(p + i + 20, 1.1f);
+                    BigEndianAny.Assign(p + i + 24, 2.2);
+                    Assert.AreEqual(BigEndianAny.ToSingle(p + i + 20), 1.1f);
+                    Assert.AreEqual(BigEndianAny.ToDouble(p + i + 24), 2.2);
                 }
-                Assert.AreEqual(BigEndian.ToUInt64(src, 0 + i), (ulong)0x8899aabbccddeeff);
-                Assert.AreEqual(BigEndian.ToUInt32(src, 8 + i), (uint)0x8899aabb);
-                Assert.AreEqual(BigEndian.ToUInt16(src, 12 + i), (ushort)0x8899);
-                Assert.AreEqual(BigEndian.ToUInt8(src, 14 + i), (byte)0x88);
-                Assert.AreEqual(BigEndian.ToInt64(src, 0 + i), unchecked((long)0x8899aabbccddeeff));
-                Assert.AreEqual(BigEndian.ToInt32(src, 8 + i), unchecked((int)0x8899aabb));
-                Assert.AreEqual(BigEndian.ToInt16(src, 12 + i), unchecked((short)0x8899));
-                Assert.AreEqual(BigEndian.ToInt8(src, 14 + i), unchecked((sbyte)0x88));
+                Assert.AreEqual(BigEndianAny.ToUInt64(src, 0 + i), (ulong)0x8899aabbccddeeff);
+                Assert.AreEqual(BigEndianAny.ToUInt32(src, 8 + i), (uint)0x8899aabb);
+                Assert.AreEqual(BigEndianAny.ToUInt16(src, 12 + i), (ushort)0x8899);
+                Assert.AreEqual(BigEndianAny.ToUInt8(src, 14 + i), (byte)0x88);
+                Assert.AreEqual(BigEndianAny.ToInt64(src, 0 + i), unchecked((long)0x8899aabbccddeeff));
+                Assert.AreEqual(BigEndianAny.ToInt32(src, 8 + i), unchecked((int)0x8899aabb));
+                Assert.AreEqual(BigEndianAny.ToInt16(src, 12 + i), unchecked((short)0x8899));
+                Assert.AreEqual(BigEndianAny.ToInt8(src, 14 + i), unchecked((sbyte)0x88));
             }
         }
 

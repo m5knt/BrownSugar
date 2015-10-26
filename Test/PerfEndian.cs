@@ -141,8 +141,8 @@ namespace Test {
         public unsafe void NoByteOrderToUInt8() {
             var ret = Duel(Limit, "ToUInt8",
                 (b, i) => { BitConverter.ToBoolean(b, i); },
-                (b, i) => { LittleEndian.ToUInt8(b, i); },
-                (b) => { LittleEndian.ToUInt8(b); });
+                (b, i) => { LittleEndianAny.ToUInt8(b, i); },
+                (b) => { LittleEndianAny.ToUInt8(b); });
             Assert.IsTrue(ret);
         }
 
@@ -150,8 +150,8 @@ namespace Test {
         public unsafe void NoByteOrderToInt8() {
             var ret = Duel(Limit, "ToInt8",
                 (b, i) => { BitConverter.ToBoolean(b, i); },
-                (b, i) => { LittleEndian.ToInt8(b, i); },
-                (b) => { LittleEndian.ToInt8(b); });
+                (b, i) => { LittleEndianAny.ToInt8(b, i); },
+                (b) => { LittleEndianAny.ToInt8(b); });
             Assert.IsTrue(ret);
         }
 
@@ -159,8 +159,8 @@ namespace Test {
         public unsafe void NoByteOrderToBoolean() {
             var ret = Duel(Limit, "ToInt8",
                 (b, i) => { BitConverter.ToBoolean(b, i); },
-                (b, i) => { LittleEndian.ToBoolean(b, i); },
-                (b) => { LittleEndian.ToBoolean(b); });
+                (b, i) => { LittleEndianAny.ToBoolean(b, i); },
+                (b) => { LittleEndianAny.ToBoolean(b); });
             Assert.IsTrue(ret);
         }
 
@@ -168,8 +168,8 @@ namespace Test {
         public unsafe void LittleEndianToUInt16() {
             var ret = Duel(Limit, "PerfLittleEndianToUInt16",
                 (b, i) => { BitConverter.ToUInt16(b, i); },
-                (b, i) => { LittleEndian.ToUInt16(b, i); },
-                (b) => { LittleEndian.ToUInt16(b); });
+                (b, i) => { LittleEndianAny.ToUInt16(b, i); },
+                (b) => { LittleEndianAny.ToUInt16(b); });
             Assert.IsTrue(ret);
         }
 
@@ -177,8 +177,8 @@ namespace Test {
         public unsafe void LittleEndianToInt16() {
             var ret = Duel(Limit, "PerfLittleEndianToInt16",
                 (b, i) => { BitConverter.ToInt16(b, i); },
-                (b, i) => { LittleEndian.ToInt16(b, i); },
-                (b) => { LittleEndian.ToInt16(b); });
+                (b, i) => { LittleEndianAny.ToInt16(b, i); },
+                (b) => { LittleEndianAny.ToInt16(b); });
             Assert.IsTrue(ret);
         }
 
@@ -186,8 +186,8 @@ namespace Test {
         public unsafe void LittleEndianToUInt32() {
             var ret = Duel(Limit, "PerfLittleEndianToUInt32",
                 (b, i) => { BitConverter.ToUInt32(b, i); },
-                (b, i) => { LittleEndian.ToUInt32(b, i); },
-                (b) => { LittleEndian.ToUInt32(b); });
+                (b, i) => { LittleEndianAny.ToUInt32(b, i); },
+                (b) => { LittleEndianAny.ToUInt32(b); });
             Assert.IsTrue(ret);
         }
 
@@ -195,8 +195,8 @@ namespace Test {
         public unsafe void LittleEndianToInt32() {
             var ret = Duel(Limit, "PerfLittleEndianToInt32",
                 (b, i) => { BitConverter.ToInt32(b, i); },
-                (b, i) => { LittleEndian.ToInt32(b, i); },
-                (b) => { LittleEndian.ToInt32(b); });
+                (b, i) => { LittleEndianAny.ToInt32(b, i); },
+                (b) => { LittleEndianAny.ToInt32(b); });
             Assert.IsTrue(ret);
         }
 
@@ -204,8 +204,8 @@ namespace Test {
         public unsafe void LittleEndianToUInt64() {
             var ret = Duel(Limit, "PerfLittleEndianToUInt64",
                 (b, i) => { BitConverter.ToUInt64(b, i); },
-                (b, i) => { LittleEndian.ToUInt64(b, i); },
-                (b) => { LittleEndian.ToUInt64(b); });
+                (b, i) => { LittleEndianAny.ToUInt64(b, i); },
+                (b) => { LittleEndianAny.ToUInt64(b); });
             Assert.IsTrue(ret);
         }
 
@@ -213,8 +213,8 @@ namespace Test {
         public unsafe void LittleEndianToInt64() {
             var ret = Duel(Limit, "PerfLittleEndianToInt64",
                 (b, i) => { BitConverter.ToInt64(b, i); },
-                (b, i) => { LittleEndian.ToInt64(b, i); },
-                (b) => { LittleEndian.ToInt64(b); });
+                (b, i) => { LittleEndianAny.ToInt64(b, i); },
+                (b) => { LittleEndianAny.ToInt64(b); });
             Assert.IsTrue(ret);
         }
 
@@ -222,8 +222,8 @@ namespace Test {
         public unsafe void LittleEndianToBoolean() {
             var ret = Duel(Limit, "PerfLittleEndianToBoolean",
                 (b, i) => { BitConverter.ToBoolean(b, i); },
-                (b, i) => { LittleEndian.ToBoolean(b, i); },
-                (b) => { LittleEndian.ToBoolean(b); });
+                (b, i) => { LittleEndianAny.ToBoolean(b, i); },
+                (b) => { LittleEndianAny.ToBoolean(b); });
             Assert.IsTrue(ret);
         }
 
@@ -231,8 +231,8 @@ namespace Test {
         public unsafe void LittleEndianToChar() {
             var ret = Duel(Limit, "PerfLittleEndianToChar",
                 (b, i) => { BitConverter.ToChar(b, i); },
-                (b, i) => { LittleEndian.ToChar(b, i); },
-                (b) => { LittleEndian.ToChar(b); });
+                (b, i) => { LittleEndianAny.ToChar(b, i); },
+                (b) => { LittleEndianAny.ToChar(b); });
             Assert.IsTrue(ret);
         }
 
@@ -240,8 +240,8 @@ namespace Test {
         public unsafe void LittleEndianToSingle() {
             var ret = Duel(Limit, "PerfLittleEndianToSingle",
                 (b, i) => { BitConverter.ToSingle(b, i); },
-                (b, i) => { LittleEndian.ToSingle(b, i); },
-                (b) => { LittleEndian.ToSingle(b); });
+                (b, i) => { LittleEndianAny.ToSingle(b, i); },
+                (b) => { LittleEndianAny.ToSingle(b); });
             Assert.IsTrue(ret);
         }
 
@@ -249,8 +249,8 @@ namespace Test {
         public unsafe void LittleEndianToDouble() {
             var ret = Duel(Limit, "PerfLittleEndianToDouble",
                 (b, i) => { BitConverter.ToDouble(b, i); },
-                (b, i) => { LittleEndian.ToDouble(b, i); },
-                (b) => { LittleEndian.ToDouble(b); });
+                (b, i) => { LittleEndianAny.ToDouble(b, i); },
+                (b) => { LittleEndianAny.ToDouble(b); });
             Assert.IsTrue(ret);
         }
 
@@ -267,8 +267,8 @@ namespace Test {
         public unsafe void BigEndianToUInt16() {
             var ret = Duel(Limit, "PerfBigEndianToUInt16",
                 (b, i) => { var n = unchecked((ushort)IPAddress.NetworkToHostOrder(unchecked((short)BitConverter.ToUInt16(b, i)))); },
-                (b, i) => { var n = BigEndian.ToUInt16(b, i); },
-                (b) => { BigEndian.ToUInt16(b); });
+                (b, i) => { var n = BigEndianAny.ToUInt16(b, i); },
+                (b) => { BigEndianAny.ToUInt16(b); });
             Assert.IsTrue(ret);
         }
 
@@ -276,8 +276,8 @@ namespace Test {
         public unsafe void BigEndianToInt16() {
             var ret = Duel(Limit, "PerfBigEndianToInt16",
                 (b, i) => { IPAddress.NetworkToHostOrder(BitConverter.ToInt16(b, i)); },
-                (b, i) => { BigEndian.ToInt16(b, i); },
-                (b) => { BigEndian.ToInt16(b); });
+                (b, i) => { BigEndianAny.ToInt16(b, i); },
+                (b) => { BigEndianAny.ToInt16(b); });
             Assert.IsTrue(ret);
         }
 
@@ -285,8 +285,8 @@ namespace Test {
         public unsafe void BigEndianToUInt32() {
             var ret = Duel(Limit, "PerfBigEndianToUInt32",
                 (b, i) => { var n = unchecked((uint)IPAddress.NetworkToHostOrder(unchecked((int)BitConverter.ToUInt32(b, i)))); },
-                (b, i) => { var n = BigEndian.ToUInt32(b, i); },
-                (b) => { BigEndian.ToUInt32(b); });
+                (b, i) => { var n = BigEndianAny.ToUInt32(b, i); },
+                (b) => { BigEndianAny.ToUInt32(b); });
             Assert.IsTrue(ret);
         }
 
@@ -294,8 +294,8 @@ namespace Test {
         public unsafe void BigEndianToInt32() {
             var ret = Duel(Limit, "PerfBigEndianToInt32",
                 (b, i) => { IPAddress.NetworkToHostOrder(BitConverter.ToInt32(b, i)); },
-                (b, i) => { BigEndian.ToInt32(b, i); },
-                (b) => { BigEndian.ToInt32(b); });
+                (b, i) => { BigEndianAny.ToInt32(b, i); },
+                (b) => { BigEndianAny.ToInt32(b); });
             Assert.IsTrue(ret);
         }
 
@@ -303,8 +303,8 @@ namespace Test {
         public unsafe void BigEndianToUInt64() {
             var ret = Duel(Limit, "PerfBigEndianToUInt64",
                 (b, i) => { var n = unchecked((ulong)IPAddress.NetworkToHostOrder(unchecked((long)BitConverter.ToUInt64(b, i)))); },
-                (b, i) => { var n = BigEndian.ToUInt64(b, i); },
-                (b) => { BigEndian.ToUInt64(b); });
+                (b, i) => { var n = BigEndianAny.ToUInt64(b, i); },
+                (b) => { BigEndianAny.ToUInt64(b); });
             Assert.IsTrue(ret);
         }
 
@@ -312,8 +312,8 @@ namespace Test {
         public unsafe void BigEndianToInt64() {
             var ret = Duel(Limit, "PerfBigEndianToInt64",
                 (b, i) => { IPAddress.NetworkToHostOrder(BitConverter.ToInt64(b, i)); },
-                (b, i) => { BigEndian.ToInt64(b, i); },
-                (b) => { BigEndian.ToInt64(b); });
+                (b, i) => { BigEndianAny.ToInt64(b, i); },
+                (b) => { BigEndianAny.ToInt64(b); });
             Assert.IsTrue(ret);
         }
 
@@ -321,8 +321,8 @@ namespace Test {
         public unsafe void BigEndianToBoolean() {
             var ret = Duel(Limit, "PerfBigEndianToBoolean",
                 (b, i) => { BitConverter.ToBoolean(b, i); },
-                (b, i) => { BigEndian.ToBoolean(b, i); },
-                (b) => { BigEndian.ToBoolean(b); });
+                (b, i) => { BigEndianAny.ToBoolean(b, i); },
+                (b) => { BigEndianAny.ToBoolean(b); });
             Assert.IsTrue(ret);
         }
 
@@ -330,8 +330,8 @@ namespace Test {
         public unsafe void BigEndianToChar() {
             var ret = Duel(Limit, "PerfBigEndianToChar",
                 (b, i) => { var n = unchecked((char)IPAddress.NetworkToHostOrder(unchecked((ushort)BitConverter.ToChar(b, i)))); },
-                (b, i) => { var n = BigEndian.ToChar(b, i); },
-                (b) => { BigEndian.ToChar(b); });
+                (b, i) => { var n = BigEndianAny.ToChar(b, i); },
+                (b) => { BigEndianAny.ToChar(b); });
             Assert.IsTrue(ret);
         }
 
@@ -339,8 +339,8 @@ namespace Test {
         public unsafe void BigEndianToSingle() {
             var ret = Duel(Limit, "PerfBigEndianToSingle",
                 (b, i) => { BitConverter.ToSingle(b, i); },
-                (b, i) => { BigEndian.ToSingle(b, i); },
-                (b) => { BigEndian.ToSingle(b); });
+                (b, i) => { BigEndianAny.ToSingle(b, i); },
+                (b) => { BigEndianAny.ToSingle(b); });
             Assert.IsTrue(ret);
         }
 
@@ -348,8 +348,8 @@ namespace Test {
         public unsafe void BigEndianToDouble() {
             var ret = Duel(Limit, "PerfBigEndianToDouble",
                 (b, i) => { BitConverter.Int64BitsToDouble(IPAddress.NetworkToHostOrder(BitConverter.ToInt64(b, i))); },
-                (b, i) => { BigEndian.ToDouble(b, i); },
-                (b) => { BigEndian.ToDouble(b); });
+                (b, i) => { BigEndianAny.ToDouble(b, i); },
+                (b) => { BigEndianAny.ToDouble(b); });
             Assert.IsTrue(ret);
         }
 
