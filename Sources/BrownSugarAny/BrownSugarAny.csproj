@@ -39,7 +39,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sources\BrownSugar\BrownSugar.csproj">
+    <ProjectReference Include="..\BrownSugar\BrownSugar.csproj">
       <Project>{8af748ed-157e-4434-8a24-59df1d073af0}</Project>
       <Name>BrownSugar</Name>
     </ProjectReference>
