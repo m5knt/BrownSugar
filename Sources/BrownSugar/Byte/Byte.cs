@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 namespace ThunderEgg.BrownSugar {
 
     public static class SugarByte {
-
+#if false
         /// <summary>倍精度値をビットイメージとして収納します</summary>
         public static long DoubleToInt64Bits(this double value) {
             return BitConverter.DoubleToInt64Bits(value);
@@ -88,6 +88,7 @@ namespace ThunderEgg.BrownSugar {
                 (unchecked((ulong)value) & 0x000000000000ff00UL) << 40 |
                 unchecked((ulong)value) << 56));
         }
+#endif
 
         /// <summary>マーシャルなオブジェクトのサイズを返します</summary>
         public static int MarshalSize(this object obj) {

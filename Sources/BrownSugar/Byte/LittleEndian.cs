@@ -11,7 +11,7 @@ using System;
 
 namespace ThunderEgg.BrownSugar {
 
-    /// <summary>リトルエンディアン順でバッファを操作します</summary>
+    /// <summary>バッファをリトルエンディアン順で操作します</summary>
     public class LittleEndian : OneByte {
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
@@ -70,23 +70,13 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
         public static unsafe float ToSingle(byte* p) {
-            if (BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
-                return *(float*)p;
-            }
             var tmp = ((p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0];
             return *(float*)&tmp;
         }
 
-        /// <summary>リトルエンディアン順で値を読み込みます</summary>
-        public static unsafe float ToSingle(byte[] buffer, int index) {
-            fixed(byte* p = &buffer[index])
-            {
-                if (BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
-                    return *(float*)p;
-                }
-                var tmp = ((p[3] << 8 | p[2]) << 8 | p[1]) << 8 | p[0];
-                return *(float*)&tmp;
-            }
+        public static unsafe float ToSingle(byte[] p, int i) {
+            var tmp = ((p[i + 3] << 8 | p[i + 2]) << 8 | p[i+1]) << 8 | p[i];
+            return *(float*)&tmp;
         }
 
         //
@@ -95,7 +85,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
         public static unsafe ulong ToUInt64(byte* p) {
-            if (BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+            if (BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                 return *(ulong*)p;
             }
             // il 55 bytes
@@ -105,7 +95,7 @@ namespace ThunderEgg.BrownSugar {
         }
 
         public static unsafe long ToInt64(byte* p) {
-            if (BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+            if (BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                 return *(long*)p;
             }
             return unchecked((long)
@@ -116,9 +106,10 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static unsafe ulong ToUInt64(byte[] buffer, int index) {
-            fixed (byte* p = &buffer[index])
+            fixed (byte* fix = buffer)
             {
-                if (BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+                var p = fix + index;
+                if (BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                     return *(ulong*)p;
                 }
                 return (ulong)
@@ -128,9 +119,10 @@ namespace ThunderEgg.BrownSugar {
         }
 
         public static unsafe long ToInt64(byte[] buffer, int index) {
-            fixed (byte* p = &buffer[index])
+            fixed (byte* fix = buffer)
             {
-                if (BitConverter.IsLittleEndian || (index & 7) == 0) {
+                var p = fix + index;
+                if (BitConverter.IsLittleEndian && (index & 7) == 0) {
                     return *(long*)p;
                 }
                 return unchecked((long)
@@ -141,7 +133,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
         public static unsafe double ToDouble(byte* p) {
-            if (BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+            if (BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                 return *(double*)p;
             }
             var tmp = unchecked((long)
@@ -152,9 +144,10 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファ読み込み</summary>
         public static unsafe double ToDouble(byte[] buffer, int index) {
-            fixed (byte* p = &buffer[index])
+            fixed (byte* fix = buffer)
             {
-                if (BitConverter.IsLittleEndian || (index & 7) == 0) {
+                var p = fix + index;
+                if (BitConverter.IsLittleEndian && (index & 7) == 0) {
                     return *(double*)p;
                 }
                 var tmp = unchecked((long)
@@ -174,6 +167,40 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
+        public static unsafe void Assign(byte* buffer, short value) {
+            buffer[0] = (byte)value;
+            buffer[1] = (byte)(value >> 8);
+        }
+
+        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
+        public static void Assign(byte[] buffer, int index, ushort value) {
+            buffer[index] = (byte)value;
+            buffer[index + 1] = (byte)(value >> 8);
+        }
+
+        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
+        public static void Assign(byte[] buffer, int index, short value) {
+            buffer[index] = (byte)value;
+            buffer[index + 1] = (byte)(value >> 8);
+        }
+
+        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
+        public static unsafe void Assign(byte* buffer, char value) {
+            buffer[0] = (byte)value;
+            buffer[1] = (byte)(value >> 8);
+        }
+
+        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
+        public static void Assign(byte[] buffer, int index, char value) {
+            buffer[index] = (byte)value;
+            buffer[index + 1] = (byte)(value >> 8);
+        }
+
+        //
+        //
+        //
+
+        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, uint value) {
             buffer[0] = (byte)value;
             buffer[1] = (byte)(value >> 8);
@@ -181,28 +208,12 @@ namespace ThunderEgg.BrownSugar {
             buffer[3] = (byte)(value >> 24);
         }
 
-        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, ulong value) {
-            if ((((int)buffer) & 7) == 0) {
-                *(ulong*)(buffer) = BitConverter.IsLittleEndian ?
-                    value : value.SwapByteOrder();
-                return;
-            }
-            byte* v = (byte*)&value;
-            buffer[0] = v[0];
-            buffer[1] = v[1];
-            buffer[2] = v[2];
-            buffer[3] = v[3];
-            buffer[4] = v[4];
-            buffer[5] = v[5];
-            buffer[6] = v[6];
-            buffer[7] = v[7];
-        }
-
-        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, short value) {
-            buffer[0] = (byte)value;
-            buffer[1] = (byte)(value >> 8);
+        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
+        public static void Assign(byte[] buffer, int index, uint value) {
+            buffer[index] = (byte)value;
+            buffer[index + 1] = (byte)(value >> 8);
+            buffer[index + 2] = (byte)(value >> 16);
+            buffer[index + 3] = (byte)(value >> 24);
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
@@ -213,137 +224,153 @@ namespace ThunderEgg.BrownSugar {
             buffer[3] = (byte)(value >> 24);
         }
 
-        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, long value) {
-            if ((((int)buffer) & 7) == 0) {
-                *(long*)(buffer) = BitConverter.IsLittleEndian ?
-                    value : value.SwapByteOrder();
-                return;
-            }
-            byte* v = (byte*)&value;
-            buffer[0] = v[0];
-            buffer[1] = v[1];
-            buffer[2] = v[2];
-            buffer[3] = v[3];
-            buffer[4] = v[4];
-            buffer[5] = v[5];
-            buffer[6] = v[6];
-            buffer[7] = v[7];
-        }
-
-        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, char value) {
+        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
+        public static void Assign(byte[] buffer, int index, int value) {
             buffer[0] = (byte)value;
             buffer[1] = (byte)(value >> 8);
+            buffer[2] = (byte)(value >> 16);
+            buffer[3] = (byte)(value >> 24);
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, float value) {
-            byte* v = (byte*)&value;
-            buffer[0] = v[0];
-            buffer[1] = v[1];
-            buffer[2] = v[2];
-            buffer[3] = v[3];
+            var tmp = *(uint*)&value;
+            buffer[0] = (byte)tmp;
+            buffer[1] = (byte)(tmp >> 8);
+            buffer[2] = (byte)(tmp >> 16);
+            buffer[3] = (byte)(tmp >> 24);
+        }
+
+        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
+        public static unsafe void Assign(byte[] buffer, int index, float value) {
+            var tmp = *(uint*)&value;
+            buffer[0] = (byte)tmp;
+            buffer[1] = (byte)(tmp >> 8);
+            buffer[2] = (byte)(tmp >> 16);
+            buffer[3] = (byte)(tmp >> 24);
+        }
+
+        //
+        //
+        //
+
+        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
+        public static unsafe void Assign(byte* buffer, ulong value) {
+            if (BitConverter.IsLittleEndian && ((int)buffer & 7) == 0) {
+                *(ulong*)(buffer) = value;
+                return;
+            }
+            byte* tmp = (byte*)&value;
+            buffer[0] = tmp[0];
+            buffer[1] = tmp[1];
+            buffer[2] = tmp[2];
+            buffer[3] = tmp[3];
+            buffer[4] = tmp[4];
+            buffer[5] = tmp[5];
+            buffer[6] = tmp[6];
+            buffer[7] = tmp[7];
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, double value) {
-            if ((((int)buffer) & 7) == 0) {
-                *(long*)(buffer) = BitConverter.IsLittleEndian ?
-                    ((long*)&value)[0] : ((long*)&value)[0].SwapByteOrder();
+        public static unsafe void Assign(byte* buffer, long value) {
+            if (BitConverter.IsLittleEndian && ((int)buffer & 7) == 0) {
+                *(long*)(buffer) = value;
                 return;
             }
-            byte* v = (byte*)&value;
-            buffer[0] = v[0];
-            buffer[1] = v[1];
-            buffer[2] = v[2];
-            buffer[3] = v[3];
-            buffer[4] = v[4];
-            buffer[5] = v[5];
-            buffer[6] = v[6];
-            buffer[7] = v[7];
-        }
-
-        //
-        //
-        //
-
-        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, ushort value) {
-            buffer[index] = unchecked((byte)value);
-            buffer[index + 1] = unchecked((byte)(value >> 8));
+            byte* tmp = (byte*)&value;
+            buffer[0] = tmp[0];
+            buffer[1] = tmp[1];
+            buffer[2] = tmp[2];
+            buffer[3] = tmp[3];
+            buffer[4] = tmp[4];
+            buffer[5] = tmp[5];
+            buffer[6] = tmp[6];
+            buffer[7] = tmp[7];
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, uint value) {
-            buffer[index] = unchecked((byte)value);
-            buffer[index + 1] = unchecked((byte)(value >> 8));
-            buffer[index + 2] = unchecked((byte)(value >> 16));
-            buffer[index + 3] = unchecked((byte)(value >> 24));
+        public static unsafe void Assign(byte[] buffer, int index, long value) {
+            fixed (byte* fix = buffer)
+            {
+                if (BitConverter.IsLittleEndian && ((int)index & 7) == 0) {
+                    *(long*)(fix + index) = value;
+                    return;
+                }
+                else {
+                    var tmp = (byte*)&value;
+                    var pointer = fix + index;
+                    pointer[0] = tmp[0];
+                    pointer[1] = tmp[1];
+                    pointer[2] = tmp[2];
+                    pointer[3] = tmp[3];
+                    pointer[4] = tmp[4];
+                    pointer[5] = tmp[5];
+                    pointer[6] = tmp[6];
+                    pointer[7] = tmp[7];
+                }
+            }
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
         public static unsafe void Assign(byte[] buffer, int index, ulong value) {
-            fixed (byte* pointer = &buffer[index])
+            fixed (byte* fix = buffer)
             {
-                if ((((int)pointer) & 7) == 0) {
-                    *(ulong*)(pointer) = BitConverter.IsLittleEndian ?
-                        value : value.SwapByteOrder();
+                if (BitConverter.IsLittleEndian && ((int)index & 7) == 0) {
+                    *(ulong*)(fix + index) = value;
                     return;
                 }
-                byte* v = (byte*)&value;
-                pointer[0] = v[0];
-                pointer[1] = v[1];
-                pointer[2] = v[2];
-                pointer[3] = v[3];
-                pointer[4] = v[4];
-                pointer[5] = v[5];
-                pointer[6] = v[6];
-                pointer[7] = v[7];
+                else {
+                    var tmp = (byte*)&value;
+                    var pointer = fix + index;
+                    pointer[0] = tmp[0];
+                    pointer[1] = tmp[1];
+                    pointer[2] = tmp[2];
+                    pointer[3] = tmp[3];
+                    pointer[4] = tmp[4];
+                    pointer[5] = tmp[5];
+                    pointer[6] = tmp[6];
+                    pointer[7] = tmp[7];
+                }
             }
         }
 
-        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, short value) {
-            buffer[index] = unchecked((byte)value);
-            buffer[index + 1] = unchecked((byte)(value >> 8));
-        }
-
-        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, int value) {
-            unsafe
-            {
-                fixed (byte* p = &buffer[index]) Assign(p, value);
+        /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
+        public static unsafe void Assign(byte* buffer, double value) {
+            if (BitConverter.IsLittleEndian && ((int)buffer & 7) == 0) {
+                *(double*)(buffer) = value;
+                return;
             }
+            byte* tmp = (byte*)&value;
+            buffer[0] = tmp[0];
+            buffer[1] = tmp[1];
+            buffer[2] = tmp[2];
+            buffer[3] = tmp[3];
+            buffer[4] = tmp[4];
+            buffer[5] = tmp[5];
+            buffer[6] = tmp[6];
+            buffer[7] = tmp[7];
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, long value) {
-            unsafe
+        public static unsafe void Assign(byte[] buffer, int index, double value) {
+            fixed (byte* fix = buffer)
             {
-                fixed (byte* p = &buffer[index]) Assign(p, value);
-            }
-        }
-
-        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, char value) {
-            buffer[index] = unchecked((byte)value);
-            buffer[index + 1] = unchecked((byte)(value >> 8));
-        }
-
-        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, float value) {
-            unsafe
-            {
-                fixed (byte* p = &buffer[index]) Assign(p, value);
-            }
-        }
-
-        /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, double value) {
-            unsafe
-            {
-                fixed (byte* p = &buffer[index]) Assign(p, value);
+                if (BitConverter.IsLittleEndian && ((int)index & 7) == 0) {
+                    *(double*)(fix + index) = value;
+                    return;
+                }
+                else {
+                    var tmp = (byte*)&value;
+                    var pointer = fix + index;
+                    pointer[0] = tmp[0];
+                    pointer[1] = tmp[1];
+                    pointer[2] = tmp[2];
+                    pointer[3] = tmp[3];
+                    pointer[4] = tmp[4];
+                    pointer[5] = tmp[5];
+                    pointer[6] = tmp[6];
+                    pointer[7] = tmp[7];
+                }
             }
         }
 

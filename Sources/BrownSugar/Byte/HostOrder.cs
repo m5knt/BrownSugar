@@ -222,6 +222,8 @@ namespace ThunderEgg.BrownSugar {
 
     public class HostOrder {
 
+        public static int LittleEndian = 0; // 0 リトル
+
         /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
         public static void Assign<T>(byte[] buffer, int index, T obj) {
             int length = Marshal.SizeOf(typeof(T));

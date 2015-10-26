@@ -12,11 +12,7 @@ using System.Collections.Generic;
 
 namespace ThunderEgg.BrownSugar {
 
-    /// <summary>ネットワークバイトオーダーでバッファ操作をします</summary>
-    public class NetOrder : BigEndian {
-    }
-
-    /// <summary>ビッグエンディアン順でバッファ操作をします</summary>
+    /// <summary>バッファをビッグエンディアン順で操作します</summary>
     public class BigEndian : OneByte {
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
@@ -76,7 +72,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe float ToSingle(byte* p) {
-            if (!BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+            if (!BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                 return *(float*)p;
             }
             var tmp = ((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3];
@@ -85,9 +81,10 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
         public static unsafe float ToSingle(byte[] buffer, int index) {
-            fixed(byte* p = &buffer[index])
+            fixed(byte* fix = buffer)
             {
-                if (!BitConverter.IsLittleEndian || (index & 7) == 0) {
+                var p = fix + index;
+                if (!BitConverter.IsLittleEndian && (index & 7) == 0) {
                     return *(float*)p;
                 }
                 var tmp = ((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3];
@@ -101,7 +98,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe ulong ToUInt64(byte* p) {
-            if (!BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+            if (!BitConverter.IsLittleEndian && ((long)p & 7) == 0) {
                 return *(ulong*)p;
             }
             // il 55 bytes
@@ -112,7 +109,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe long ToInt64(byte* p) {
-            if (!BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+            if (!BitConverter.IsLittleEndian && ((long)p & 7) == 0) {
                 return *(long*)p;
             }
             return unchecked((long)
@@ -122,9 +119,10 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
         public static unsafe long ToInt64(byte[] buffer, int index) {
-            fixed (byte* p = &buffer[index])
+            fixed (byte* fix = buffer)
             {
-                if (!BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+                var p = fix + index;
+                if (!BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                     return *(long*)p;
                 }
                 // il 52 bytes
@@ -136,9 +134,10 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
         public static unsafe ulong ToUInt64(byte[] buffer, int index) {
-            fixed (byte* p = &buffer[index])
+            fixed (byte* fix = buffer)
             {
-                if (!BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+                var p = fix + index;
+                if (!BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                     return *(ulong*)p;
                 }
                 // il 55 bytes
@@ -150,7 +149,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe double ToDouble(byte* p) {
-            if (!BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+            if (!BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                 return *(double*)p;
             }
             var tmp = 
@@ -161,9 +160,10 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
         public static unsafe double ToDouble(byte[] buffer, int index) {
-            fixed(byte* p = &buffer[index])
+            fixed(byte* fix = buffer)
             {
-                if (!BitConverter.IsLittleEndian || ((int)p & 7) == 0) {
+                var p = fix + index;
+                if (!BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                     return *(double*)p;
                 }
                 var tmp =
@@ -217,6 +217,15 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
+        public static unsafe void Assign(byte* buffer, float value) {
+            var tmp = *(int*)&value;
+            buffer[0] = unchecked((byte)(tmp >> 24));
+            buffer[1] = unchecked((byte)(tmp >> 16));
+            buffer[2] = unchecked((byte)(tmp >> 8));
+            buffer[3] = unchecked((byte)tmp);
+        }
+
+        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, long value) {
             buffer[0] = unchecked((byte)(value >> 56));
             buffer[1] = unchecked((byte)(value >> 48));
@@ -232,14 +241,6 @@ namespace ThunderEgg.BrownSugar {
         public static unsafe void Assign(byte* buffer, char value) {
             buffer[0] = unchecked((byte)(value >> 8));
             buffer[1] = unchecked((byte)value);
-        }
-
-        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, float value) {
-            buffer[0] = ((byte*)&value)[0];
-            buffer[1] = ((byte*)&value)[1];
-            buffer[2] = ((byte*)&value)[2];
-            buffer[3] = ((byte*)&value)[3];
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>

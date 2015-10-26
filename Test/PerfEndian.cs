@@ -20,49 +20,49 @@ namespace Test {
         }
 
         [TestMethod]
-        public void LittleEndian2Bytes() {
+        public void LittleEndianTo2Bytes() {
             PerfEndian.LittleEndianToUInt16();
             PerfEndian.LittleEndianToInt16();
             PerfEndian.LittleEndianToChar();
         }
 
         [TestMethod]
-        public void BigEndian2Bytes() {
+        public void BigEndianTo2Bytes() {
             PerfEndian.BigEndianToUInt16();
             PerfEndian.BigEndianToInt16();
             PerfEndian.BigEndianToChar();
         }
 
         [TestMethod]
-        public void LittleEndian4Bytes() {
+        public void LittleEndianTo4Bytes() {
             PerfEndian.LittleEndianToUInt32();
             PerfEndian.LittleEndianToInt32();
             PerfEndian.LittleEndianToSingle();
         }
 
         [TestMethod]
-        public void BigEndian4Bytes() {
+        public void BigEndianTo4Bytes() {
             PerfEndian.BigEndianToUInt32();
             PerfEndian.BigEndianToInt32();
             PerfEndian.BigEndianToSingle();
         }
 
         [TestMethod]
-        public void LittleEndian8Bytes() {
+        public void LittleEndianTo8Bytes() {
             PerfEndian.LittleEndianToUInt64();
             PerfEndian.LittleEndianToInt64();
             PerfEndian.LittleEndianToDouble();
         }
 
         [TestMethod]
-        public void BigEndian8Bytes() {
+        public void BigEndianTo8Bytes() {
             PerfEndian.BigEndianToUInt64();
             PerfEndian.BigEndianToInt64();
             PerfEndian.BigEndianToDouble();
         }
 
         [TestMethod]
-        public void LittleEndian() {
+        public void LittleEndianToAll() {
             Console.WriteLine("1");
             PerfEndian.LittleEndianToBoolean();
             Console.WriteLine("2");
@@ -82,7 +82,7 @@ namespace Test {
         }
 
         [TestMethod]
-        public void BigEndian() {
+        public void BigEndianToAll() {
             Console.WriteLine("1");
             PerfEndian.BigEndianToBoolean();
             Console.WriteLine("2");
