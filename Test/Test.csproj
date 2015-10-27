@@ -58,7 +58,9 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Bench.cs" />
-    <Compile Include="TestEndian.cs" />
+    <Compile Include="TestLittleEndian.cs" />
+    <Compile Include="TestBigEndian.cs" />
+    <Compile Include="ByteEndian.cs" />
     <Compile Include="PerfEndian.cs" />
     <Compile Include="TestMarshal.cs" />
     <Compile Include="TestCast.cs" />

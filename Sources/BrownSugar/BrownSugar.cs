@@ -25,7 +25,7 @@ namespace ThunderEgg.BrownSugar {
     //
     //
     //
-
+#if false
     public class BrownSugar {
 
         public long Bench(int limit, Action<long> action) {
@@ -56,5 +56,6 @@ namespace ThunderEgg.BrownSugar {
             }
         }
     }
+#endif
 }
 

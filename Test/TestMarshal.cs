@@ -75,7 +75,7 @@ namespace Test {
                 };
             }
         }
-
+#if false
         [TestMethod]
         public unsafe void TestMarshalClass() {
             var src = new MarshalClass();
@@ -101,5 +101,6 @@ namespace Test {
             /**/
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
         }
+#endif
     }
 }

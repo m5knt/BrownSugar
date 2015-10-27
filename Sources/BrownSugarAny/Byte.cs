@@ -6,4 +6,7 @@ namespace ThunderEgg.BrownSugar
 
     public class BigEndian : BigEndianAny {
     }
+
+    public class NetOrder : BigEndianAny {
+    }
 }

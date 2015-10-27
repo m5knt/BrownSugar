@@ -3,6 +3,8 @@
  * @brief バイトオーダー不要のバッファ操作回り
  */
 
+using System;
+
 /*
  *
  */
@@ -40,6 +42,21 @@ namespace ThunderEgg.BrownSugar {
             return buffer[index] != 0;
         }
 
+        /// <summary>byte/遅いです</summary>
+        public static byte ToUInt8(ArraySegment<byte> buffer, int index) {
+            return buffer.Array[buffer.Offset + index];
+        }
+
+        /// <summary>バッファ内の値を取得/遅いです</summary>
+        public static sbyte ToInt8(ArraySegment<byte> buffer, int index) {
+            return unchecked((sbyte)buffer.Array[buffer.Offset + index]);
+        }
+
+        /// <summary>バッファ内の値を取得/遅いです</summary>
+        public static bool ToBoolean(ArraySegment<byte> buffer, int index) {
+            return buffer.Array[buffer.Offset + index] != 0;
+        }
+
         //
         //
         //
@@ -73,6 +90,20 @@ namespace ThunderEgg.BrownSugar {
         public static void Assign(byte[] buffer, int index, bool value) {
             buffer[index] = value ? (byte)0 : (byte)1;
         }
-    }
 
+        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        public static void Assign(ArraySegment<byte> buffer, int index, byte value) {
+            buffer.Array[buffer.Offset + index] = value;
+        }
+
+        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        public static void Assign(ArraySegment<byte> buffer, int index, sbyte value) {
+            buffer.Array[buffer.Offset + index] = unchecked((byte)value);
+        }
+
+        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        public static void Assign(ArraySegment<byte> buffer, int index, bool value) {
+            buffer.Array[buffer.Offset + index] = value ? (byte)0 : (byte)1;
+        }
+    }
 }
