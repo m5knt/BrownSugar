@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
  *
  */
 
-namespace ThunderEgg.BrownSugar {
+namespace ThunderEgg.BrownSugar.Byte {
 
     public static class SugarByte {
 #if false

@@ -64,7 +64,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Byte\BigEndianAny.cs" />
-    <Compile Include="Byte\OneByte.cs" />
     <Compile Include="Byte\Cast.cs" />
     <Compile Include="Byte\HostOrder.cs" />
     <Compile Include="Byte\LittleEndianAny.cs" />

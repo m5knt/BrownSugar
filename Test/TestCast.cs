@@ -3,15 +3,33 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
 using System.Runtime.InteropServices;
-using ThunderEgg.BrownSugar;
+using ThunderEgg.BrownSugar.Byte;
 
 namespace Test {
 
     [TestClass]
     public class TestCast {
 
+        public sealed class Hoge { }
+        public class Fuga {
+            public Hoge hoge = new Hoge();
+            public static implicit operator Hoge(Fuga f) {
+                return f.hoge;
+            }
+        }
+        public class Moga : Fuga {
+        }
+
         [TestMethod]
         public void TestCastUnsigned() {
+            var hoge = new Hoge();
+            var fuga = new Fuga();
+            var moga = new Moga();
+            //fuga = (Fuga)moga;//.Cast<Fuga>();
+            //hoge = fuga;
+            //.Cast<Hoge>();
+
+
             var b = (byte)0x80;
             var s = (ushort)0x8000;
             var i = (uint)0x80000000;

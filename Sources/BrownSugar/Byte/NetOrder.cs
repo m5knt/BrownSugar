@@ -9,15 +9,7 @@ using System;
  *
  */
 
-namespace ThunderEgg.BrownSugar {
-
-    /// <summary>バッファをネットワークバイトオーダー順で操作します</summary>
-    public class NetOrder : BigEndianAny {
-    }
-
-    //
-    //
-    //
+namespace ThunderEgg.BrownSugar.Byte {
 
     public static class SugarNet {
         /// <summary>ホストオーダー値からネットオーダー値にする</summary>

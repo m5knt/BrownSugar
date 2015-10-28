@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
-using ThunderEgg.BrownSugar;
+using ThunderEgg.BrownSugar.Byte;
 
 namespace Test {
 
@@ -44,6 +44,59 @@ namespace Test {
                 Assert.AreEqual<int>(Order.ToInt32(src, 8 + i), unchecked((int)0xbbaa9988));
                 Assert.AreEqual<short>(Order.ToInt16(src, 12 + i), unchecked((short)0x9988));
                 Assert.AreEqual<sbyte>(Order.ToInt8(src, 14 + i), unchecked((sbyte)0x88));
+
+                byte[] hoge;
+                hoge = new byte[i + 1];
+                Order.Assign(hoge, i, UInt8);
+                Assert.AreEqual(Order.ToUInt8(hoge, i), UInt8);
+                hoge = new byte[i + 2];
+                Order.Assign(hoge, i, UInt16);
+                Assert.AreEqual(Order.ToUInt16(hoge, i), UInt16);
+                hoge = new byte[i + 4];
+                Order.Assign(hoge, i, UInt32);
+                Assert.AreEqual(Order.ToUInt32(hoge, i), UInt32);
+                hoge = new byte[i + 8];
+                Order.Assign(hoge, i, UInt64);
+                Assert.AreEqual(Order.ToUInt64(hoge, i), UInt64);
+
+                hoge = new byte[i + 1];
+                Order.Assign(hoge, i, Int8);
+                Assert.AreEqual(Order.ToInt8(hoge, i), Int8);
+                hoge = new byte[i + 2];
+                Order.Assign(hoge, i, Int16);
+                Assert.AreEqual(Order.ToInt16(hoge, i), Int16);
+                hoge = new byte[i + 4];
+                Order.Assign(hoge, i, Int32);
+                Assert.AreEqual(Order.ToInt32(hoge, i), Int32);
+                hoge = new byte[i + 8];
+                Order.Assign(hoge, i, Int64);
+                Assert.AreEqual(Order.ToInt64(hoge, i), Int64);
+
+                hoge = new byte[i + 1];
+                Order.Assign(hoge, i, UInt8);
+                Assert.AreEqual(Order.ToUInt8(hoge, i), UInt8);
+                hoge = new byte[i + 2];
+                Order.Assign(hoge, i, UInt16);
+                Assert.AreEqual(Order.ToUInt16(hoge, i), UInt16);
+                hoge = new byte[i + 4];
+                Order.Assign(hoge, i, UInt32);
+                Assert.AreEqual(Order.ToUInt32(hoge, i), UInt32);
+                hoge = new byte[i + 8];
+                Order.Assign(hoge, i, UInt64);
+                Assert.AreEqual(Order.ToUInt64(hoge, i), UInt64);
+
+                hoge = new byte[i + 1];
+                Order.Assign(hoge, i, Boolean);
+                Assert.AreEqual(Order.ToBoolean(hoge, i), Boolean);
+                hoge = new byte[i + 2];
+                Order.Assign(hoge, i, Char);
+                Assert.AreEqual(Order.ToChar(hoge, i), Char);
+                hoge = new byte[i + 4];
+                Order.Assign(hoge, i, Single);
+                Assert.AreEqual(Order.ToSingle(hoge, i), Single);
+                hoge = new byte[i + 8];
+                Order.Assign(hoge, i, Double);
+                Assert.AreEqual(Order.ToDouble(hoge, i), Double);
             }
         }
     }

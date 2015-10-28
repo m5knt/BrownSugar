@@ -9,10 +9,106 @@ using System;
  *
  */
 
-namespace ThunderEgg.BrownSugar {
+namespace ThunderEgg.BrownSugar.Byte {
 
     /// <summary>バッファをビッグエンディアン順で操作します</summary>
-    public class BigEndianAny : OneByte {
+    public class BigEndianAny {
+
+        /// <summary>ポインタ位置の値を取得/遅いです</summary>
+        public static unsafe byte ToUInt8(byte* b) {
+            return *b;
+        }
+        /// <summary>ポインタ位置の値を取得/遅いです</summary>
+        public static unsafe sbyte ToInt8(byte* b) {
+            return *(sbyte*)b;
+        }
+        /// <summary>ポインタ位置の値を取得/遅いです</summary>
+        public static unsafe bool ToBoolean(byte* b) {
+            return *(bool*)b;
+        }
+
+        /// <summary>バッファ内の値を取得/遅いです</summary>
+        public static byte ToUInt8(byte[] buffer, int index) {
+            return buffer[index];
+        }
+
+        /// <summary>バッファ内の値を取得/遅いです</summary>
+        public static sbyte ToInt8(byte[] buffer, int index) {
+            return unchecked((sbyte)buffer[index]);
+        }
+
+        /// <summary>バッファ内の値を取得/遅いです</summary>
+        public static bool ToBoolean(byte[] buffer, int index) {
+            return buffer[index] != 0;
+        }
+
+        /// <summary>byte/遅いです</summary>
+        public static byte ToUInt8(ArraySegment<byte> buffer, int index) {
+            return buffer.Array[buffer.Offset + index];
+        }
+
+        /// <summary>バッファ内の値を取得/遅いです</summary>
+        public static sbyte ToInt8(ArraySegment<byte> buffer, int index) {
+            return unchecked((sbyte)buffer.Array[buffer.Offset + index]);
+        }
+
+        /// <summary>バッファ内の値を取得/遅いです</summary>
+        public static bool ToBoolean(ArraySegment<byte> buffer, int index) {
+            return buffer.Array[buffer.Offset + index] != 0;
+        }
+
+        //
+        //
+        //
+
+        /// <summary>ポインタ位置に値を書/遅いですく</summary>
+        public static unsafe void Assign(byte* buffer, byte value) {
+            *buffer = value;
+        }
+
+        /// <summary>ポインタ位置に値を書く/遅いです</summary>
+        public static unsafe void Assign(byte* buffer, sbyte value) {
+            *buffer = unchecked((byte)value);
+        }
+
+        /// <summary>ポインタ位置に値を書く/遅いです</summary>
+        public static unsafe void Assign(byte* buffer, bool value) {
+            *buffer = value ? (byte)0 : (byte)1;
+        }
+
+        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        public static void Assign(byte[] buffer, int index, byte value) {
+            buffer[index] = value;
+        }
+
+        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        public static void Assign(byte[] buffer, int index, sbyte value) {
+            buffer[index] = unchecked((byte)value);
+        }
+
+        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        public static void Assign(byte[] buffer, int index, bool value) {
+            buffer[index] = value ? (byte)1 : (byte)0;
+        }
+
+        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        public static void Assign(ArraySegment<byte> buffer, int index, byte value) {
+            buffer.Array[buffer.Offset + index] = value;
+        }
+
+        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        public static void Assign(ArraySegment<byte> buffer, int index, sbyte value) {
+            buffer.Array[buffer.Offset + index] = unchecked((byte)value);
+        }
+
+        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        public static void Assign(ArraySegment<byte> buffer, int index, bool value) {
+            buffer.Array[buffer.Offset + index] = value ? (byte)0 : (byte)1;
+        }
+
+        //
+        //
+        //
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe ushort ToUInt16(byte* b) {
@@ -208,6 +304,12 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
+        public static unsafe void Assign(byte* buffer, char value) {
+            buffer[0] = unchecked((byte)(value >> 8));
+            buffer[1] = unchecked((byte)value);
+        }
+
+        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, int value) {
             buffer[0] = unchecked((byte)(value >> 24));
             buffer[1] = unchecked((byte)(value >> 16));
@@ -217,7 +319,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, float value) {
-            var tmp = *(int*)&value;
+            var tmp = *(uint*)&value;
             buffer[0] = unchecked((byte)(tmp >> 24));
             buffer[1] = unchecked((byte)(tmp >> 16));
             buffer[2] = unchecked((byte)(tmp >> 8));
@@ -234,12 +336,6 @@ namespace ThunderEgg.BrownSugar {
             buffer[5] = unchecked((byte)(value >> 16));
             buffer[6] = unchecked((byte)(value >> 8));
             buffer[7] = unchecked((byte)value);
-        }
-
-        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static unsafe void Assign(byte* buffer, char value) {
-            buffer[0] = unchecked((byte)(value >> 8));
-            buffer[1] = unchecked((byte)value);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
@@ -266,6 +362,12 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
+        public static void Assign(byte[] buffer, int index, short value) {
+            buffer[index] = unchecked((byte)(value >> 8));
+            buffer[index + 1] = unchecked((byte)value);
+        }
+
+        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static void Assign(byte[] buffer, int index, uint value) {
             buffer[index] = unchecked((byte)(value >> 24));
             buffer[index + 1] = unchecked((byte)(value >> 16));
@@ -273,6 +375,25 @@ namespace ThunderEgg.BrownSugar {
             buffer[index + 3] = unchecked((byte)value);
         }
 
+        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
+        public static void Assign(byte[] buffer, int index, int value) {
+            buffer[index] = unchecked((byte)(value >> 24));
+            buffer[index + 1] = unchecked((byte)(value >> 16));
+            buffer[index + 2] = unchecked((byte)(value >> 8));
+            buffer[index + 3] = unchecked((byte)value);
+        }
+
+        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
+        public static void Assign(byte[] buffer, int index, float value) {
+            unsafe
+            {
+                var tmp = *(uint*)&value;
+                buffer[index] = unchecked((byte)(tmp >> 24));
+                buffer[index + 1] = unchecked((byte)(tmp >> 16));
+                buffer[index + 2] = unchecked((byte)(tmp >> 8));
+                buffer[index + 3] = unchecked((byte)(tmp));
+            }
+        }
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static void Assign(byte[] buffer, int index, ulong value) {
             buffer[index] = unchecked((byte)(value >> 56));
@@ -283,20 +404,6 @@ namespace ThunderEgg.BrownSugar {
             buffer[index + 5] = unchecked((byte)(value >> 16));
             buffer[index + 6] = unchecked((byte)(value >> 8));
             buffer[index + 7] = unchecked((byte)value);
-        }
-
-        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, short value) {
-            buffer[index] = unchecked((byte)(value >> 8));
-            buffer[index + 1] = unchecked((byte)value);
-        }
-
-        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
-        public static void Assign(byte[] buffer, int index, int value) {
-            buffer[index] = unchecked((byte)(value >> 24));
-            buffer[index + 1] = unchecked((byte)(value >> 16));
-            buffer[index + 2] = unchecked((byte)(value >> 8));
-            buffer[index + 3] = unchecked((byte)value);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>

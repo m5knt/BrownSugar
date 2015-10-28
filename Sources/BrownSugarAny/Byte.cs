@@ -1,5 +1,5 @@
 ﻿
-namespace ThunderEgg.BrownSugar
+namespace ThunderEgg.BrownSugar.Byte
 {
     public class LittleEndian : LittleEndianAny {
     }

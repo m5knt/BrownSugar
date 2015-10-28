@@ -3,7 +3,7 @@ using System;
 using System.Net;
 using System.Linq;
 using System.Runtime.InteropServices;
-using ThunderEgg.BrownSugar;
+using ThunderEgg.BrownSugar.Byte;
 
 namespace Test {
 
