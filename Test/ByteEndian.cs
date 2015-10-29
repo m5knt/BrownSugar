@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ThunderEgg.BrownSugar;
-using ThunderEgg.BrownSugar.Byte;
+using ThunderEgg.BrownSugar.Sugar;
 
 namespace Test {
 
@@ -82,16 +82,6 @@ namespace Test {
                 Assert.AreEqual<int>(Order.ToInt32(src, 8 + i), unchecked((int)0xbbaa9988));
                 Assert.AreEqual<short>(Order.ToInt16(src, 12 + i), unchecked((short)0x9988));
                 Assert.AreEqual<sbyte>(Order.ToInt8(src, 14 + i), unchecked((sbyte)0x88));
-
-                var seg = new ArraySegment<byte>(src, i, src.Length - i);
-                Assert.AreEqual<ulong>(Order.ToUInt64(seg, 0), (ulong)0xffeeddccbbaa9988);
-                Assert.AreEqual<uint>(Order.ToUInt32(seg, 8), (uint)0xbbaa9988);
-                Assert.AreEqual<ushort>(Order.ToUInt16(seg, 12), (ushort)0x9988);
-                Assert.AreEqual<byte>(Order.ToUInt8(seg, 14), (byte)0x88);
-                Assert.AreEqual<long>(Order.ToInt64(seg, 0), unchecked((long)0xffeeddccbbaa9988));
-                Assert.AreEqual<int>(Order.ToInt32(seg, 8), unchecked((int)0xbbaa9988));
-                Assert.AreEqual<short>(Order.ToInt16(seg, 12), unchecked((short)0x9988));
-                Assert.AreEqual<sbyte>(Order.ToInt8(seg, 14), unchecked((sbyte)0x88));
 
                 byte[] hoge;
                 hoge = new byte[i + 1];

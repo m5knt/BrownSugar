@@ -3,7 +3,7 @@
  * @brief キャスト回り
  */
 
-namespace ThunderEgg.BrownSugar.Byte {
+namespace ThunderEgg.BrownSugar.Sugar {
 
     /// <summary>
     /// unchecked((type)value)と書くのが物臭な人や

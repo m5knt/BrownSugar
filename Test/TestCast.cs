@@ -3,7 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Net;
 using System.Runtime.InteropServices;
-using ThunderEgg.BrownSugar.Byte;
+
+using ThunderEgg.BrownSugar;
+using ThunderEgg.BrownSugar.Sugar;
 
 namespace Test {
 

@@ -1,7 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Linq;
-using ThunderEgg.BrownSugar.Byte;
+using ThunderEgg.BrownSugar;
+using ThunderEgg.BrownSugar.Sugar;
 
 namespace Test {
 

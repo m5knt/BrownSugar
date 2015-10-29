@@ -1,5 +1,5 @@
 ﻿
-namespace ThunderEgg.BrownSugar.Byte
+namespace ThunderEgg.BrownSugar
 {
     public class LittleEndian : HostOrderAligned {
     }
@@ -9,5 +9,4 @@ namespace ThunderEgg.BrownSugar.Byte
 
     public class NetOrder : BigEndianAny {
     }
-
 }
