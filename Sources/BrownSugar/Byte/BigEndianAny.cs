@@ -73,7 +73,7 @@ namespace ThunderEgg.BrownSugar.Byte {
 
         /// <summary>ポインタ位置に値を書く/遅いです</summary>
         public static unsafe void Assign(byte* buffer, bool value) {
-            *buffer = value ? (byte)0 : (byte)1;
+            *buffer = value ? (byte)1 : (byte)0;
         }
 
         /// <summary>バッファ位置に値を書く/遅いです</summary>
@@ -103,7 +103,7 @@ namespace ThunderEgg.BrownSugar.Byte {
 
         /// <summary>バッファ位置に値を書く/遅いです</summary>
         public static void Assign(ArraySegment<byte> buffer, int index, bool value) {
-            buffer.Array[buffer.Offset + index] = value ? (byte)0 : (byte)1;
+            buffer.Array[buffer.Offset + index] = value ? (byte)1 : (byte)0;
         }
 
         //
