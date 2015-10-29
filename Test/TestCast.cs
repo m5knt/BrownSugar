@@ -27,6 +27,7 @@ namespace Test {
             var hoge = new Hoge();
             var fuga = new Fuga();
             var moga = new Moga();
+            
             //fuga = (Fuga)moga;//.Cast<Fuga>();
             //hoge = fuga;
             //.Cast<Hoge>();
