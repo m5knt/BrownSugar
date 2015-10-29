@@ -4,7 +4,7 @@
 //
 //
 
-namespace ThunderEgg.BrownSugar.Sugar {
+namespace ThunderEgg.BrownSugar.Extends {
 
     public static class SugarMath {
 

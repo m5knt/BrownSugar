@@ -10,7 +10,7 @@ using System.Globalization;
 //
 //
 
-namespace ThunderEgg.BrownSugar.Sugar {
+namespace ThunderEgg.BrownSugar.Extends {
 
     public static class SugarChar {
 

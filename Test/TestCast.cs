@@ -5,7 +5,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 
 using ThunderEgg.BrownSugar;
-using ThunderEgg.BrownSugar.Sugar;
+using ThunderEgg.BrownSugar.Extends;
 
 namespace Test {
 
