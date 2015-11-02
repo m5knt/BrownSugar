@@ -4,9 +4,9 @@
 //
 //
 
-namespace ThunderEgg.BrownSugar.Extends {
+namespace ThunderEgg.BrownSugar.Extentions {
 
-    public static class SugarMath {
+    public static class Maths {
 
         /// <summary>無限大であるかを返す</summary>
         public static bool IsInfinity(this float value) {　return float.IsInfinity(value);　}
@@ -28,13 +28,13 @@ namespace ThunderEgg.BrownSugar.Extends {
         /// <summary>正の無限大であるかを返す</summary>
         public static bool IsPositiveInfinity(this double value) {　return double.IsPositiveInfinity(value);　}
 
-        /// <summary>小数点以下切り上げ返す</summary>
+        /// <summary>小数点以下切り上げを返す</summary>
         public static double Ceiling(this double value) { return Math.Ceiling(value); }
-        /// <summary>小数点以下切り上げ返す</summary>
+        /// <summary>小数点以下切り上げを返す</summary>
         public static decimal Ceiling(this decimal value) { return Math.Ceiling(value); }
-        /// <summary>小数点以下切り捨て数を返す</summary>
+        /// <summary>小数点以下切り捨てを返す</summary>
         public static double Floor(this double value) { return Math.Floor(value); }
-        /// <summary>小数点以下切り捨て数を返す</summary>
+        /// <summary>小数点以下切り捨てを返す</summary>
         public static decimal Floor(this decimal value) { return Math.Floor(value); }
         /// <summary>整数部を返す</summary>
         public static double Truncate(this double value) { return Math.Truncate(value); }

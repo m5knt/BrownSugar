@@ -3,13 +3,13 @@
  * @brief キャスト回り
  */
 
-namespace ThunderEgg.BrownSugar.Extends {
+namespace ThunderEgg.BrownSugar.Extentions {
 
     /// <summary>
     /// unchecked((type)value)と書くのが物臭な人や
     /// 右につなげたい人用
     /// </summary>
-    public static class SugarCast {
+    public static class Casts {
 
         public static T Cast<T>(this object obj) where T : class {
             return (T)obj;

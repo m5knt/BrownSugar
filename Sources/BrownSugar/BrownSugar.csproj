@@ -60,9 +60,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Byte\NoOrder.cs" />
     <Compile Include="Byte\BigEndianAny.cs" />
     <Compile Include="Extends\Cast.cs" />
     <Compile Include="Byte\HostOrder.cs" />

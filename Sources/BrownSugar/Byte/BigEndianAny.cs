@@ -12,66 +12,34 @@ using System;
 namespace ThunderEgg.BrownSugar {
 
     /// <summary>バッファをビッグエンディアン順で操作します</summary>
-    public class BigEndianAny {
+    public class BigEndianAny : NoOrder {
 
-        /// <summary>ポインタ位置の値を取得/遅いです</summary>
-        public static unsafe byte ToUInt8(byte* b) {
-            return *b;
-        }
-        /// <summary>ポインタ位置の値を取得/遅いです</summary>
-        public static unsafe sbyte ToInt8(byte* b) {
-            return *(sbyte*)b;
-        }
-        /// <summary>ポインタ位置の値を取得/遅いです</summary>
-        public static unsafe bool ToBoolean(byte* b) {
-            return *(bool*)b;
-        }
-
-        /// <summary>バッファ内の値を取得/遅いです</summary>
-        public static byte ToUInt8(byte[] buffer, int index) {
-            return buffer[index];
-        }
-
-        /// <summary>バッファ内の値を取得/遅いです</summary>
-        public static sbyte ToInt8(byte[] buffer, int index) {
-            return unchecked((sbyte)buffer[index]);
-        }
-
-        /// <summary>バッファ内の値を取得/遅いです</summary>
-        public static bool ToBoolean(byte[] buffer, int index) {
-            return buffer[index] != 0;
-        }
-
-        //
-        //
-        //
-
-        /// <summary>ポインタ位置に値を書/遅いですく</summary>
+        /// <summary>ポインタ位置に値を書く</summary>
         public static unsafe void Assign(byte* buffer, byte value) {
             *buffer = value;
         }
 
-        /// <summary>ポインタ位置に値を書く/遅いです</summary>
+        /// <summary>ポインタ位置に値を書く</summary>
         public static unsafe void Assign(byte* buffer, sbyte value) {
             *buffer = unchecked((byte)value);
         }
 
-        /// <summary>ポインタ位置に値を書く/遅いです</summary>
+        /// <summary>ポインタ位置に値を書く</summary>
         public static unsafe void Assign(byte* buffer, bool value) {
             *buffer = value ? (byte)1 : (byte)0;
         }
 
-        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        /// <summary>バッファ位置に値を書く</summary>
         public static void Assign(byte[] buffer, int index, byte value) {
             buffer[index] = value;
         }
 
-        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        /// <summary>バッファ位置に値を書く</summary>
         public static void Assign(byte[] buffer, int index, sbyte value) {
             buffer[index] = unchecked((byte)value);
         }
 
-        /// <summary>バッファ位置に値を書く/遅いです</summary>
+        /// <summary>バッファ位置に値を書く</summary>
         public static void Assign(byte[] buffer, int index, bool value) {
             buffer[index] = value ? (byte)1 : (byte)0;
         }
@@ -116,31 +84,30 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe uint ToUInt32(byte* p) {
-            return ((((uint)p[0] << 8 | p[1]) << 8) | p[2]) << 8 | p[3];
+            return (uint)(p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]);
         }
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe int ToInt32(byte* p) {
-            // il 24 bytes
-            return ((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3];
-        }
-
-        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
-        public static unsafe int ToInt32(byte[] p, int i) {
-            return ((p[i] << 8 | p[i + 1]) << 8 | p[i + 2]) << 8 | p[i + 3];
+            return p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3];
         }
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
         public static uint ToUInt32(byte[] p, int i) {
-            return ((((uint)p[i] << 8 | p[i + 1]) << 8) | p[i + 2]) << 8 | p[i + 3];
+            return (uint)(p[i] << 24 | p[i + 1] << 16 | p[i + 2] << 8 | p[i + 3]);
+        }
+
+        /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
+        public static int ToInt32(byte[] p, int i) {
+            return p[i] << 24 | p[i + 1] << 16 | p[i + 2] << 8 | p[i + 3];
         }
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
         public static unsafe float ToSingle(byte* p) {
-            if (!BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
+            if (!BitConverter.IsLittleEndian && ((int)p & 3) == 0) {
                 return *(float*)p;
             }
-            var tmp = ((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3];
+            var tmp = p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3];
             return *(float*)&tmp;
         }
 
@@ -149,10 +116,10 @@ namespace ThunderEgg.BrownSugar {
             fixed(byte* fix = buffer)
             {
                 var p = fix + index;
-                if (!BitConverter.IsLittleEndian && (index & 7) == 0) {
+                if (!BitConverter.IsLittleEndian && (index & 3) == 0) {
                     return *(float*)p;
                 }
-                var tmp = ((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3];
+                var tmp = p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3];
                 return *(float*)&tmp;
             }
         }
@@ -166,10 +133,9 @@ namespace ThunderEgg.BrownSugar {
             if (!BitConverter.IsLittleEndian && ((long)p & 7) == 0) {
                 return *(ulong*)p;
             }
-            // il 55 bytes
-            return (ulong)
-                ((((uint)p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
-                ((((uint)p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]);
+            return 
+                (ulong)(p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]) << 32 |
+                 (uint)(p[4] << 24 | p[5] << 16 | p[6] << 8 | p[7]);
         }
 
         /// <summary>ビッグエンディアン順で値を読み込みます</summary>
@@ -177,9 +143,9 @@ namespace ThunderEgg.BrownSugar {
             if (!BitConverter.IsLittleEndian && ((long)p & 7) == 0) {
                 return *(long*)p;
             }
-            return unchecked((long)
-                ((((uint)p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
-                ((((uint)p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]));
+            return unchecked(
+                (long)(p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]) << 32 |
+                (uint)(p[4] << 24 | p[5] << 16 | p[6] << 8 | p[7]));
         }
 
         /// <summary>ビッグエンディアン順でバッファ読み込み</summary>
@@ -190,10 +156,9 @@ namespace ThunderEgg.BrownSugar {
                 if (!BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                     return *(long*)p;
                 }
-                // il 52 bytes
-                return unchecked((long)
-                    ((((uint)p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
-                    ((((uint)p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]));
+                return unchecked(
+                    (long)(p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]) << 32 |
+                    (uint)(p[4] << 24 | p[5] << 16 | p[6] << 8 | p[7]));
             }
         }
 
@@ -205,10 +170,9 @@ namespace ThunderEgg.BrownSugar {
                 if (!BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                     return *(ulong*)p;
                 }
-                // il 55 bytes
-                return (ulong)
-                    ((((uint)p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
-                    ((((uint)p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]);
+                return 
+                    (ulong)(p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]) << 32 |
+                     (uint)(p[4] << 24 | p[5] << 16 | p[6] << 8 | p[7]);
             }
         }
 
@@ -217,9 +181,9 @@ namespace ThunderEgg.BrownSugar {
             if (!BitConverter.IsLittleEndian && ((int)p & 7) == 0) {
                 return *(double*)p;
             }
-            var tmp = 
-                (long)(((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
-                (uint)(((p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]);
+            var tmp =
+                (ulong)(p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]) << 32 |
+                 (uint)(p[4] << 24 | p[5] << 16 | p[6] << 8 | p[7]);
             return ((double*)&tmp)[0];
         }
 
@@ -232,8 +196,8 @@ namespace ThunderEgg.BrownSugar {
                     return *(double*)p;
                 }
                 var tmp =
-                    (long)(((p[0] << 8 | p[1]) << 8 | p[2]) << 8 | p[3]) << 32 |
-                    (uint)(((p[4] << 8 | p[5]) << 8 | p[6]) << 8 | p[7]);
+                    (ulong)(p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3]) << 32 |
+                     (uint)(p[4] << 24 | p[5] << 16 | p[6] << 8 | p[7]);
                 return ((double*)&tmp)[0];
             }
         }
@@ -310,15 +274,15 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, double value) {
-            var n = BitConverter.DoubleToInt64Bits(value);
-            buffer[0] = unchecked((byte)(n >> 56));
-            buffer[1] = unchecked((byte)(n >> 48));
-            buffer[2] = unchecked((byte)(n >> 40));
-            buffer[3] = unchecked((byte)(n >> 32));
-            buffer[4] = unchecked((byte)(n >> 24));
-            buffer[5] = unchecked((byte)(n >> 16));
-            buffer[6] = unchecked((byte)(n >> 8));
-            buffer[7] = unchecked((byte)n);
+            var tmp = *(ulong*)&value;
+            buffer[0] = unchecked((byte)(tmp >> 56));
+            buffer[1] = unchecked((byte)(tmp >> 48));
+            buffer[2] = unchecked((byte)(tmp >> 40));
+            buffer[3] = unchecked((byte)(tmp >> 32));
+            buffer[4] = unchecked((byte)(tmp >> 24));
+            buffer[5] = unchecked((byte)(tmp >> 16));
+            buffer[6] = unchecked((byte)(tmp >> 8));
+            buffer[7] = unchecked((byte)tmp);
         }
 
         //
@@ -390,15 +354,18 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static void Assign(byte[] buffer, int index, double value) {
-            var n = BitConverter.DoubleToInt64Bits(value);
-            buffer[index] = unchecked((byte)(n >> 56));
-            buffer[index + 1] = unchecked((byte)(n >> 48));
-            buffer[index + 2] = unchecked((byte)(n >> 40));
-            buffer[index + 3] = unchecked((byte)(n >> 32));
-            buffer[index + 4] = unchecked((byte)(n >> 24));
-            buffer[index + 5] = unchecked((byte)(n >> 16));
-            buffer[index + 6] = unchecked((byte)(n >> 8));
-            buffer[index + 7] = unchecked((byte)n);
+            unsafe
+            {
+                var tmp = *(ulong*)&value;
+                buffer[index] = unchecked((byte)(tmp >> 56));
+                buffer[index + 1] = unchecked((byte)(tmp >> 48));
+                buffer[index + 2] = unchecked((byte)(tmp >> 40));
+                buffer[index + 3] = unchecked((byte)(tmp >> 32));
+                buffer[index + 4] = unchecked((byte)(tmp >> 24));
+                buffer[index + 5] = unchecked((byte)(tmp >> 16));
+                buffer[index + 6] = unchecked((byte)(tmp >> 8));
+                buffer[index + 7] = unchecked((byte)tmp);
+            }
         }
 
         //
