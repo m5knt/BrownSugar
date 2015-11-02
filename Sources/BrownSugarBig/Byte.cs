@@ -2,7 +2,7 @@
 namespace ThunderEgg.BrownSugar
 {
     /// <summary>リトルエンディアンでバッファを操作します</summary>
-    public class LittleEndian : HostOrderAligned {
+    public class LittleEndian : LittleEndianAny {
     }
 
     /// <summary>ビッグエンディアンでバッファを操作します</summary>
@@ -14,6 +14,6 @@ namespace ThunderEgg.BrownSugar
     }
 
     /// <summary>ホストオーダーでバッファを操作します</summary>
-    public class HostOrder : LittleEndian {
+    public class HostOrder : BigEndian {
     }
 }
