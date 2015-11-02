@@ -17,9 +17,9 @@ namespace ThunderEgg.BrownSugar {
 
     public static class Always {
         /// <summary>常に真</summary>
-        public static bool True { get { return true; } }
+        public const bool True = true;
         /// <summary>常に偽</summary>
-        public static bool False { get { return false; } }
+        public const bool False = false;
     }
 
     //
