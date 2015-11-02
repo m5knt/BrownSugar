@@ -5,7 +5,7 @@ using System.Net;
 using System.Runtime.InteropServices;
 
 using ThunderEgg.BrownSugar;
-using ThunderEgg.BrownSugar.Extends;
+using ThunderEgg.BrownSugar.Extentions;
 
 namespace Test {
 
@@ -24,10 +24,11 @@ namespace Test {
 
         [TestMethod]
         public void TestCastUnsigned() {
-            var hoge = new Hoge();
-            var fuga = new Fuga();
-            var moga = new Moga();
-            
+            if (Always.True) {
+                var hoge = new Hoge();
+                var fuga = new Fuga();
+                var moga = new Moga();
+            }
             //fuga = (Fuga)moga;//.Cast<Fuga>();
             //hoge = fuga;
             //.Cast<Hoge>();

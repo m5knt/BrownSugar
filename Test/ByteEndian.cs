@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ThunderEgg.BrownSugar;
-using ThunderEgg.BrownSugar.Extends;
+using ThunderEgg.BrownSugar.Extentions;
 
 namespace Test {
 

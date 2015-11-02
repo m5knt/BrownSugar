@@ -8,7 +8,16 @@ namespace Test {
             var count = 0L;
             while ((DateTime.Now - now).TotalSeconds < limit) {
                 action(count);
-                ++count;
+                action(count);
+                action(count);
+                action(count);
+                action(count);
+                action(count);
+                action(count);
+                action(count);
+                action(count);
+                action(count);
+                count += 10;
             }
             return count;
         }

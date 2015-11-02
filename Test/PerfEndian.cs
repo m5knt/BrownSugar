@@ -109,10 +109,68 @@ namespace Test {
         const double Limit = 2;
         const int Boost = 100;
 
+
         [TestMethod]
-        public unsafe void PerfInt32() {
-            // おそらく差が出ない
-            var limit = 60;
+        public unsafe void PerfAssignInt32() {
+            // 普通の方が早い
+            var limit = 5;
+            var result = 0L;
+            var b = stackalloc byte[16];
+            result = Bench.Run(limit, (n) => {
+                for (var j = 0; j < Boost; ++j) {
+                    b[0] = (byte)(j >> 24);
+                    b[1] = (byte)(j >> 16);
+                    b[2] = (byte)(j >> 8);
+                    b[3] = (byte)(j);
+                }
+            });
+            Console.WriteLine("type 1 : " + result);
+            result = Bench.Run(limit, (n) => {
+                for (var j = 0; j < Boost; ++j) {
+                    b[0] = (byte)((byte*)&n)[3];
+                    b[1] = (byte)((byte*)&n)[2];
+                    b[2] = (byte)((byte*)&n)[1];
+                    b[3] = (byte)((byte*)&n)[0];
+                }
+            });
+            Console.WriteLine("type 2 : " + result);
+            result = Bench.Run(limit, (n) => {
+                for (var j = 0; j < Boost; ++j) {
+                    b[0] = (byte)((*(uint*)&n) >> 24);
+                    b[1] = (byte)((*(uint*)&n) >> 16);
+                    b[2] = (byte)((*(uint*)&n) >> 8);
+                    b[3] = (byte)((*(uint*)&n));
+                }
+            });
+            Console.WriteLine("type 3 : " + result);
+        }
+
+        [TestMethod]
+        public unsafe void PerfDouble2Int64() {
+            // ポインタの方が速い
+            var limit = 5;
+            var result = 0L;
+            var b = stackalloc byte[16];
+            result = Bench.Run(limit, (n) => {
+                var f64 = 1.1;
+                for (var j = 0; j < Boost; ++j) {
+                    var t = BitConverter.DoubleToInt64Bits(f64);
+                }
+            });
+            Console.WriteLine("type 1 : " + result);
+            result = Bench.Run(limit, (n) => {
+                var f64 = 1.1;
+                for (var j = 0; j < Boost; ++j) {
+                    var t = *(long*)&f64;
+                }
+            });
+            Console.WriteLine("type 2 : " + result);
+        }
+
+        [TestMethod]
+        public unsafe void PerfToInt32() {
+            // 普通の方が早い
+            var limit = 5;
             var result = 0L;
             var b = stackalloc byte[16];
             result = Bench.Run(limit, (n) => {
