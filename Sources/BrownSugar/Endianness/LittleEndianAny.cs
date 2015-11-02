@@ -146,7 +146,7 @@ namespace ThunderEgg.BrownSugar {
             fixed (byte* fix = buffer)
             {
                 var b = fix + index;
-                if (BitConverter.IsLittleEndian && ((int)b & 7) == 0 && (index + 7 < buffer.Length)) {
+                if (BitConverter.IsLittleEndian && ((int)b & 7) == 0) {
                     return *(ulong*)b;
                 }
                 return

@@ -207,7 +207,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>バッファ位置に値をホストオーダー順で書く</summary>
         public static unsafe void Assign(byte[] buffer, int index, Int32 value) {
-            fixed (byte* fix = buffer) *(Int32*)&fi[index] = value;
+            fixed (byte* fix = buffer) *(Int32*)&fix[index] = value;
         }
 
         /// <summary>バッファ位置に値をホストオーダー順で書く</summary>

@@ -62,17 +62,17 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Byte\NoOrder.cs" />
-    <Compile Include="Byte\BigEndianAny.cs" />
+    <Compile Include="Endianness\NoOrder.cs" />
+    <Compile Include="Endianness\BigEndianAny.cs" />
     <Compile Include="Extends\Cast.cs" />
-    <Compile Include="Byte\HostOrder.cs" />
-    <Compile Include="Byte\LittleEndianAny.cs" />
+    <Compile Include="Endianness\HostOrder.cs" />
+    <Compile Include="Endianness\LittleEndianAny.cs" />
     <Compile Include="Extends\Char.cs" />
     <Compile Include="Extends\Collection.cs" />
     <Compile Include="Extends\Math.cs" />
     <Compile Include="BrownSugar.cs" />
-    <Compile Include="Byte\NetOrder.cs" />
-    <Compile Include="Byte\Byte.cs" />
+    <Compile Include="Endianness\NetOrder.cs" />
+    <Compile Include="Endianness\Byte.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
