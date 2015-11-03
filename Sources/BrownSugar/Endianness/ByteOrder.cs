@@ -88,12 +88,12 @@ namespace ThunderEgg.BrownSugar.Byte {
                 (unchecked((ulong)value) & 0x000000000000ff00UL) << 40 |
                 unchecked((ulong)value) << 56));
         }
-#endif
 
         /// <summary>マーシャルなオブジェクトのサイズを返します</summary>
         public static int MarshalSize(this object obj) {
             return Marshal.SizeOf(obj);
         }
+#endif
     }
 
     //
