@@ -72,7 +72,7 @@
     <Compile Include="Extentions\Maths.cs" />
     <Compile Include="BrownSugar.cs" />
     <Compile Include="Endianness\NetOrder.cs" />
-    <Compile Include="Endianness\Byte.cs" />
+    <Compile Include="Endianness\ByteOrder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

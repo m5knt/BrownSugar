@@ -58,6 +58,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Bench.cs" />
+    <Compile Include="TestPerf.cs" />
     <Compile Include="TestLittleEndian.cs" />
     <Compile Include="TestBigEndian.cs" />
     <Compile Include="ByteEndian.cs" />
