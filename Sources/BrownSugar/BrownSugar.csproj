@@ -64,12 +64,12 @@
   <ItemGroup>
     <Compile Include="Endianness\NoOrder.cs" />
     <Compile Include="Endianness\BigEndianAny.cs" />
-    <Compile Include="Extends\Cast.cs" />
+    <Compile Include="Extentions\Casts.cs" />
     <Compile Include="Endianness\HostOrder.cs" />
     <Compile Include="Endianness\LittleEndianAny.cs" />
-    <Compile Include="Extends\Char.cs" />
-    <Compile Include="Extends\Collection.cs" />
-    <Compile Include="Extends\Math.cs" />
+    <Compile Include="Extentions\Chars.cs" />
+    <Compile Include="Extentions\Collections.cs" />
+    <Compile Include="Extentions\Maths.cs" />
     <Compile Include="BrownSugar.cs" />
     <Compile Include="Endianness\NetOrder.cs" />
     <Compile Include="Endianness\Byte.cs" />
