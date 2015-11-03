@@ -5,20 +5,6 @@ namespace ThunderEgg.BrownSugar.Extentions {
 
     public static partial class Collections {
 
-        public static void Foreach<T>(this IEnumerable<T> self, Action<T> action) {
-            foreach(var t in self) {
-                action(t);
-            }
-        }
-
-        public static T[] MakeArray<T>(this T value) {
-            return new T[] { value };
-        }
-
-        public static List<T> MakeList<T>(this T value) {
-            return new List<T>() { value };
-        }
-
 #if false
         public static IList<T> Add<T>(this IList<T> self, IEnumerable<T> collection) {
             foreach (var t in collection) {
