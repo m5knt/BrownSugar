@@ -1,6 +1,6 @@
 ﻿/**
  * @file
- * @brief リトルエンディアン回り
+ * @brief リトルエンディアン順のバッファ操作関係
  */
 
 using System;
@@ -11,7 +11,7 @@ using System;
 
 namespace ThunderEgg.BrownSugar {
 
-    /// <summary>バッファをリトルエンディアン順で操作します</summary>
+    /// <summary>リトルエンディアン順のバッファ操作関係</summary>
     public class LittleEndianAny : NoOrder {
 
         /// <summary>ポインタ位置に値を書く</summary>

@@ -1,6 +1,6 @@
 ﻿/**
  * @file
- * @brief ホストオーダー順のバッファ操作
+ * @brief ホストオーダー順のバッファ操作関係
  */
 
 using System;
@@ -12,7 +12,10 @@ using System.Runtime.InteropServices;
 
 namespace ThunderEgg.BrownSugar {
 
-    /// <summary>バッファをホストオーダー順で操作</summary>
+    /// <summary>
+    /// ホストオーダー順のバッファ操作関係
+    /// アライメント済み位置であること
+    /// </summary>
     public class HostOrderAligned : NoOrder {
 
         /// <summary>ポインタ位置に値を書く</summary>

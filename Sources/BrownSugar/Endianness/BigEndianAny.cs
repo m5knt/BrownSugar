@@ -1,6 +1,6 @@
 ﻿/**
  * @file
- * @brief ビッグエンディアン回り
+ * @brief ビッグエンディアン順のバッファ操作関係
  */
 
 using System;
@@ -11,7 +11,7 @@ using System;
 
 namespace ThunderEgg.BrownSugar {
 
-    /// <summary>バッファをビッグエンディアン順で操作します</summary>
+    /// <summary>ビッグエンディアン順のバッファ操作関係</summary>
     public class BigEndianAny : NoOrder {
 
         /// <summary>ポインタ位置に値を書く</summary>

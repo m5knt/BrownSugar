@@ -1,6 +1,6 @@
-﻿/*
+﻿/**
  * @file
- * @Auther Yukio KANEDA
+ * @brief ホストオーダー順のバッファ操作関係
  */
 
 using System;

@@ -1,6 +1,6 @@
 ﻿/**
  * @file
- * @brief ビッグエンディアン回り
+ * @brief エンディアンに影響されないバッファ操作関係
  */
 
 using System;
@@ -11,6 +11,7 @@ using System;
 
 namespace ThunderEgg.BrownSugar {
 
+    /// <summary>エンディアンに影響されないバッファ操作関係</summary>
     public class NoOrder {
 
         /// <summary>ポインタ位置の値を取得</summary>
