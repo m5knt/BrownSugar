@@ -330,37 +330,43 @@ namespace ThunderEgg.BrownSugar {
         }
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static void Assign(byte[] buffer, int index, ulong value) {
-            buffer[index] = unchecked((byte)(value >> 56));
-            buffer[index + 1] = unchecked((byte)(value >> 48));
-            buffer[index + 2] = unchecked((byte)(value >> 40));
-            buffer[index + 3] = unchecked((byte)(value >> 32));
-            buffer[index + 4] = unchecked((byte)(value >> 24));
-            buffer[index + 5] = unchecked((byte)(value >> 16));
-            buffer[index + 6] = unchecked((byte)(value >> 8));
-            buffer[index + 7] = unchecked((byte)value);
+            var tmp = (uint)(value >> 32);
+            buffer[index] = unchecked((byte)(tmp >> 24));
+            buffer[index + 1] = unchecked((byte)(tmp >> 16));
+            buffer[index + 2] = unchecked((byte)(tmp >> 8));
+            buffer[index + 3] = unchecked((byte)tmp);
+            tmp = (uint)value;
+            buffer[index + 4] = unchecked((byte)(tmp >> 24));
+            buffer[index + 5] = unchecked((byte)(tmp >> 16));
+            buffer[index + 6] = unchecked((byte)(tmp >> 8));
+            buffer[index + 7] = unchecked((byte)tmp);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static void Assign(byte[] buffer, int index, long value) {
-            buffer[index] = unchecked((byte)(value >> 56));
-            buffer[index + 1] = unchecked((byte)(value >> 48));
-            buffer[index + 2] = unchecked((byte)(value >> 40));
-            buffer[index + 3] = unchecked((byte)(value >> 32));
-            buffer[index + 4] = unchecked((byte)(value >> 24));
-            buffer[index + 5] = unchecked((byte)(value >> 16));
-            buffer[index + 6] = unchecked((byte)(value >> 8));
-            buffer[index + 7] = unchecked((byte)value);
+            var tmp = (uint)(value >> 32);
+            buffer[index] = unchecked((byte)(tmp >> 24));
+            buffer[index + 1] = unchecked((byte)(tmp >> 16));
+            buffer[index + 2] = unchecked((byte)(tmp >> 8));
+            buffer[index + 3] = unchecked((byte)tmp);
+            tmp = (uint)value;
+            buffer[index + 4] = unchecked((byte)(tmp >> 24));
+            buffer[index + 5] = unchecked((byte)(tmp >> 16));
+            buffer[index + 6] = unchecked((byte)(tmp >> 8));
+            buffer[index + 7] = unchecked((byte)tmp);
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static void Assign(byte[] buffer, int index, double value) {
             unsafe
             {
-                var tmp = *(ulong*)&value;
-                buffer[index] = unchecked((byte)(tmp >> 56));
-                buffer[index + 1] = unchecked((byte)(tmp >> 48));
-                buffer[index + 2] = unchecked((byte)(tmp >> 40));
-                buffer[index + 3] = unchecked((byte)(tmp >> 32));
+                var val = *(ulong*)&value;
+                var tmp = (uint)(val >> 32);
+                buffer[index] = unchecked((byte)(tmp >> 24));
+                buffer[index + 1] = unchecked((byte)(tmp >> 16));
+                buffer[index + 2] = unchecked((byte)(tmp >> 8));
+                buffer[index + 3] = unchecked((byte)tmp);
+                tmp = (uint)val;
                 buffer[index + 4] = unchecked((byte)(tmp >> 24));
                 buffer[index + 5] = unchecked((byte)(tmp >> 16));
                 buffer[index + 6] = unchecked((byte)(tmp >> 8));

@@ -297,14 +297,16 @@ namespace ThunderEgg.BrownSugar {
                 *(ulong*)(buffer) = value;
                 return;
             }
-            buffer[0] = (byte)value;
-            buffer[1] = (byte)(value >> 8);
-            buffer[2] = (byte)(value >> 16);
-            buffer[3] = (byte)(value >> 24);
-            buffer[4] = (byte)(value >> 32);
-            buffer[5] = (byte)(value >> 40);
-            buffer[6] = (byte)(value >> 48);
-            buffer[7] = (byte)(value >> 56);
+            var tmp = (uint)value;
+            buffer[0] = (byte)tmp;
+            buffer[1] = (byte)(tmp >> 8);
+            buffer[2] = (byte)(tmp >> 16);
+            buffer[3] = (byte)(tmp >> 24);
+            tmp = (uint)(value >> 32);
+            buffer[4] = (byte)(value);
+            buffer[5] = (byte)(value >> 8);
+            buffer[6] = (byte)(value >> 16);
+            buffer[7] = (byte)(value >> 24);
         }
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
@@ -313,14 +315,16 @@ namespace ThunderEgg.BrownSugar {
                 *(long*)(buffer) = value;
                 return;
             }
-            buffer[0] = (byte)value;
-            buffer[1] = (byte)(value >> 8);
-            buffer[2] = (byte)(value >> 16);
-            buffer[3] = (byte)(value >> 24);
-            buffer[4] = (byte)(value >> 32);
-            buffer[5] = (byte)(value >> 40);
-            buffer[6] = (byte)(value >> 48);
-            buffer[7] = (byte)(value >> 56);
+            var tmp = (uint)value;
+            buffer[0] = (byte)tmp;
+            buffer[1] = (byte)(tmp >> 8);
+            buffer[2] = (byte)(tmp >> 16);
+            buffer[3] = (byte)(tmp >> 24);
+            tmp = (uint)(value >> 32);
+            buffer[4] = (byte)(value);
+            buffer[5] = (byte)(value >> 8);
+            buffer[6] = (byte)(value >> 16);
+            buffer[7] = (byte)(value >> 24);
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
@@ -333,14 +337,16 @@ namespace ThunderEgg.BrownSugar {
                     return;
                 }
                 else {
-                    pointer[0] = (byte)value;
-                    pointer[1] = (byte)(value >> 8);
-                    pointer[2] = (byte)(value >> 16);
-                    pointer[3] = (byte)(value >> 24);
-                    pointer[4] = (byte)(value >> 32);
-                    pointer[5] = (byte)(value >> 40);
-                    pointer[6] = (byte)(value >> 48);
-                    pointer[7] = (byte)(value >> 56);
+                    var tmp = (uint)value;
+                    pointer[0] = (byte)tmp;
+                    pointer[1] = (byte)(tmp >> 8);
+                    pointer[2] = (byte)(tmp >> 16);
+                    pointer[3] = (byte)(tmp >> 24);
+                    tmp = (uint)(value >> 32);
+                    pointer[4] = (byte)(tmp);
+                    pointer[5] = (byte)(tmp >> 8);
+                    pointer[6] = (byte)(tmp >> 16);
+                    pointer[7] = (byte)(tmp >> 24);
                 }
             }
         }
@@ -355,14 +361,16 @@ namespace ThunderEgg.BrownSugar {
                     return;
                 }
                 else {
-                    pointer[0] = (byte)value;
-                    pointer[1] = (byte)(value >> 8);
-                    pointer[2] = (byte)(value >> 16);
-                    pointer[3] = (byte)(value >> 24);
-                    pointer[4] = (byte)(value >> 32);
-                    pointer[5] = (byte)(value >> 40);
-                    pointer[6] = (byte)(value >> 48);
-                    pointer[7] = (byte)(value >> 56);
+                    var tmp = (uint)value;
+                    pointer[0] = (byte)tmp;
+                    pointer[1] = (byte)(tmp >> 8);
+                    pointer[2] = (byte)(tmp >> 16);
+                    pointer[3] = (byte)(tmp >> 24);
+                    tmp = (uint)(value >> 32);
+                    pointer[4] = (byte)(tmp);
+                    pointer[5] = (byte)(tmp >> 8);
+                    pointer[6] = (byte)(tmp >> 16);
+                    pointer[7] = (byte)(tmp >> 24);
                 }
             }
         }
@@ -373,15 +381,17 @@ namespace ThunderEgg.BrownSugar {
                 *(double*)(buffer) = value;
                 return;
             }
-            var tmp = *(ulong*)&value;
+            var val = *(ulong*)&value;
+            var tmp = (uint)val;
             buffer[0] = (byte)tmp;
             buffer[1] = (byte)(tmp >> 8);
             buffer[2] = (byte)(tmp >> 16);
             buffer[3] = (byte)(tmp >> 24);
-            buffer[4] = (byte)(tmp >> 32);
-            buffer[5] = (byte)(tmp >> 40);
-            buffer[6] = (byte)(tmp >> 48);
-            buffer[7] = (byte)(tmp >> 56);
+            tmp = (uint)(val >> 32);
+            buffer[4] = (byte)(tmp);
+            buffer[5] = (byte)(tmp >> 8);
+            buffer[6] = (byte)(tmp >> 16);
+            buffer[7] = (byte)(tmp >> 24);
         }
 
         /// <summary>リトルエンディアン順でバッファに値を書き込みます</summary>
@@ -394,15 +404,16 @@ namespace ThunderEgg.BrownSugar {
                     return;
                 }
                 else {
-                    var tmp = *(ulong*)&value;
+                    var tmp = (uint)((ulong*)&value)[0];
                     pointer[0] = (byte)tmp;
                     pointer[1] = (byte)(tmp >> 8);
                     pointer[2] = (byte)(tmp >> 16);
                     pointer[3] = (byte)(tmp >> 24);
-                    pointer[4] = (byte)(tmp >> 32);
-                    pointer[5] = (byte)(tmp >> 40);
-                    pointer[6] = (byte)(tmp >> 48);
-                    pointer[7] = (byte)(tmp >> 56);
+                    tmp = (uint)(((ulong*)&value)[0] >> 32);
+                    pointer[4] = (byte)(tmp);
+                    pointer[5] = (byte)(tmp >> 8);
+                    pointer[6] = (byte)(tmp >> 16);
+                    pointer[7] = (byte)(tmp >> 24);
                 }
             }
         }
