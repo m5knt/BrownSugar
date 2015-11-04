@@ -123,7 +123,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
         public static unsafe ulong ToUInt64(byte* b) {
-            if (BitConverter.IsLittleEndian && ((int)b & 7) == 0) {
+            if (((int)b & 7) == 0 && BitConverter.IsLittleEndian) {
                 return *(ulong*)b;
             }
             return 
@@ -132,7 +132,7 @@ namespace ThunderEgg.BrownSugar {
         }
 
         public static unsafe long ToInt64(byte* b) {
-            if (BitConverter.IsLittleEndian && ((int)b & 7) == 0) {
+            if (((int)b & 7) == 0 && BitConverter.IsLittleEndian) {
                 return *(long*)b;
             }
             return 
@@ -146,7 +146,7 @@ namespace ThunderEgg.BrownSugar {
             fixed (byte* fix = buffer)
             {
                 var b = fix + index;
-                if (BitConverter.IsLittleEndian && ((int)b & 7) == 0) {
+                if (((int)b & 7) == 0 && BitConverter.IsLittleEndian) {
                     return *(ulong*)b;
                 }
                 return
@@ -159,7 +159,7 @@ namespace ThunderEgg.BrownSugar {
             fixed (byte* fix = buffer)
             {
                 var b = fix + index;
-                if (BitConverter.IsLittleEndian && (index & 7) == 0) {
+                if ((index & 7) == 0 && BitConverter.IsLittleEndian) {
                     return *(long*)b;
                 }
                 return 
@@ -170,10 +170,10 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
         public static unsafe double ToDouble(byte* b) {
-            if (BitConverter.IsLittleEndian && ((int)b & 7) == 0) {
+            if (((int)b & 7) == 0 && BitConverter.IsLittleEndian) {
                 return *(double*)b;
             }
-            var tmp = 
+            var tmp =
                 (ulong)(b[7] << 24 | b[6] << 16 | b[5] << 8 | b[4]) << 32 |
                  (uint)(b[3] << 24 | b[2] << 16 | b[1] << 8 | b[0]);
             return *(double*)&tmp;
@@ -184,7 +184,7 @@ namespace ThunderEgg.BrownSugar {
             fixed (byte* fix = buffer)
             {
                 var b = fix + index;
-                if (BitConverter.IsLittleEndian && (index & 7) == 0) {
+                if ((index & 7) == 0 && BitConverter.IsLittleEndian) {
                     return *(double*)b;
                 }
                 var tmp = 
@@ -293,7 +293,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, ulong value) {
-            if (BitConverter.IsLittleEndian && ((int)buffer & 7) == 0) {
+            if (((int)buffer & 7) == 0 && BitConverter.IsLittleEndian) {
                 *(ulong*)(buffer) = value;
                 return;
             }
@@ -311,7 +311,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, long value) {
-            if (BitConverter.IsLittleEndian && ((int)buffer & 7) == 0) {
+            if (((int)buffer & 7) == 0 && BitConverter.IsLittleEndian) {
                 *(long*)(buffer) = value;
                 return;
             }
@@ -332,7 +332,7 @@ namespace ThunderEgg.BrownSugar {
             fixed (byte* fix = buffer)
             {
                 var pointer = fix + index;
-                if (BitConverter.IsLittleEndian && ((int)index & 7) == 0) {
+                if (((int)index & 7) == 0 && BitConverter.IsLittleEndian) {
                     *(long*)pointer = value;
                     return;
                 }
@@ -356,7 +356,7 @@ namespace ThunderEgg.BrownSugar {
             fixed (byte* fix = buffer)
             {
                 var pointer = fix + index;
-                if (BitConverter.IsLittleEndian && ((int)index & 7) == 0) {
+                if (((int)index & 7) == 0 && BitConverter.IsLittleEndian) {
                     *(ulong*)pointer = value;
                     return;
                 }
@@ -377,7 +377,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>リトルエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, double value) {
-            if (BitConverter.IsLittleEndian && ((int)buffer & 7) == 0) {
+            if (((int)buffer & 7) == 0 && BitConverter.IsLittleEndian) {
                 *(double*)(buffer) = value;
                 return;
             }
@@ -399,7 +399,7 @@ namespace ThunderEgg.BrownSugar {
             fixed (byte* fix = buffer)
             {
                 var pointer = fix + index;
-                if (BitConverter.IsLittleEndian && ((int)index & 7) == 0) {
+                if (((int)index & 7) == 0 && BitConverter.IsLittleEndian) {
                     *(double*)pointer = value;
                     return;
                 }
