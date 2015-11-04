@@ -221,10 +221,12 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, ulong value) {
-            buffer[0] = unchecked((byte)(value >> 56));
-            buffer[1] = unchecked((byte)(value >> 48));
-            buffer[2] = unchecked((byte)(value >> 40));
-            buffer[3] = unchecked((byte)(value >> 32));
+            var tmp = (uint)(value >> 32);
+            buffer[0] = unchecked((byte)(value >> 24));
+            buffer[1] = unchecked((byte)(value >> 16));
+            buffer[2] = unchecked((byte)(value >> 8));
+            buffer[3] = unchecked((byte)value);
+            tmp = (uint)value;
             buffer[4] = unchecked((byte)(value >> 24));
             buffer[5] = unchecked((byte)(value >> 16));
             buffer[6] = unchecked((byte)(value >> 8));
@@ -262,10 +264,12 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, long value) {
-            buffer[0] = unchecked((byte)(value >> 56));
-            buffer[1] = unchecked((byte)(value >> 48));
-            buffer[2] = unchecked((byte)(value >> 40));
-            buffer[3] = unchecked((byte)(value >> 32));
+            var tmp = (uint)(value >> 32);
+            buffer[0] = unchecked((byte)(value >> 24));
+            buffer[1] = unchecked((byte)(value >> 16));
+            buffer[2] = unchecked((byte)(value >> 8));
+            buffer[3] = unchecked((byte)value);
+            tmp = (uint)value;
             buffer[4] = unchecked((byte)(value >> 24));
             buffer[5] = unchecked((byte)(value >> 16));
             buffer[6] = unchecked((byte)(value >> 8));
@@ -274,11 +278,13 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static unsafe void Assign(byte* buffer, double value) {
-            var tmp = *(ulong*)&value;
-            buffer[0] = unchecked((byte)(tmp >> 56));
-            buffer[1] = unchecked((byte)(tmp >> 48));
-            buffer[2] = unchecked((byte)(tmp >> 40));
-            buffer[3] = unchecked((byte)(tmp >> 32));
+            var val = *(ulong*)&value;
+            var tmp = (uint)(val >> 32);
+            buffer[0] = unchecked((byte)(tmp >> 24));
+            buffer[1] = unchecked((byte)(tmp >> 16));
+            buffer[2] = unchecked((byte)(tmp >> 8));
+            buffer[3] = unchecked((byte)tmp);
+            tmp = (uint)val;
             buffer[4] = unchecked((byte)(tmp >> 24));
             buffer[5] = unchecked((byte)(tmp >> 16));
             buffer[6] = unchecked((byte)(tmp >> 8));
