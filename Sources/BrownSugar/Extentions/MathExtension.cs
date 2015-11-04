@@ -12,7 +12,7 @@ using System;
 namespace ThunderEgg.BrownSugar.Extentions {
 
     /// <summary>計算関係</summary>
-    public static class Maths {
+    public static class MathExtension {
 
         /// <summary>無限大であるかを返す</summary>
         /// <seealso cref="float.IsInfinity(float)"/>

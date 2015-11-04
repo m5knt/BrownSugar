@@ -11,8 +11,7 @@
     <AssemblyName>BrownSugar</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile>
-    </TargetFrameworkProfile>
+    <TargetFrameworkProfile>Unity Subset v3.5</TargetFrameworkProfile>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -58,18 +57,15 @@
     <OutputPath>bin\ReleaseLE\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="Endianness\NoOrder.cs" />
     <Compile Include="Endianness\BigEndianAny.cs" />
-    <Compile Include="Extentions\Casts.cs" />
+    <Compile Include="Extentions\StringBufferExtension.cs" />
+    <Compile Include="Extentions\CastExtension.cs" />
     <Compile Include="Endianness\HostOrder.cs" />
     <Compile Include="Endianness\LittleEndianAny.cs" />
-    <Compile Include="Extentions\Chars.cs" />
-    <Compile Include="Extentions\Collections.cs" />
-    <Compile Include="Extentions\Maths.cs" />
+    <Compile Include="Extentions\CharExtension.cs" />
+    <Compile Include="Extentions\CollectionExtension.cs" />
+    <Compile Include="Extentions\MathExtension.cs" />
     <Compile Include="BrownSugar.cs" />
     <Compile Include="Endianness\NetOrder.cs" />
     <Compile Include="Endianness\ByteOrder.cs" />
@@ -98,6 +94,9 @@
 </ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

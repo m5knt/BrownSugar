@@ -11,7 +11,7 @@ using System.Globalization;
 
 namespace ThunderEgg.BrownSugar.Extentions {
 
-    public static class Chars {
+    public static class CharExtension {
 
         /// <summary>文字を倍精度値で返す</summary>
         /// <seealso cref="char.GetNumericValue(char)"/>

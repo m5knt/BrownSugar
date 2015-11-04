@@ -9,7 +9,7 @@ namespace ThunderEgg.BrownSugar.Extentions {
     /// unchecked((type)value)と書くのが物臭な人や
     /// 右につなげたい人用
     /// </summary>
-    public static class Casts {
+    public static class CastExtension {
 
         public static T Cast<T>(this object obj) where T : class {
             return (T)obj;

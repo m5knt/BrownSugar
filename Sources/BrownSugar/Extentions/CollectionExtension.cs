@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ThunderEgg.BrownSugar.Extentions {
 
-    public static partial class Collections {
+    public static partial class CollectionExtension {
 
 #if false
         public static IList<T> Add<T>(this IList<T> self, IEnumerable<T> collection) {
