@@ -12,30 +12,16 @@ using System.Runtime.InteropServices;
 
 namespace ThunderEgg.BrownSugar {
 
-    public static class SugarByte {
-#if false
-        /// <summary>倍精度値をビットイメージとして収納します</summary>
-        public static long DoubleToInt64Bits(this double value) {
-            return BitConverter.DoubleToInt64Bits(value);
-        }
+    public static class ByteOrder {
 
-        /// <summary>倍精度値をビットイメージから復元します</summary>
-        public static double Int64BitsToDouble(this long value) {
-            return BitConverter.Int64BitsToDouble(value);
-        }
-
-        // /// <summary>バイトオーダーを反転させた値を返す</summary>
-        // public static byte SwapByteOrder(this byte value) { return value; }
-
-        /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static ushort SwapByteOrder(this ushort value) {
+        public static ushort Swap(ushort value) {
             return unchecked((ushort)( //
                 value >> 8 |
                 value << 8));
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static uint SwapByteOrder(this uint value) {
+        public static uint Swap(uint value) {
             return ( //
                 value >> 24 |
                 (value & 0x00ff0000U) >> 8 |
@@ -44,7 +30,7 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static ulong SwapByteOrder(this ulong value) {
+        public static ulong Swap(ulong value) {
             return ( //
                 value >> 56 |
                 (value & 0x00ff000000000000UL) >> 40 |
@@ -55,9 +41,6 @@ namespace ThunderEgg.BrownSugar {
                 (value & 0x000000000000ff00UL) << 40 |
                 value << 56);
         }
-
-        // /// <summary>バイトオーダーを反転させた値を返す</summary>
-        // public static sbyte SwapByteOrder(this sbyte value) { return value; }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
         public static short SwapByteOrder(this short value) {
@@ -88,46 +71,9 @@ namespace ThunderEgg.BrownSugar {
                 unchecked((ulong)value) << 56));
         }
 
-        /// <summary>マーシャルなオブジェクトのサイズを返します</summary>
-        public static int MarshalSize(this object obj) {
-            return Marshal.SizeOf(obj);
-        }
-#endif
-    }
-
-    //
-    //
-    //
-
-    public static class ByteOrder {
-
-        public static ushort Swap(ushort value) {
-            return unchecked((ushort)( //
-                value >> 8 |
-                value << 8));
-        }
-
-        /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static uint Swap(uint value) {
-            return ( //
-                value >> 24 |
-                (value & 0x00ff0000U) >> 8 |
-                (value & 0x0000ff00U) << 8 |
-                value << 24);
-        }
-
-        /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static ulong Swap(ulong value) {
-            return ( //
-                value >> 56 |
-                (value & 0x00ff000000000000UL) >> 40 |
-                (value & 0x0000ff0000000000UL) >> 24 |
-                (value & 0x000000ff00000000UL) >> 8 |
-                (value & 0x00000000ff000000UL) << 8 |
-                (value & 0x0000000000ff0000UL) << 24 |
-                (value & 0x000000000000ff00UL) << 40 |
-                value << 56);
-        }
+        //
+        //
+        //
 
         /// <summary>
         /// 型のサイズを求めます
@@ -168,7 +114,13 @@ namespace ThunderEgg.BrownSugar {
             }
             int length = Marshal.SizeOf(typeof(T));
             var buffer = new byte[length];
-            Assign(buffer, 0, obj);
+            unsafe
+            {
+                fixed (byte* fix = buffer)
+                {
+                    Marshal.StructureToPtr(obj, new IntPtr(fix), false);
+                }
+            }
             return buffer;
         }
 
@@ -231,11 +183,17 @@ namespace ThunderEgg.BrownSugar {
                 }
                 var ty = f.FieldType;
                 var offset = index + Marshal.OffsetOf(type, f.Name).ToInt32();
+
+                // 配列か確認
                 if (ty.IsArray) {
-                    var attribute = f.GetCustomAttributes(MarshalAttributeType, false);
-                    var marshal = (MarshalAsAttribute)attribute[0];
                     var elem_type = ty.GetElementType();
                     var elem_size = Marshal.SizeOf(elem_type);
+                    // 1バイトなら何もしない
+                    if (elem_size <= 1) {
+                        continue;
+                    }
+                    var attribute = f.GetCustomAttributes(MarshalAttributeType, false);
+                    var marshal = (MarshalAsAttribute)attribute[0];
                     for(var j = 0; j < marshal.SizeConst; ++j) {
                         Swap(buffer, offset, elem_type);
                         offset += elem_size;
@@ -244,9 +202,9 @@ namespace ThunderEgg.BrownSugar {
                 }
 
                 // ネストしているか確認
-                bool has_nest = false;
                 var nest_fields = ty.GetFields();
-                for (var j = 0; !has_nest && j < nest_fields.Length; ++j) {
+                bool has_nest = false;
+                for (var j = nest_fields.Length; --j >= 0 && !has_nest;) {
                     has_nest = !nest_fields[j].IsStatic;
                 }
                 if (has_nest) {
@@ -254,11 +212,14 @@ namespace ThunderEgg.BrownSugar {
                     continue;
                 }
 
-                // 値の反転
+                // 1バイトなら何もしない
                 var size = Marshal.SizeOf(ty);
-                if (size > 1) {
-                    Array.Reverse(buffer, offset, size);
+                if (size <= 1) {
+                    continue;
                 }
+
+                // 値の反転
+                Array.Reverse(buffer, offset, size);
             }
         }
     }
