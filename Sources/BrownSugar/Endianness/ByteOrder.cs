@@ -1,6 +1,5 @@
 ﻿/**
  * @file
- * @brief バイト・ビットに関係するシンタックスシュガーを纏めています
  */
 
 using System;
@@ -11,7 +10,7 @@ using System.Runtime.InteropServices;
  *
  */
 
-namespace ThunderEgg.BrownSugar.Byte {
+namespace ThunderEgg.BrownSugar {
 
     public static class SugarByte {
 #if false
@@ -102,67 +101,165 @@ namespace ThunderEgg.BrownSugar.Byte {
 
     public static class ByteOrder {
 
-        // 処理を簡潔にするためbool
-        /// <summary>バイトオーダーの種類</summary>
-        public const bool LittleEndian = true;
-        /// <summary>バイトオーダーの種類</summary>
-        public const bool BigEndian = false;
+        public static ushort Swap(ushort value) {
+            return unchecked((ushort)( //
+                value >> 8 |
+                value << 8));
+        }
 
-        [AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
-        public class ByteOrderAttribute : Attribute {
-            public bool IsLittleEndian { get; private set; }
-            public ByteOrderAttribute(bool is_le) {
-                IsLittleEndian = is_le;
+        /// <summary>バイトオーダーを反転させた値を返す</summary>
+        public static uint Swap(uint value) {
+            return ( //
+                value >> 24 |
+                (value & 0x00ff0000U) >> 8 |
+                (value & 0x0000ff00U) << 8 |
+                value << 24);
+        }
+
+        /// <summary>バイトオーダーを反転させた値を返す</summary>
+        public static ulong Swap(ulong value) {
+            return ( //
+                value >> 56 |
+                (value & 0x00ff000000000000UL) >> 40 |
+                (value & 0x0000ff0000000000UL) >> 24 |
+                (value & 0x000000ff00000000UL) >> 8 |
+                (value & 0x00000000ff000000UL) << 8 |
+                (value & 0x0000000000ff0000UL) << 24 |
+                (value & 0x000000000000ff00UL) << 40 |
+                value << 56);
+        }
+
+        /// <summary>
+        /// 型のサイズを求めます
+        /// PODもしくはマーシャルアトリビュートがある型が扱えます
+        /// </summary>
+        /// <seealso cref="Marshal.SizeOf(object)"/>
+        public static int SizeOf<T>(T obj) {
+            return Marshal.SizeOf(obj);
+        }
+
+        /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public static int Assign<T>(byte[] buffer, int index, T obj) {
+            if (buffer == null || obj == null) {
+                throw new ArgumentNullException();
+            }
+            int length = Marshal.SizeOf(typeof(T));
+            if (index < 0 || (index + length) > buffer.Length) {
+                throw new IndexOutOfRangeException();
+            }
+            unsafe
+            {
+                fixed (byte* fix = buffer)
+                {
+                    var p = fix + index;
+                    Marshal.StructureToPtr(obj, new IntPtr(fix), false);
+                }
+            }
+            return length;
+        }
+
+        /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static byte[] GetBytes<T>(T obj) {
+            if (obj == null) {
+                throw new ArgumentNullException();
+            }
+            int length = Marshal.SizeOf(typeof(T));
+            var buffer = new byte[length];
+            Assign(buffer, 0, obj);
+            return buffer;
+        }
+
+        /// <summary>バッファからオブジェクトを復元する</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public static int CopyTo<T>(byte[] buffer, int index, T obj)
+            where T : class //
+        {
+            if (buffer == null || obj == null) {
+                throw new ArgumentNullException();
+            }
+            var type = typeof(T);
+            int length = Marshal.SizeOf(type);
+            if (index < 0 || (index + length) > buffer.Length) {
+                throw new IndexOutOfRangeException();
+            }
+            unsafe
+            {
+                fixed (byte* fix = buffer)
+                {
+                    var p = fix + index;
+                    Marshal.PtrToStructure(new IntPtr(fix), obj);
+                }
+            }
+            return length;
+        }
+
+        /// <summary>バッファからオブジェクトを復元する</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public static T To<T>(byte[] buffer, int index) {
+            var type = typeof(T);
+            if (buffer == null) {
+                throw new ArgumentNullException();
+            }
+            int length = Marshal.SizeOf(type);
+            if (index < 0 || (index + length) > buffer.Length) {
+                throw new IndexOutOfRangeException();
+            }
+            unsafe
+            {
+                fixed (byte* fix = buffer)
+                {
+                    var p = fix + index;
+                    return (T)Marshal.PtrToStructure(new IntPtr(fix), type);
+                }
             }
         }
 
+        static Type MarshalAttributeType = typeof(MarshalAsAttribute);
+
         /// <summary>型情報をもとにバイトオーダーを反転させます</summary>
-        static void SwapByteOrder(byte[] buffer, int index, Type type) {
+        public static void Swap(byte[] buffer, int index, Type type) {
             var fields = type.GetFields();
             for (var i = 0; i < fields.Length; ++i) {
                 var f = fields[i];
                 if (f.IsStatic) {
                     continue;
                 }
-                // TODO 配列..
-                bool has_child = false;
-                // 子の確認
-                var child = f.FieldType.GetFields();
-                for (var j = 0; !has_child && j < child.Length; ++j) {
-                    has_child = !child[j].IsStatic;
-                }
-                var offset = Marshal.OffsetOf(type, f.Name).ToInt32();
-                if (has_child) {
-                    SwapByteOrder(buffer, index + offset, f.FieldType);
-                }
-                else {
-                    var size = Marshal.SizeOf(f.FieldType);
-                    if (size > 1) {
-                        Array.Reverse(buffer, index + offset, size);
+                var ty = f.FieldType;
+                var offset = index + Marshal.OffsetOf(type, f.Name).ToInt32();
+                if (ty.IsArray) {
+                    var attribute = f.GetCustomAttributes(MarshalAttributeType, false);
+                    var marshal = (MarshalAsAttribute)attribute[0];
+                    var elem_type = ty.GetElementType();
+                    var elem_size = Marshal.SizeOf(elem_type);
+                    for(var j = 0; j < marshal.SizeConst; ++j) {
+                        Swap(buffer, offset, elem_type);
+                        offset += elem_size;
                     }
+                    continue;
+                }
+
+                // ネストしているか確認
+                bool has_nest = false;
+                var nest_fields = ty.GetFields();
+                for (var j = 0; !has_nest && j < nest_fields.Length; ++j) {
+                    has_nest = !nest_fields[j].IsStatic;
+                }
+                if (has_nest) {
+                    Swap(buffer, offset, ty);
+                    continue;
+                }
+
+                // 値の反転
+                var size = Marshal.SizeOf(ty);
+                if (size > 1) {
+                    Array.Reverse(buffer, offset, size);
                 }
             }
         }
-
-#if false
-
-        /// <summary>バイトオーダーを調整します</summary>
-        static void Adjust(Type type, byte[] buffer, int index) {
-            var fields = type.GetFields();
-            for (var i = 0; i < fields.Length; ++i) {
-                var f = fields[i];
-                if (!f.IsDefined(typeof(ByteOrderAttribute), false)) continue;
-                //
-                var attr = (ByteOrderAttribute)f.GetCustomAttributes(
-                    typeof(ByteOrderAttribute), false)[0];
-                var offset = Marshal.OffsetOf(type, f.Name).ToInt32();
-                if (attr.IsLittleEndian != BitConverter.IsLittleEndian) {
-                    Array.Reverse(buffer, index + offset, Marshal.SizeOf(f.FieldType));
-                }
-            }
-        }
-#endif
     }
-
-
 }

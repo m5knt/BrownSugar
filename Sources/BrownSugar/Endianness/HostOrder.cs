@@ -4,7 +4,6 @@
  */
 
 using System;
-using System.Runtime.InteropServices;
 
 //
 //
@@ -253,69 +252,4 @@ namespace ThunderEgg.BrownSugar {
         }
 
     }
-
-    //
-    //
-    //
-
-    public partial class HostOrder {
-
-        /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
-        public static void Assign<T>(byte[] buffer, int index, T obj) {
-            int length = Marshal.SizeOf(typeof(T));
-            if (index < 0 || (index + length) > buffer.Length) {
-                throw new IndexOutOfRangeException();
-            }
-            unsafe
-            {
-                fixed (byte* fix = &buffer[index])
-                {
-                    Marshal.StructureToPtr(obj, new IntPtr(fix), false);
-                }
-            }
-        }
-
-        /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
-        public static byte[] GetBytes<T>(T obj) {
-            int length = Marshal.SizeOf(typeof(T));
-            var buffer = new byte[length];
-            Assign(buffer, 0, obj);
-            return buffer;
-        }
-
-        /// <summary>バッファからオブジェクトを復元する</summary>
-        public static void CopyTo<T>(byte[] buffer, int index, T obj)
-            where T : class //
-        {
-            var type = typeof(T);
-            int length = Marshal.SizeOf(type);
-            if (index < 0 || (index + length) > buffer.Length) {
-                throw new IndexOutOfRangeException();
-            }
-            unsafe
-            {
-                fixed (byte* fix = &buffer[index])
-                {
-                    Marshal.PtrToStructure(new IntPtr(fix), obj);
-                }
-            }
-        }
-
-        /// <summary>バッファからオブジェクトを復元する</summary>
-        public static T To<T>(byte[] buffer, int index) {
-            var type = typeof(T);
-            int length = Marshal.SizeOf(type);
-            if (index < 0 || (index + length) > buffer.Length) {
-                throw new IndexOutOfRangeException();
-            }
-            unsafe
-            {
-                fixed (byte* fix = &buffer[index])
-                {
-                    return (T)Marshal.PtrToStructure(new IntPtr(fix), type);
-                }
-            }
-        }
-    }
-
 }

@@ -8,10 +8,10 @@ using ThunderEgg.BrownSugar;
 namespace Test {
 
     [TestClass]
-    public class TestMarshal {
+    public class Marshal {
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public class MarshalClass {
+        public class MarshalTypeClass {
             public byte u8 = 0x88;
             public ushort u16 = 0x8899;
             public uint u32 = 0x8899aabb;
@@ -28,14 +28,14 @@ namespace Test {
             public decimal f128 = 1.1m;
             public char c = '@';
             /**/
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
-            public string str = "01234567890";
+//            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
+//            public string str = "0123456789";
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
             public double[] array = new double[10];
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct MarshalFixed {
+        public unsafe struct MarshalTypeFixed {
             public byte u8;
             public ushort u16;
             public uint u32;
@@ -55,8 +55,8 @@ namespace Test {
             public fixed char str[10];
             public fixed double array[10];
 
-            public static MarshalFixed Create() {
-                return new MarshalFixed() {
+            public static MarshalTypeFixed Create() {
+                return new MarshalTypeFixed() {
                     u8 = 0x88,
                     u16 = 0x8899,
                     u32 = 0x8899aabb,
@@ -75,29 +75,33 @@ namespace Test {
                 };
             }
         }
-#if false
+#if true
         [TestMethod]
         public unsafe void TestMarshalClass() {
-            var src = new MarshalClass();
-            var srcbin = new byte[src.MarshalSize()];
-            HostOrder.Assign(srcbin, 0, src);
+            var src = new MarshalTypeClass();
+            var srcbin = new byte[ByteOrder.SizeOf(src)];
+            ByteOrder.Assign(srcbin, 0, src);
+            ByteOrder.Swap(srcbin, 0, typeof(MarshalTypeClass));
+            ByteOrder.Swap(srcbin, 0, typeof(MarshalTypeClass));
             /**/
-            var ext = HostOrder.To<MarshalClass>(srcbin, 0);
-            var extbin = new byte[ext.MarshalSize()];
-            HostOrder.Assign(extbin, 0, ext);
+            var ext = ByteOrder.To<MarshalTypeClass>(srcbin, 0);
+            var extbin = new byte[ByteOrder.SizeOf(ext)];
+            ByteOrder.Assign(extbin, 0, ext);
             /**/
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
         }
 
         [TestMethod]
         public unsafe void TestMarshalFixed() {
-            var src = MarshalFixed.Create();
-            var srcbin = new byte[src.MarshalSize()];
-            HostOrder.Assign(srcbin, 0, src);
+            var src = MarshalTypeFixed.Create();
+            var srcbin = new byte[ByteOrder.SizeOf(src)];
+            ByteOrder.Assign(srcbin, 0, src);
+            ByteOrder.Swap(srcbin, 0, typeof(MarshalTypeFixed));
+            ByteOrder.Swap(srcbin, 0, typeof(MarshalTypeFixed));
             /**/
-            var ext = HostOrder.To<MarshalFixed>(srcbin, 0);
-            var extbin = new byte[ext.MarshalSize()];
-            HostOrder.Assign(extbin, 0, ext);
+            var ext = ByteOrder.To<MarshalTypeFixed>(srcbin, 0);
+            var extbin = new byte[ByteOrder.SizeOf(ext)];
+            ByteOrder.Assign(extbin, 0, ext);
             /**/
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
         }
