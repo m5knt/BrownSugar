@@ -10,8 +10,26 @@ namespace Test {
     [TestClass]
     public class Marshal {
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
+        public class MarshalTypeClassSub {
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
+            public string str = "0123456789";
+            const int array_size = 1;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
+            public double[] array = new double[array_size];
+        }
+
+        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
         public class MarshalTypeClass {
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
+            public string str = "あ12345678\0";
+            const int array_size = 1;
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
+            public double[] array = new double[] { 1.1 };
+            /**/
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
+            MarshalTypeClassSub[] sub = new MarshalTypeClassSub[2];
+            /**/
             public byte u8 = 0x88;
             public ushort u16 = 0x8899;
             public uint u32 = 0x8899aabb;
@@ -27,11 +45,6 @@ namespace Test {
             public double f64 = 1.1;
             public decimal f128 = 1.1m;
             public char c = '@';
-            /**/
-//            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
-//            public string str = "0123456789";
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 10)]
-            public double[] array = new double[10];
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]

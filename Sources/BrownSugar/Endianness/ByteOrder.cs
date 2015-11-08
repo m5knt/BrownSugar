@@ -1,9 +1,9 @@
 ﻿/**
  * @file
+ * @brief バイトオーダー操作関係
  */
 
 using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 
 /*
@@ -12,8 +12,10 @@ using System.Runtime.InteropServices;
 
 namespace ThunderEgg.BrownSugar {
 
+    /// <summary>バイトオーダー操作関係</summary>
     public static class ByteOrder {
 
+        /// <summary>バイトオーダーを反転させた値を返す</summary>
         public static ushort Swap(ushort value) {
             return unchecked((ushort)( //
                 value >> 8 |
@@ -43,14 +45,14 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static short SwapByteOrder(this short value) {
+        public static short Swap(short value) {
             return unchecked((short)( //
                 unchecked((ushort)value) >> 8 |
                 unchecked((ushort)value) << 8));
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static int SwapByteOrder(this int value) {
+        public static int Swap(int value) {
             return unchecked((int)( //
                 unchecked((uint)value) >> 24 |
                 (unchecked((uint)value) & 0x00ff0000U) >> 8 |
@@ -59,7 +61,7 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static long SwapByteOrder(this long value) {
+        public static long Swap(long value) {
             return unchecked((long)( //
                 unchecked((ulong)value) >> 56 |
                 (unchecked((ulong)value) & 0x00ff000000000000UL) >> 40 |
@@ -69,6 +71,80 @@ namespace ThunderEgg.BrownSugar {
                 (unchecked((ulong)value) & 0x0000000000ff0000UL) << 24 |
                 (unchecked((ulong)value) & 0x000000000000ff00UL) << 40 |
                 unchecked((ulong)value) << 56));
+        }
+
+        static Type StructLayoutAttributeType = typeof(StructLayoutAttribute);
+        static Type MarshalAttributeType = typeof(MarshalAsAttribute);
+        static Type StringType = typeof(string);
+
+        /// <summary>バッファのバイトオーダーを反転させます</summary>
+        public static void Swap(byte[] buffer, int index, Type type) {
+            // 文字セットの確認
+            var set = type.StructLayoutAttribute.CharSet;
+            if (set == CharSet.Auto) {
+                throw new InvalidOperationException("not support Charset.Auto");
+            }
+            var is_unicode = set == CharSet.Unicode;
+            /**/
+            var fields = type.GetFields();
+            for (var i = 0; i < fields.Length; ++i) {
+                var f = fields[i];
+                if (f.IsStatic) {
+                    continue;
+                }
+                var ty = f.FieldType;
+                var offset = index + Marshal.OffsetOf(type, f.Name).ToInt32();
+
+                // 文字列用処理
+                if (is_unicode && ty == StringType) {
+                    var attribs = f.GetCustomAttributes(MarshalAttributeType, false);
+                    var attrib = (MarshalAsAttribute)attribs[0];
+                    var p = offset;
+                    for (var j = attrib.SizeConst; --j >= 0;　p += 2) {
+                        var t = buffer[p];
+                        buffer[p] = buffer[p + 1];
+                        buffer[p + 1] = t;
+                    }
+                    continue;
+                }
+
+                // 配列用処理
+                if (ty.IsArray) {
+                    var elem_type = ty.GetElementType();
+                    var elem_size = Marshal.SizeOf(elem_type);
+                    // 1バイトなら何もしない
+                    if (elem_size <= 1) {
+                        continue;
+                    }
+                    var attribs = f.GetCustomAttributes(MarshalAttributeType, false);
+                    var attrib = (MarshalAsAttribute)attribs[0];
+                    for (var j = attrib.SizeConst; --j >= 0;) {
+                        Swap(buffer, offset, elem_type);
+                        offset += elem_size;
+                    }
+                    continue;
+                }
+
+                // ネストしているか確認
+                var nest_fields = ty.GetFields();
+                bool has_nest = false;
+                for (var j = nest_fields.Length; --j >= 0 && !has_nest;) {
+                    has_nest = !nest_fields[j].IsStatic;
+                }
+                if (has_nest) {
+                    Swap(buffer, offset, ty);
+                    continue;
+                }
+
+                // 1バイトなら何もしない
+                var size = Marshal.SizeOf(ty);
+                if (size <= 1) {
+                    continue;
+                }
+
+                // 値の反転
+                Array.Reverse(buffer, offset, size);
+            }
         }
 
         //
@@ -100,7 +176,7 @@ namespace ThunderEgg.BrownSugar {
                 fixed (byte* fix = buffer)
                 {
                     var p = fix + index;
-                    Marshal.StructureToPtr(obj, new IntPtr(fix), false);
+                    Marshal.StructureToPtr(obj, new IntPtr(p), false);
                 }
             }
             return length;
@@ -143,7 +219,7 @@ namespace ThunderEgg.BrownSugar {
                 fixed (byte* fix = buffer)
                 {
                     var p = fix + index;
-                    Marshal.PtrToStructure(new IntPtr(fix), obj);
+                    Marshal.PtrToStructure(new IntPtr(p), obj);
                 }
             }
             return length;
@@ -166,61 +242,10 @@ namespace ThunderEgg.BrownSugar {
                 fixed (byte* fix = buffer)
                 {
                     var p = fix + index;
-                    return (T)Marshal.PtrToStructure(new IntPtr(fix), type);
+                    return (T)Marshal.PtrToStructure(new IntPtr(p), type);
                 }
             }
         }
 
-        static Type MarshalAttributeType = typeof(MarshalAsAttribute);
-
-        /// <summary>型情報をもとにバイトオーダーを反転させます</summary>
-        public static void Swap(byte[] buffer, int index, Type type) {
-            var fields = type.GetFields();
-            for (var i = 0; i < fields.Length; ++i) {
-                var f = fields[i];
-                if (f.IsStatic) {
-                    continue;
-                }
-                var ty = f.FieldType;
-                var offset = index + Marshal.OffsetOf(type, f.Name).ToInt32();
-
-                // 配列か確認
-                if (ty.IsArray) {
-                    var elem_type = ty.GetElementType();
-                    var elem_size = Marshal.SizeOf(elem_type);
-                    // 1バイトなら何もしない
-                    if (elem_size <= 1) {
-                        continue;
-                    }
-                    var attribute = f.GetCustomAttributes(MarshalAttributeType, false);
-                    var marshal = (MarshalAsAttribute)attribute[0];
-                    for(var j = 0; j < marshal.SizeConst; ++j) {
-                        Swap(buffer, offset, elem_type);
-                        offset += elem_size;
-                    }
-                    continue;
-                }
-
-                // ネストしているか確認
-                var nest_fields = ty.GetFields();
-                bool has_nest = false;
-                for (var j = nest_fields.Length; --j >= 0 && !has_nest;) {
-                    has_nest = !nest_fields[j].IsStatic;
-                }
-                if (has_nest) {
-                    Swap(buffer, offset, ty);
-                    continue;
-                }
-
-                // 1バイトなら何もしない
-                var size = Marshal.SizeOf(ty);
-                if (size <= 1) {
-                    continue;
-                }
-
-                // 値の反転
-                Array.Reverse(buffer, offset, size);
-            }
-        }
     }
 }
