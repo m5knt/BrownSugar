@@ -15,6 +15,11 @@ namespace ThunderEgg.BrownSugar {
     /// <summary>バイトオーダー操作関係</summary>
     public static class ByteOrder {
 
+        /// <summary>リトルエンディアン</summary>
+        public static bool LittleEndian = true;
+        /// <summary>ビッグエンディアン</summary>
+        public static bool BigEndian = false;
+
         /// <summary>バイトオーダーを反転させた値を返す</summary>
         public static ushort Swap(ushort value) {
             return unchecked((ushort)( //
@@ -85,11 +90,10 @@ namespace ThunderEgg.BrownSugar {
             }
         }
 
-        static Type StructLayoutAttributeType = typeof(StructLayoutAttribute);
-        static Type MarshalAttributeType = typeof(MarshalAsAttribute);
-        static Type StringType = typeof(string);
-
-        /// <summary>バッファのバイトオーダーを反転させます</summary>
+        /// <summary>
+        /// バッファのバイトオーダーを反転させます
+        /// CharSet.Autoはサポートしていません
+        /// </summary>
         public static void Swap(byte[] buffer, int index, Type type) {
             unsafe
             {
@@ -100,7 +104,14 @@ namespace ThunderEgg.BrownSugar {
             }
         }
 
-        /// <summary>バッファのバイトオーダーを反転させます</summary>
+        static Type StructLayoutAttributeType = typeof(StructLayoutAttribute);
+        static Type MarshalAttributeType = typeof(MarshalAsAttribute);
+        static Type StringType = typeof(string);
+
+        /// <summary>
+        /// バッファのバイトオーダーを反転させます
+        /// CharSet.Autoはサポートしていません
+        /// </summary>
         public static unsafe void Swap(byte* buffer, Type type) {
             // 文字セットの確認
             var set = type.StructLayoutAttribute.CharSet;
@@ -187,48 +198,8 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static int Assign<T>(byte[] buffer, int index, T obj) {
-            if (buffer == null || obj == null) {
-                throw new ArgumentNullException();
-            }
-            int length = Marshal.SizeOf(typeof(T));
-            if (index < 0 || (index + length) > buffer.Length) {
-                throw new IndexOutOfRangeException();
-            }
-            unsafe
-            {
-                fixed (byte* fix = buffer)
-                {
-                    var p = fix + index;
-                    Marshal.StructureToPtr(obj, new IntPtr(p), false);
-                }
-            }
-            return length;
-        }
-
-        /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        public static byte[] GetBytes<T>(T obj) {
-            if (obj == null) {
-                throw new ArgumentNullException();
-            }
-            int length = Marshal.SizeOf(typeof(T));
-            var buffer = new byte[length];
-            unsafe
-            {
-                fixed (byte* fix = buffer)
-                {
-                    Marshal.StructureToPtr(obj, new IntPtr(fix), false);
-                }
-            }
-            return buffer;
-        }
-
-        /// <summary>バッファからオブジェクトを復元する</summary>
-        /// <exception cref="ArgumentNullException"></exception>
-        /// <exception cref="IndexOutOfRangeException"></exception>
-        public static int CopyTo<T>(byte[] buffer, int index, T obj)
-            where T : class //
+        public static int Assign<T>(byte[] buffer, int index, T obj, //
+            bool is_littleendian = true) //
         {
             if (buffer == null || obj == null) {
                 throw new ArgumentNullException();
@@ -243,6 +214,61 @@ namespace ThunderEgg.BrownSugar {
                 fixed (byte* fix = buffer)
                 {
                     var p = fix + index;
+                    Marshal.StructureToPtr(obj, new IntPtr(p), false);
+                    if (is_littleendian ^ BitConverter.IsLittleEndian) {
+                        Swap(p, type);
+                    }
+                }
+            }
+            return length;
+        }
+
+        /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static byte[] GetBytes<T>(T obj, bool is_littleendian = true) {
+            if (obj == null) {
+                throw new ArgumentNullException();
+            }
+            var type = typeof(T);
+            int length = Marshal.SizeOf(typeof(T));
+            var buffer = new byte[length];
+            unsafe
+            {
+                fixed (byte* fix = buffer)
+                {
+                    Marshal.StructureToPtr(obj, new IntPtr(fix), false);
+                    if (is_littleendian ^ BitConverter.IsLittleEndian) {
+                        Swap(fix, type);
+                    }
+                }
+            }
+            return buffer;
+        }
+
+        /// <summary>バッファからオブジェクトを復元する</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public static int CopyTo<T>(byte[] buffer, int index, T obj, //
+            bool is_littleendian = true) //
+            where T : class //
+        {
+            if (buffer == null || obj == null) {
+                throw new ArgumentNullException();
+            }
+            var type = typeof(T);
+            int length = Marshal.SizeOf(type);
+            if (index < 0 || (index + length) > buffer.Length) {
+                throw new IndexOutOfRangeException();
+            }
+            unsafe
+            {
+                // TODO 
+                fixed (byte* fix = (byte[])buffer.Clone())
+                {
+                    var p = fix + index;
+                    if (is_littleendian ^ BitConverter.IsLittleEndian) {
+                        Swap(p, type);
+                    }
                     Marshal.PtrToStructure(new IntPtr(p), obj);
                 }
             }
@@ -252,7 +278,9 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>バッファからオブジェクトを復元する</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static T To<T>(byte[] buffer, int index) {
+        public static T To<T>(byte[] buffer, int index, //
+            bool is_littleendian = true) //
+        {
             var type = typeof(T);
             if (buffer == null) {
                 throw new ArgumentNullException();
@@ -263,9 +291,13 @@ namespace ThunderEgg.BrownSugar {
             }
             unsafe
             {
-                fixed (byte* fix = buffer)
+                // TODO
+                fixed (byte* fix = (byte[])buffer.Clone())
                 {
                     var p = fix + index;
+                    if (is_littleendian ^ BitConverter.IsLittleEndian) {
+                        Swap(p, type);
+                    }
                     return (T)Marshal.PtrToStructure(new IntPtr(p), type);
                 }
             }
