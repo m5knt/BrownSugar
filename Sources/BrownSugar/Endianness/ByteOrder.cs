@@ -73,12 +73,35 @@ namespace ThunderEgg.BrownSugar {
                 unchecked((ulong)value) << 56));
         }
 
+        /// <summary>バッファのバイトオーダーを反転させます</summary>
+        public static unsafe void Swap(byte* buffer, int size) {
+            // 値の反転
+            var p = buffer;
+            var q = p + size - 1;
+            for (var j = size / 2; --j >= 0; ++p, --q) {
+                var t = *p;
+                *p = *q;
+                *q = t;
+            }
+        }
+
         static Type StructLayoutAttributeType = typeof(StructLayoutAttribute);
         static Type MarshalAttributeType = typeof(MarshalAsAttribute);
         static Type StringType = typeof(string);
 
         /// <summary>バッファのバイトオーダーを反転させます</summary>
         public static void Swap(byte[] buffer, int index, Type type) {
+            unsafe
+            {
+                fixed(byte* fix = buffer)
+                {
+                    Swap(fix + index, type);
+                }
+            }
+        }
+
+        /// <summary>バッファのバイトオーダーを反転させます</summary>
+        public static unsafe void Swap(byte* buffer, Type type) {
             // 文字セットの確認
             var set = type.StructLayoutAttribute.CharSet;
             if (set == CharSet.Auto) {
@@ -93,17 +116,18 @@ namespace ThunderEgg.BrownSugar {
                     continue;
                 }
                 var ty = f.FieldType;
-                var offset = index + Marshal.OffsetOf(type, f.Name).ToInt32();
+                var offset = Marshal.OffsetOf(type, f.Name).ToInt32();
 
                 // 文字列用処理
                 if (is_unicode && ty == StringType) {
                     var attribs = f.GetCustomAttributes(MarshalAttributeType, false);
                     var attrib = (MarshalAsAttribute)attribs[0];
-                    var p = offset;
-                    for (var j = attrib.SizeConst; --j >= 0;　p += 2) {
-                        var t = buffer[p];
-                        buffer[p] = buffer[p + 1];
-                        buffer[p + 1] = t;
+                    var p = buffer + offset;
+                    var q = p + 1;
+                    for (var j = attrib.SizeConst; --j >= 0; p += 2, q += 2) {
+                        var t = *p;
+                        *p = *q;
+                        *q = t;
                     }
                     continue;
                 }
@@ -119,7 +143,7 @@ namespace ThunderEgg.BrownSugar {
                     var attribs = f.GetCustomAttributes(MarshalAttributeType, false);
                     var attrib = (MarshalAsAttribute)attribs[0];
                     for (var j = attrib.SizeConst; --j >= 0;) {
-                        Swap(buffer, offset, elem_type);
+                        Swap(buffer + offset, elem_type);
                         offset += elem_size;
                     }
                     continue;
@@ -132,7 +156,7 @@ namespace ThunderEgg.BrownSugar {
                     has_nest = !nest_fields[j].IsStatic;
                 }
                 if (has_nest) {
-                    Swap(buffer, offset, ty);
+                    Swap(buffer + offset, ty);
                     continue;
                 }
 
@@ -142,8 +166,8 @@ namespace ThunderEgg.BrownSugar {
                     continue;
                 }
 
-                // 値の反転
-                Array.Reverse(buffer, offset, size);
+                // 反転
+                Swap(buffer + offset, size);
             }
         }
 

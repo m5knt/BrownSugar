@@ -13,7 +13,7 @@ namespace Test {
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
         public class MarshalTypeClassSub {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
-            public string str = "0123456789";
+            public string str = "ABCDEFGHI\0";
             const int array_size = 1;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
             public double[] array = new double[array_size];
@@ -30,6 +30,13 @@ namespace Test {
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
             MarshalTypeClassSub[] sub = new MarshalTypeClassSub[2];
             /**/
+            public bool bt = true;
+            public bool bf = false;
+            public float f32 = 1.1f;
+            public double f64 = 1.1;
+            public decimal f128 = 1.1m;
+            public char c = '@';
+            /**/
             public byte u8 = 0x88;
             public ushort u16 = 0x8899;
             public uint u32 = 0x8899aabb;
@@ -38,13 +45,6 @@ namespace Test {
             public short s16 = unchecked((short)0x8899);
             public int s32 = unchecked((int)0x8899aabb);
             public long s64 = unchecked((long)0x8899aabbccddeeff);
-            /**/
-            public bool bt = true;
-            public bool bf = false;
-            public float f32 = 1.1f;
-            public double f64 = 1.1;
-            public decimal f128 = 1.1m;
-            public char c = '@';
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
