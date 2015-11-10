@@ -15,20 +15,22 @@ namespace ThunderEgg.BrownSugar {
     /// <summary>バイトオーダー操作関係</summary>
     public static class ByteOrder {
 
-        /// <summary>リトルエンディアン</summary>
-        public static bool LittleEndian = true;
-        /// <summary>ビッグエンディアン</summary>
-        public static bool BigEndian = false;
-
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static ushort Swap(ushort value) {
-            return unchecked((ushort)( //
+        public static char Swap(char value) {
+            return unchecked((char)( //
                 value >> 8 |
                 value << 8));
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static uint Swap(uint value) {
+        public static UInt16 Swap(UInt16 value) {
+            return unchecked((UInt16)( //
+                value >> 8 |
+                value << 8));
+        }
+
+        /// <summary>バイトオーダーを反転させた値を返す</summary>
+        public static UInt32 Swap(UInt32 value) {
             return ( //
                 value >> 24 |
                 (value & 0x00ff0000U) >> 8 |
@@ -37,7 +39,7 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static ulong Swap(ulong value) {
+        public static UInt64 Swap(UInt64 value) {
             return ( //
                 value >> 56 |
                 (value & 0x00ff000000000000UL) >> 40 |
@@ -50,15 +52,15 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static short Swap(short value) {
-            return unchecked((short)( //
+        public static Int16 Swap(Int16 value) {
+            return unchecked((Int16)( //
                 unchecked((ushort)value) >> 8 |
                 unchecked((ushort)value) << 8));
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static int Swap(int value) {
-            return unchecked((int)( //
+        public static Int32 Swap(Int32 value) {
+            return unchecked((Int32)( //
                 unchecked((uint)value) >> 24 |
                 (unchecked((uint)value) & 0x00ff0000U) >> 8 |
                 (unchecked((uint)value) & 0x0000ff00U) << 8 |
@@ -66,8 +68,8 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>バイトオーダーを反転させた値を返す</summary>
-        public static long Swap(long value) {
-            return unchecked((long)( //
+        public static Int64 Swap(Int64 value) {
+            return unchecked((Int64)( //
                 unchecked((ulong)value) >> 56 |
                 (unchecked((ulong)value) & 0x00ff000000000000UL) >> 40 |
                 (unchecked((ulong)value) & 0x0000ff0000000000UL) >> 24 |
@@ -79,22 +81,47 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>バッファのバイトオーダーを反転させます</summary>
-        public static unsafe void Swap(byte* buffer, int size) {
+        public static unsafe void Swap(byte* buffer, int length) {
             // 値の反転
             var p = buffer;
-            var q = p + size - 1;
-            for (var j = size / 2; --j >= 0; ++p, --q) {
+            var q = buffer + length - 1;
+            for (var j = length / 2; --j >= 0; ++p, --q) {
                 var t = *p;
                 *p = *q;
                 *q = t;
             }
         }
 
+        /// <summary>バッファのバイトオーダーを反転させます</summary>
+        public static void Swap(byte[] buffer, int index, int length) {
+            if (buffer == null) {
+                throw new ArgumentNullException();
+            }
+            if (index < 0 || length < 0 || (index + length) > buffer.Length) {
+                throw new IndexOutOfRangeException();
+            }
+            unsafe
+            {
+                fixed (byte* fix = buffer)
+                {
+                    Swap(fix, length);
+                }
+            }
+        }
+
+
         /// <summary>
         /// バッファのバイトオーダーを反転させます
         /// CharSet.Autoはサポートしていません
         /// </summary>
         public static void Swap(byte[] buffer, int index, Type type) {
+            if (buffer == null || type == null) {
+                throw new ArgumentNullException();
+            }
+            var length = Marshal.SizeOf(type);
+            if (index < 0 || (index + length) > buffer.Length) {
+                throw new IndexOutOfRangeException();
+            }
             unsafe
             {
                 fixed(byte* fix = buffer)
@@ -104,22 +131,18 @@ namespace ThunderEgg.BrownSugar {
             }
         }
 
-        static Type StructLayoutAttributeType = typeof(StructLayoutAttribute);
-        static Type MarshalAttributeType = typeof(MarshalAsAttribute);
-        static Type StringType = typeof(string);
-
         /// <summary>
         /// バッファのバイトオーダーを反転させます
         /// CharSet.Autoはサポートしていません
         /// </summary>
+        /// <exception cref="InvalidOperationException">CharSet.Auto指定時</exception>
         public static unsafe void Swap(byte* buffer, Type type) {
             // 文字セットの確認
-            var set = type.StructLayoutAttribute.CharSet;
-            if (set == CharSet.Auto) {
+            var cs = type.StructLayoutAttribute.CharSet;
+            if (cs == CharSet.Auto) {
                 throw new InvalidOperationException("not support Charset.Auto");
             }
-            var is_unicode = set == CharSet.Unicode;
-            /**/
+            var is_unicode = (cs == CharSet.Unicode);
             var fields = type.GetFields();
             for (var i = 0; i < fields.Length; ++i) {
                 var f = fields[i];
@@ -130,16 +153,26 @@ namespace ThunderEgg.BrownSugar {
                 var offset = Marshal.OffsetOf(type, f.Name).ToInt32();
 
                 // 文字列用処理
-                if (is_unicode && ty == StringType) {
-                    var attribs = f.GetCustomAttributes(MarshalAttributeType, false);
-                    var attrib = (MarshalAsAttribute)attribs[0];
-                    var p = buffer + offset;
-                    var q = p + 1;
-                    for (var j = attrib.SizeConst; --j >= 0; p += 2, q += 2) {
-                        var t = *p;
-                        *p = *q;
-                        *q = t;
+                if (ty == typeof(string)) {
+                    // utf16処理
+                    if (is_unicode) {
+                        var attribs = f.GetCustomAttributes(typeof(MarshalAsAttribute), false);
+                        var attrib = (MarshalAsAttribute)attribs[0];
+                        var p = buffer + offset;
+                        for (var j = attrib.SizeConst; --j >= 0; p += 2) {
+                            var t = p[0];
+                            p[0] = p[1];
+                            p[1] = t;
+                        }
                     }
+                    continue;
+                }
+
+                // 文字処理
+                if (ty == typeof(char)) {
+                    var t = buffer[offset];
+                    buffer[offset] = buffer[offset + 1];
+                    buffer[offset + 1] = t;
                     continue;
                 }
 
@@ -147,16 +180,22 @@ namespace ThunderEgg.BrownSugar {
                 if (ty.IsArray) {
                     var elem_type = ty.GetElementType();
                     var elem_size = Marshal.SizeOf(elem_type);
-                    // 1バイトなら何もしない
+                    // バイト配列なら何もしない
                     if (elem_size <= 1) {
                         continue;
                     }
-                    var attribs = f.GetCustomAttributes(MarshalAttributeType, false);
+                    var attribs = f.GetCustomAttributes(typeof(MarshalAsAttribute), false);
                     var attrib = (MarshalAsAttribute)attribs[0];
                     for (var j = attrib.SizeConst; --j >= 0;) {
                         Swap(buffer + offset, elem_type);
                         offset += elem_size;
                     }
+                    continue;
+                }
+
+                // 1バイトなら何もしない
+                var size = Marshal.SizeOf(ty);
+                if (size <= 1) {
                     continue;
                 }
 
@@ -168,12 +207,6 @@ namespace ThunderEgg.BrownSugar {
                 }
                 if (has_nest) {
                     Swap(buffer + offset, ty);
-                    continue;
-                }
-
-                // 1バイトなら何もしない
-                var size = Marshal.SizeOf(ty);
-                if (size <= 1) {
                     continue;
                 }
 

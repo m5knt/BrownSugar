@@ -67,7 +67,7 @@
     <Compile Include="TestBigEndian.cs" />
     <Compile Include="ByteEndian.cs" />
     <Compile Include="PerfEndian.cs" />
-    <Compile Include="TestMarshal.cs" />
+    <Compile Include="Swap.cs" />
     <Compile Include="TestCast.cs" />
     <Compile Include="TestByteSwap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
