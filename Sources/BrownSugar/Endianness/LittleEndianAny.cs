@@ -12,41 +12,10 @@ using System;
 namespace ThunderEgg.BrownSugar {
 
     /// <summary>リトルエンディアン順のバッファ操作関係</summary>
-    public class LittleEndianAny : NoOrder {
+    public partial class LittleEndianAny : NoOrder {
 
-        /// <summary>ポインタ位置に値を書く</summary>
-        public static unsafe void Assign(byte* buffer, byte value) {
-            *buffer = value;
-        }
-
-        /// <summary>ポインタ位置に値を書く</summary>
-        public static unsafe void Assign(byte* buffer, sbyte value) {
-            *buffer = unchecked((byte)value);
-        }
-
-        /// <summary>ポインタ位置に値を書く</summary>
-        public static unsafe void Assign(byte* buffer, bool value) {
-            *buffer = value ? (byte)1 : (byte)0;
-        }
-
-        /// <summary>バッファ位置に値を書く</summary>
-        public static void Assign(byte[] buffer, int index, byte value) {
-            buffer[index] = value;
-        }
-
-        /// <summary>バッファ位置に値を書く</summary>
-        public static void Assign(byte[] buffer, int index, sbyte value) {
-            buffer[index] = unchecked((byte)value);
-        }
-
-        /// <summary>バッファ位置に値を書く</summary>
-        public static void Assign(byte[] buffer, int index, bool value) {
-            buffer[index] = value ? (byte)1 : (byte)0;
-        }
-
-        //
-        //
-        //
+        /// <summary>リトルエンディアンであるか</summary>
+        static bool IsLittleEndian = true;
 
         /// <summary>リトルエンディアン順で値を読み込みます</summary>
         public static unsafe ushort ToUInt16(byte* b) {
@@ -126,7 +95,7 @@ namespace ThunderEgg.BrownSugar {
             if (((int)b & 7) == 0 && BitConverter.IsLittleEndian) {
                 return *(ulong*)b;
             }
-            return 
+            return
                 (ulong)(b[7] << 24 | b[6] << 16 | b[5] << 8 | b[4]) << 32 |
                  (uint)(b[3] << 24 | b[2] << 16 | b[1] << 8 | b[0]);
         }
@@ -135,7 +104,7 @@ namespace ThunderEgg.BrownSugar {
             if (((int)b & 7) == 0 && BitConverter.IsLittleEndian) {
                 return *(long*)b;
             }
-            return 
+            return
                 (long)(b[7] << 24 | b[6] << 16 | b[5] << 8 | b[4]) << 32 |
                 (uint)(b[3] << 24 | b[2] << 16 | b[1] << 8 | b[0]);
 
@@ -162,7 +131,7 @@ namespace ThunderEgg.BrownSugar {
                 if ((index & 7) == 0 && BitConverter.IsLittleEndian) {
                     return *(long*)b;
                 }
-                return 
+                return
                     (long)(b[7] << 24 | b[6] << 16 | b[5] << 8 | b[4]) << 32 |
                     (uint)(b[3] << 24 | b[2] << 16 | b[1] << 8 | b[0]);
             }
@@ -187,7 +156,7 @@ namespace ThunderEgg.BrownSugar {
                 if ((index & 7) == 0 && BitConverter.IsLittleEndian) {
                     return *(double*)b;
                 }
-                var tmp = 
+                var tmp =
                     (ulong)(b[7] << 24 | b[6] << 16 | b[5] << 8 | b[4]) << 32 |
                      (uint)(b[3] << 24 | b[2] << 16 | b[1] << 8 | b[0]);
                 return *(double*)&tmp;
@@ -417,10 +386,86 @@ namespace ThunderEgg.BrownSugar {
                 }
             }
         }
+    }
+}
+
+//
+//
+//
+
+namespace ThunderEgg.BrownSugar {
+
+    /// <summary>エンディアンを知っている型</summary>
+    using EndianHolder = LittleEndianAny;
+
+    public partial class LittleEndianAny {
+
+        /// <summary>ポインタ位置に値を書く</summary>
+        public static unsafe void Assign(byte* buffer, byte value) {
+            *buffer = value;
+        }
+
+        /// <summary>ポインタ位置に値を書く</summary>
+        public static unsafe void Assign(byte* buffer, sbyte value) {
+            *buffer = unchecked((byte)value);
+        }
+
+        /// <summary>ポインタ位置に値を書く</summary>
+        public static unsafe void Assign(byte* buffer, bool value) {
+            *buffer = value ? (byte)1 : (byte)0;
+        }
+
+        /// <summary>バッファ位置に値を書く</summary>
+        public static void Assign(byte[] buffer, int index, byte value) {
+            buffer[index] = value;
+        }
+
+        /// <summary>バッファ位置に値を書く</summary>
+        public static void Assign(byte[] buffer, int index, sbyte value) {
+            buffer[index] = unchecked((byte)value);
+        }
+
+        /// <summary>バッファ位置に値を書く</summary>
+        public static void Assign(byte[] buffer, int index, bool value) {
+            buffer[index] = value ? (byte)1 : (byte)0;
+        }
+
+        //
+        //
+        //
 
         /*
          *
          */
 
+        /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public static int Assign<T>(byte[] buffer, int index, T obj) //
+        {
+            return ByteOrder.Assign<T>(buffer, index, obj, EndianHolder.IsLittleEndian);
+        }
+
+        /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static byte[] GetBytes<T>(T obj) {
+            return ByteOrder.GetBytes<T>(obj, EndianHolder.IsLittleEndian);
+        }
+
+        /// <summary>バッファからオブジェクトを復元する</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public static int CopyTo<T>(byte[] buffer, int index, T obj) //
+            where T : class //
+        {
+            return ByteOrder.CopyTo<T>(buffer, index, obj, EndianHolder.IsLittleEndian);
+        }
+
+        /// <summary>バッファからオブジェクトを復元する</summary>
+        /// <exception cref="ArgumentNullException"></exception>
+        /// <exception cref="IndexOutOfRangeException"></exception>
+        public static T To<T>(byte[] buffer, int index) {
+            return ByteOrder.To<T>(buffer, index, EndianHolder.IsLittleEndian);
+        }
     }
 }

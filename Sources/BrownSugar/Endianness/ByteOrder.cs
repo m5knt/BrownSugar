@@ -232,7 +232,7 @@ namespace ThunderEgg.BrownSugar {
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
         public static int Assign<T>(byte[] buffer, int index, T obj, //
-            bool is_littleendian = true) //
+            bool is_little = true) //
         {
             if (buffer == null || obj == null) {
                 throw new ArgumentNullException();
@@ -248,7 +248,7 @@ namespace ThunderEgg.BrownSugar {
                 {
                     var p = fix + index;
                     Marshal.StructureToPtr(obj, new IntPtr(p), false);
-                    if (is_littleendian ^ BitConverter.IsLittleEndian) {
+                    if (is_little ^ BitConverter.IsLittleEndian) {
                         Swap(p, type);
                     }
                 }
@@ -258,7 +258,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
         /// <exception cref="ArgumentNullException"></exception>
-        public static byte[] GetBytes<T>(T obj, bool is_littleendian = true) {
+        public static byte[] GetBytes<T>(T obj, bool is_little = true) {
             if (obj == null) {
                 throw new ArgumentNullException();
             }
@@ -270,7 +270,7 @@ namespace ThunderEgg.BrownSugar {
                 fixed (byte* fix = buffer)
                 {
                     Marshal.StructureToPtr(obj, new IntPtr(fix), false);
-                    if (is_littleendian ^ BitConverter.IsLittleEndian) {
+                    if (is_little ^ BitConverter.IsLittleEndian) {
                         Swap(fix, type);
                     }
                 }
@@ -282,7 +282,7 @@ namespace ThunderEgg.BrownSugar {
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
         public static int CopyTo<T>(byte[] buffer, int index, T obj, //
-            bool is_littleendian = true) //
+            bool is_little = true) //
             where T : class //
         {
             if (buffer == null || obj == null) {
@@ -299,7 +299,7 @@ namespace ThunderEgg.BrownSugar {
                 fixed (byte* fix = (byte[])buffer.Clone())
                 {
                     var p = fix + index;
-                    if (is_littleendian ^ BitConverter.IsLittleEndian) {
+                    if (is_little ^ BitConverter.IsLittleEndian) {
                         Swap(p, type);
                     }
                     Marshal.PtrToStructure(new IntPtr(p), obj);
@@ -311,9 +311,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>バッファからオブジェクトを復元する</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static T To<T>(byte[] buffer, int index, //
-            bool is_littleendian = true) //
-        {
+        public static T To<T>(byte[] buffer, int index, bool is_little = true) {
             var type = typeof(T);
             if (buffer == null) {
                 throw new ArgumentNullException();
@@ -328,13 +326,146 @@ namespace ThunderEgg.BrownSugar {
                 fixed (byte* fix = (byte[])buffer.Clone())
                 {
                     var p = fix + index;
-                    if (is_littleendian ^ BitConverter.IsLittleEndian) {
+                    if (is_little ^ BitConverter.IsLittleEndian) {
                         Swap(p, type);
                     }
                     return (T)Marshal.PtrToStructure(new IntPtr(p), type);
                 }
             }
         }
+
+        //
+        //
+        //
+
+        /// <summary>ホストオーダー値からネットオーダー値にする</summary>
+        public static ushort ToNetOrder(ushort value) {
+            return BitConverter.IsLittleEndian ?
+                unchecked((ushort)( //
+                value >> 8 |
+                value << 8)) : value;
+        }
+
+        /// <summary>ホストオーダー値からネットオーダー値にする</summary>
+        public static uint ToNetOrder(uint value) {
+            return BitConverter.IsLittleEndian ?
+                (value >> 24 |
+                (value & 0x00ff0000U) >> 8 |
+                (value & 0x0000ff00U) << 8 |
+                value << 24) : value;
+        }
+
+        /// <summary>ホストオーダー値からネットオーダー値にする</summary>
+        public static ulong ToNetOrder(ulong value) {
+            return BitConverter.IsLittleEndian ?
+                (value >> 56 |
+                (value & 0x00ff000000000000UL) >> 40 |
+                (value & 0x0000ff0000000000UL) >> 24 |
+                (value & 0x000000ff00000000UL) >> 8 |
+                (value & 0x00000000ff000000UL) << 8 |
+                (value & 0x0000000000ff0000UL) << 24 |
+                (value & 0x000000000000ff00UL) << 40 |
+                value << 56) : value;
+        }
+
+        /// <summary>ホストオーダー値からネットオーダー値にする</summary>
+        public static short ToNetOrder(short value) {
+            return BitConverter.IsLittleEndian ?
+                unchecked((short)( //
+                unchecked((ushort)value) >> 8 |
+                value << 8)) : value;
+        }
+
+        /// <summary>ホストオーダー値からネットオーダー値にする</summary>
+        public static int ToNetOrder(int value) {
+            return BitConverter.IsLittleEndian ?
+                unchecked((int)( //
+                unchecked((uint)value) >> 24 |
+                (unchecked((uint)value) & 0x00ff0000U) >> 8 |
+                (unchecked((uint)value) & 0x0000ff00U) << 8 |
+                unchecked((uint)value) << 24)) : value;
+        }
+
+        /// <summary>ホストオーダー値からネットオーダー値にする</summary>
+        public static long ToNetOrder(long value) {
+            return BitConverter.IsLittleEndian ?
+                unchecked((long)( //
+                unchecked((ulong)value) >> 56 |
+                (unchecked((ulong)value) & 0x00ff000000000000UL) >> 40 |
+                (unchecked((ulong)value) & 0x0000ff0000000000UL) >> 24 |
+                (unchecked((ulong)value) & 0x000000ff00000000UL) >> 8 |
+                (unchecked((ulong)value) & 0x00000000ff000000UL) << 8 |
+                (unchecked((ulong)value) & 0x0000000000ff0000UL) << 24 |
+                (unchecked((ulong)value) & 0x000000000000ff00UL) << 40 |
+                unchecked((ulong)value) << 56)) : value;
+        }
+
+        //
+        //
+        //
+
+        /// <summary>ネットオーダー値からホストオーダー値にする</summary>
+        public static ushort ToHostOrder(ushort value) {
+            return BitConverter.IsLittleEndian ? //
+                unchecked((ushort)( //
+                value >> 8 |
+                value << 8)) : value;
+        }
+
+        /// <summary>ネットオーダー値からホストオーダー値にする</summary>
+        public static uint ToHostOrder(uint value) {
+            return BitConverter.IsLittleEndian ? //
+                (value >> 24 |
+                (value & 0x00ff0000U) >> 8 |
+                (value & 0x0000ff00U) << 8 |
+                value << 24) : value;
+        }
+
+        /// <summary>ネットオーダー値からホストオーダー値にする</summary>
+        public static ulong ToHostOrder(ulong value) {
+            return BitConverter.IsLittleEndian ? //
+                (value >> 56 |
+                (value & 0x00ff000000000000UL) >> 40 |
+                (value & 0x0000ff0000000000UL) >> 24 |
+                (value & 0x000000ff00000000UL) >> 8 |
+                (value & 0x00000000ff000000UL) << 8 |
+                (value & 0x0000000000ff0000UL) << 24 |
+                (value & 0x000000000000ff00UL) << 40 |
+                value << 56) : value;
+        }
+
+        /// <summary>ネットオーダー値からホストオーダー値にする</summary>
+        public static short ToHostOrder(short value) {
+            return BitConverter.IsLittleEndian ?
+                unchecked((short)( //
+                unchecked((ushort)value) >> 8 |
+                value << 8)) : value;
+        }
+
+        /// <summary>ネットオーダー値からホストオーダー値にする</summary>
+        public static int ToHostOrder(int value) {
+            return BitConverter.IsLittleEndian ?
+                unchecked((int)( //
+                unchecked((uint)value) >> 24 |
+                unchecked((uint)value & 0x00ff0000U) >> 8 |
+                unchecked((uint)value & 0x0000ff00U) << 8 |
+                unchecked((uint)value) << 24)) : value;
+        }
+
+        /// <summary>ネットオーダー値からホストオーダー値にする</summary>
+        public static long ToHostOrder(long value) {
+            return BitConverter.IsLittleEndian ?
+                unchecked((long)( //
+                unchecked((ulong)value) >> 56 |
+                unchecked((ulong)value & 0x00ff000000000000UL) >> 40 |
+                unchecked((ulong)value & 0x0000ff0000000000UL) >> 24 |
+                unchecked((ulong)value & 0x000000ff00000000UL) >> 8 |
+                unchecked((ulong)value & 0x00000000ff000000UL) << 8 |
+                unchecked((ulong)value & 0x0000000000ff0000UL) << 24 |
+                unchecked((ulong)value & 0x000000000000ff00UL) << 40 |
+                unchecked((ulong)value) << 56)) : value;
+        }
+
 
     }
 }
