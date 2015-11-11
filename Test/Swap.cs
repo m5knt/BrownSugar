@@ -27,10 +27,31 @@ namespace Test {
         UInt32 u32 = (UInt32)0x8899aabb;
         UInt64 u64 = (UInt64)0x8899aabbccddeeff;
 
+        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
+        class UnicodeType {
+            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
+            public string str = "あ";
+            public char c16 = '@';
+        }
+
         [TestMethod]
         public void Premise() {
-            Assert.AreEqual(1, Marshal.SizeOf('0')); // C言語 char 扱い
-            Assert.AreEqual(4, Marshal.SizeOf(true)); // Win32 BOOL 扱い
+            var uni = new UnicodeType();
+            // マーシャルではStructLayout情報がない文字は1byte
+            Assert.AreEqual(1, Marshal.SizeOf(uni.c16));
+            // マーシャル情報(MarshalAs)はPremの型情報なので失敗する
+            try {
+                Assert.AreEqual(10, Marshal.SizeOf(uni.str));
+            }
+            catch (ArgumentException) {
+            }
+            // マーシャル情報があればutf16で扱える
+            Assert.AreEqual(22, Marshal.SizeOf(typeof(UnicodeType))); 
+            Assert.AreEqual(22, Marshal.SizeOf(uni));
+            // マーシャルでは bool は Win32 BOOL 扱い
+            Assert.AreEqual(4, Marshal.SizeOf(true));
+
+            // 普通
             Assert.AreEqual(1, Marshal.SizeOf(s8));
             Assert.AreEqual(2, Marshal.SizeOf(s16));
             Assert.AreEqual(4, Marshal.SizeOf(s32));
@@ -49,10 +70,10 @@ namespace Test {
             Assert.AreEqual(s16, ByteOrder.Swap(s16r));
             Assert.AreEqual(s32, ByteOrder.Swap(s32r));
             Assert.AreEqual(s64, ByteOrder.Swap(s64r));
-            Assert.AreEqual(c16, ByteOrder.Swap(c16r));
             Assert.AreEqual(u16, ByteOrder.Swap(u16r));
             Assert.AreEqual(u32, ByteOrder.Swap(u32r));
             Assert.AreEqual(u64, ByteOrder.Swap(u64r));
+            Assert.AreEqual(c16, ByteOrder.Swap(c16r));
         }
 
         [TestMethod]
