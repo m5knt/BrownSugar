@@ -60,6 +60,7 @@
     <Compile Include="Endianness\HostOrderAligned.cs" />
     <Compile Include="Endianness\NoOrder.cs" />
     <Compile Include="Endianness\BigEndianAny.cs" />
+    <Compile Include="Extentions\StringExtension.cs" />
     <Compile Include="Extentions\StringBufferExtension.cs" />
     <Compile Include="Extentions\CastExtension.cs" />
     <Compile Include="Endianness\HostOrder.cs" />
