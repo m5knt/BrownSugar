@@ -10,22 +10,22 @@ namespace Test {
     [TestClass]
     public class Swap {
 
-        Int16 s16r = unchecked((Int16)0x9988);
-        Int32 s32r = unchecked((Int32)0xbbaa9988);
-        Int64 s64r = unchecked((Int64)0xffeeddccbbaa9988);
-        UInt16 u16r = (UInt16)0x9988;
-        UInt32 u32r = (UInt32)0xbbaa9988;
-        UInt64 u64r = (UInt64)0xffeeddccbbaa9988;
-        sbyte s8 = unchecked((sbyte)0x88);
-        Int16 s16 = unchecked((Int16)0x8899);
-        Int32 s32 = unchecked((Int32)0x8899aabb);
-        Int64 s64 = unchecked((Int64)0x8899aabbccddeeff);
-        char c16r = '\x4000';
-        char c16 = '\x40';
-        byte u8 = unchecked((byte)0x88);
-        UInt16 u16 = (UInt16)0x8899;
-        UInt32 u32 = (UInt32)0x8899aabb;
-        UInt64 u64 = (UInt64)0x8899aabbccddeeff;
+        static Int16 s16r = unchecked((Int16)0x9988);
+        static Int32 s32r = unchecked((Int32)0xbbaa9988);
+        static Int64 s64r = unchecked((Int64)0xffeeddccbbaa9988);
+        static UInt16 u16r = (UInt16)0x9988;
+        static UInt32 u32r = (UInt32)0xbbaa9988;
+        static UInt64 u64r = (UInt64)0xffeeddccbbaa9988;
+        static sbyte s8 = unchecked((sbyte)0x88);
+        static Int16 s16 = unchecked((Int16)0x8899);
+        static Int32 s32 = unchecked((Int32)0x8899aabb);
+        static Int64 s64 = unchecked((Int64)0x8899aabbccddeeff);
+        static char c16r = '\x4000';
+        static char c16 = '\x40';
+        static byte u8 = unchecked((byte)0x88);
+        static UInt16 u16 = (UInt16)0x8899;
+        static UInt32 u32 = (UInt32)0x8899aabb;
+        static UInt64 u64 = (UInt64)0x8899aabbccddeeff;
 
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
         class UnicodeType {
@@ -90,7 +90,7 @@ namespace Test {
 
         // メンバーの並びは定義順,詰め系の並び,文字列はUnicode(utf16)
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-        class MarshalTypeClass {
+        unsafe class Class {
 
             // 文字列は Win32 の TCHAR に相当するが文字型を決定する指定は
             // StructLayout の CharSet になる
@@ -103,7 +103,8 @@ namespace Test {
             public double[] array = new double[array_size] { 1.1, 1.2 };
             // ネスト処理の確認
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-            MarshalTypeClassSub[] sub = new MarshalTypeClassSub[2];
+            ClassSub[] sub = new ClassSub[2];
+
             /**/
             public char c16 = 'あ';
             public bool bt = true;
@@ -120,10 +121,11 @@ namespace Test {
             public short s16 = unchecked((short)0x8899);
             public int s32 = unchecked((int)0x8899aabb);
             public long s64 = unchecked((long)0x8899aabbccddeeff);
+
         }
 
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
-        class MarshalTypeClassSub {
+        class ClassSub {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
             public string str = "ABCDEFGHI\0";
             const int array_size = 2;
@@ -131,62 +133,20 @@ namespace Test {
             public double[] array = new double[array_size] { 1.1, 1.2 };
         }
 
-        [StructLayout(LayoutKind.Sequential, Pack = 1)]
-        public unsafe struct MarshalTypeFixed {
-            public byte u8;
-            public ushort u16;
-            public uint u32;
-            public ulong u64;
-            public sbyte s8;
-            public short s16;
-            public int s32;
-            public long s64;
-            /**/
-            public bool bt;
-            public bool bf;
-            public float f32;
-            public double f64;
-            public decimal f128;
-            public char c;
-            /**/
-            public fixed char str[10];
-            public fixed double array[10];
-
-            public static MarshalTypeFixed Create() {
-                return new MarshalTypeFixed() {
-                    u8 = 0x88,
-                    u16 = 0x8899,
-                    u32 = 0x8899aabb,
-                    u64 = 0x8899aabbccddeeff,
-                    s8 = unchecked((sbyte)0x88),
-                    s16 = unchecked((short)0x8899),
-                    s32 = unchecked((int)0x8899aabb),
-                    s64 = unchecked((long)0x8899aabbccddeeff),
-                    /**/
-                    bt = true,
-                    bf = false,
-                    f32 = 1.1f,
-                    f64 = 1.1,
-                    f128 = 1.1m,
-                    c = '@',
-                };
-            }
-        }
-
         [TestMethod]
-        public unsafe void SwapMarshal() {
-            var src = new MarshalTypeClass();
+        public unsafe void SwapClass() {
+            // マーシャル通して同じ結果になるか
+            var src = new Class();
             var srcbin = new byte[ByteOrder.SizeOf(src)];
             ByteOrder.Assign(srcbin, 0, src);
-            /**/
-            var ext = ByteOrder.To<MarshalTypeClass>(srcbin, 0);
+            var ext = ByteOrder.To<Class>(srcbin, 0);
             var extbin = new byte[ByteOrder.SizeOf(ext)];
             ByteOrder.Assign(extbin, 0, ext);
-            /**/
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
-            //
-            ByteOrder.Swap(srcbin, 0, typeof(MarshalTypeClass));
-            ext = ByteOrder.To<MarshalTypeClass>(srcbin, 0);
+
+            // マーシャルで反転したものが値を反転したものと同じになるか
+            ByteOrder.Swap(srcbin, 0, typeof(Class));
+            ext = ByteOrder.To<Class>(srcbin, 0);
             ByteOrder.Assign(extbin, 0, ext);
             Assert.AreEqual(src.s16, ByteOrder.Swap(ext.s16));
             Assert.AreEqual(src.s32, ByteOrder.Swap(ext.s32));
@@ -194,24 +154,42 @@ namespace Test {
             Assert.AreEqual(src.u16, ByteOrder.Swap(ext.u16));
             Assert.AreEqual(src.u32, ByteOrder.Swap(ext.u32));
             Assert.AreEqual(src.u64, ByteOrder.Swap(ext.u64));
-            //
             Assert.AreEqual(src.str[0], ByteOrder.Swap(ext.str[0]));
             Assert.AreEqual(src.c16, ByteOrder.Swap(ext.c16));
         }
 
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        public unsafe struct Struct {
+            // fixed は struct のみ
+            public fixed UInt32 fix[2];
+
+            public void Init() {
+                fixed (Struct* p = &this)
+                {
+                    p->fix[0] = u32;
+                    p->fix[1] = u32r;
+                }
+            }
+        }
+
         [TestMethod]
-        public unsafe void TestMarshalFixed() {
-            var src = MarshalTypeFixed.Create();
+        public unsafe void SwapStruct() {
+            // マーシャル通して同じ結果になるか
+            Struct src;
+            src.Init();
             var srcbin = new byte[ByteOrder.SizeOf(src)];
             ByteOrder.Assign(srcbin, 0, src);
-            ByteOrder.Swap(srcbin, 0, typeof(MarshalTypeFixed));
-            ByteOrder.Swap(srcbin, 0, typeof(MarshalTypeFixed));
-            /**/
-            var ext = ByteOrder.To<MarshalTypeFixed>(srcbin, 0);
+            var ext = ByteOrder.To<Struct>(srcbin, 0);
             var extbin = new byte[ByteOrder.SizeOf(ext)];
             ByteOrder.Assign(extbin, 0, ext);
-            /**/
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
+
+            ByteOrder.Swap(srcbin, 0, typeof(Struct));
+            ext = ByteOrder.To<Struct>(srcbin, 0);
+            ByteOrder.Assign(extbin, 0, ext);
+
+            Assert.AreEqual(src.fix[0], ByteOrder.Swap(ext.fix[0]));
+            Assert.AreEqual(ext.fix[0], u32r);
         }
 
     }
