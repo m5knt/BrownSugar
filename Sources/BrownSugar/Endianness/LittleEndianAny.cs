@@ -394,6 +394,7 @@ namespace ThunderEgg.BrownSugar {
 //
 
 namespace ThunderEgg.BrownSugar {
+    using System.Runtime.InteropServices;
 
     /// <summary>エンディアンを知っている型</summary>
     using EndianHolder = LittleEndianAny;
@@ -433,10 +434,6 @@ namespace ThunderEgg.BrownSugar {
         //
         //
         //
-
-        /*
-         *
-         */
 
         /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
         /// <exception cref="ArgumentNullException"></exception>

@@ -22,7 +22,7 @@ namespace Test {
         sbyte Int8 = unchecked((sbyte)0x88);
         Double Double = 1.1;
         Single Single = 1.1f;
-        Char Char = '@';
+        Char Char = '\x0040';
         Boolean Boolean = true;
 
         byte[] Little = new byte[] {

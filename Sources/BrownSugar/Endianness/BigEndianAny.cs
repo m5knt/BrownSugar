@@ -277,6 +277,12 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
+        public static void Assign(byte[] buffer, int index, char value) {
+            buffer[index] = unchecked((byte)(value >> 8));
+            buffer[index + 1] = unchecked((byte)value);
+        }
+
+        /// <summary>ビッグエンディアン順でバッファに書き込みます</summary>
         public static void Assign(byte[] buffer, int index, uint value) {
             buffer[index] = unchecked((byte)(value >> 24));
             buffer[index + 1] = unchecked((byte)(value >> 16));
@@ -356,6 +362,7 @@ namespace ThunderEgg.BrownSugar {
 //
 
 namespace ThunderEgg.BrownSugar {
+    using System.Runtime.InteropServices;
 
     /// <summary>エンディアンを知っている型</summary>
     using EndianHolder = BigEndianAny;
@@ -391,10 +398,6 @@ namespace ThunderEgg.BrownSugar {
         public static void Assign(byte[] buffer, int index, bool value) {
             buffer[index] = value ? (byte)1 : (byte)0;
         }
-
-        //
-        //
-        //
 
         //
         //

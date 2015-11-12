@@ -4,6 +4,7 @@
  */
 
 using System;
+using System.Runtime.InteropServices;
 
 /*
  *
@@ -40,6 +41,16 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>バッファ内の値を取得</summary>
         public static bool ToBoolean(byte[] buffer, int index) {
             return buffer[index] != 0;
+        }
+
+        //
+        //
+        //
+
+        /// <summary>マーシャル時のサイズを求めます</summary>
+        /// <seealso cref="Marshal.SizeOf(object)"/>
+        public static int SizeOf<T>(T obj) {
+            return Marshal.SizeOf(obj);
         }
 
     }
