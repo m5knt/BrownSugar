@@ -137,17 +137,17 @@ namespace Test {
         public unsafe void SwapClass() {
             // マーシャル通して同じ結果になるか
             var src = new Class();
-            var srcbin = new byte[ByteOrder.SizeOf(src)];
-            ByteOrder.Assign(srcbin, 0, src);
-            var ext = ByteOrder.To<Class>(srcbin, 0);
-            var extbin = new byte[ByteOrder.SizeOf(ext)];
-            ByteOrder.Assign(extbin, 0, ext);
+            var srcbin = new byte[ByteOrder.MarshalSizeOf(src)];
+            ByteOrder.MarshalAssign(srcbin, 0, src);
+            var ext = ByteOrder.MarshalTo<Class>(srcbin, 0);
+            var extbin = new byte[ByteOrder.MarshalSizeOf(ext)];
+            ByteOrder.MarshalAssign(extbin, 0, ext);
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
 
             // マーシャルで反転したものが値を反転したものと同じになるか
             ByteOrder.Swap(srcbin, 0, typeof(Class));
-            ext = ByteOrder.To<Class>(srcbin, 0);
-            ByteOrder.Assign(extbin, 0, ext);
+            ext = ByteOrder.MarshalTo<Class>(srcbin, 0);
+            ByteOrder.MarshalAssign(extbin, 0, ext);
             Assert.AreEqual(src.s16, ByteOrder.Swap(ext.s16));
             Assert.AreEqual(src.s32, ByteOrder.Swap(ext.s32));
             Assert.AreEqual(src.s64, ByteOrder.Swap(ext.s64));
@@ -177,16 +177,16 @@ namespace Test {
             // マーシャル通して同じ結果になるか
             Struct src;
             src.Init();
-            var srcbin = new byte[ByteOrder.SizeOf(src)];
-            ByteOrder.Assign(srcbin, 0, src);
-            var ext = ByteOrder.To<Struct>(srcbin, 0);
-            var extbin = new byte[ByteOrder.SizeOf(ext)];
-            ByteOrder.Assign(extbin, 0, ext);
+            var srcbin = new byte[ByteOrder.MarshalSizeOf(src)];
+            ByteOrder.MarshalAssign(srcbin, 0, src);
+            var ext = ByteOrder.MarshalTo<Struct>(srcbin, 0);
+            var extbin = new byte[ByteOrder.MarshalSizeOf(ext)];
+            ByteOrder.MarshalAssign(extbin, 0, ext);
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
 
             ByteOrder.Swap(srcbin, 0, typeof(Struct));
-            ext = ByteOrder.To<Struct>(srcbin, 0);
-            ByteOrder.Assign(extbin, 0, ext);
+            ext = ByteOrder.MarshalTo<Struct>(srcbin, 0);
+            ByteOrder.MarshalAssign(extbin, 0, ext);
 
             Assert.AreEqual(src.fix[0], ByteOrder.Swap(ext.fix[0]));
             Assert.AreEqual(ext.fix[0], u32r);
