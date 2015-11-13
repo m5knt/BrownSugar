@@ -33,14 +33,14 @@ namespace ThunderEgg.BrownSugar {
         /// <exception cref="IndexOutOfRangeException"></exception>
         public static int Assign<T>(byte[] buffer, int index, T obj) //
         {
-            return ByteOrder.Assign<T>(buffer, index, obj, //
+            return ByteOrder.MarshalAssign<T>(buffer, index, obj, //
                 EndianHolder.IsLittleEndian);
         }
 
         /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
         /// <exception cref="ArgumentNullException"></exception>
         public static byte[] GetBytes<T>(T obj) {
-            return ByteOrder.GetBytes<T>(obj, EndianHolder.IsLittleEndian);
+            return ByteOrder.MarshalGetBytes<T>(obj, EndianHolder.IsLittleEndian);
         }
 
         /// <summary>バッファからオブジェクトを復元する</summary>
@@ -49,7 +49,7 @@ namespace ThunderEgg.BrownSugar {
         public static int CopyTo<T>(byte[] buffer, int index, T obj) //
             where T : class //
         {
-            return ByteOrder.CopyTo<T>(buffer, index, obj, //
+            return ByteOrder.MarshalCopyTo<T>(buffer, index, obj, //
                 EndianHolder.IsLittleEndian);
         }
 
@@ -57,7 +57,7 @@ namespace ThunderEgg.BrownSugar {
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
         public static T To<T>(byte[] buffer, int index) {
-            return ByteOrder.To<T>(buffer, index, EndianHolder.IsLittleEndian);
+            return ByteOrder.MarshalTo<T>(buffer, index, EndianHolder.IsLittleEndian);
         }
 
     }

@@ -406,31 +406,34 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static int Assign<T>(byte[] buffer, int index, T obj) //
+        public static int MarshalAssign<T>(byte[] buffer, int index, T obj) //
         {
-            return ByteOrder.Assign<T>(buffer, index, obj, EndianHolder.IsLittleEndian);
+            return ByteOrder.MarshalAssign<T>(buffer, index, obj, //
+                EndianHolder.IsLittleEndian);
         }
 
         /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
         /// <exception cref="ArgumentNullException"></exception>
-        public static byte[] GetBytes<T>(T obj) {
-            return ByteOrder.GetBytes<T>(obj, EndianHolder.IsLittleEndian);
+        public static byte[] MarshalGetBytes<T>(T obj) {
+            return ByteOrder.MarshalGetBytes<T>(obj, EndianHolder.IsLittleEndian);
         }
 
         /// <summary>バッファからオブジェクトを復元する</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static int CopyTo<T>(byte[] buffer, int index, T obj) //
+        public static int MarshalCopyTo<T>(byte[] buffer, int index, T obj) //
             where T : class //
         {
-            return ByteOrder.CopyTo<T>(buffer, index, obj, EndianHolder.IsLittleEndian);
+            return ByteOrder.MarshalCopyTo<T>(buffer, index, obj, //
+                EndianHolder.IsLittleEndian);
         }
 
         /// <summary>バッファからオブジェクトを復元する</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static T To<T>(byte[] buffer, int index) {
-            return ByteOrder.To<T>(buffer, index, EndianHolder.IsLittleEndian);
+        public static T MarshalTo<T>(byte[] buffer, int index) {
+            return ByteOrder.MarshalTo<T>(buffer, index, //
+                EndianHolder.IsLittleEndian);
         }
     }
 }

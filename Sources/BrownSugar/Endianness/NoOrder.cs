@@ -49,7 +49,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>マーシャル時のサイズを求めます</summary>
         /// <seealso cref="Marshal.SizeOf(object)"/>
-        public static int SizeOf<T>(T obj) {
+        public static int MarshalSizeOf<T>(T obj) {
             return Marshal.SizeOf(obj);
         }
 

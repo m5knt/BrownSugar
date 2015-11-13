@@ -224,14 +224,14 @@ namespace ThunderEgg.BrownSugar {
         /// PODもしくはマーシャルアトリビュートがある型が扱えます
         /// </summary>
         /// <seealso cref="Marshal.SizeOf(object)"/>
-        public static int SizeOf<T>(T obj) {
+        public static int MarshalSizeOf<T>(T obj) {
             return Marshal.SizeOf(obj);
         }
 
         /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static int Assign<T>(byte[] buffer, int index, T obj, //
+        public static int MarshalAssign<T>(byte[] buffer, int index, T obj, //
             bool is_little = true) //
         {
             if (buffer == null || obj == null) {
@@ -258,7 +258,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>オブジェクトをバイナリ化しバッファを返す</summary>
         /// <exception cref="ArgumentNullException"></exception>
-        public static byte[] GetBytes<T>(T obj, bool is_little = true) {
+        public static byte[] MarshalGetBytes<T>(T obj, bool is_little = true) {
             if (obj == null) {
                 throw new ArgumentNullException();
             }
@@ -281,7 +281,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>バッファからオブジェクトを復元する</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static int CopyTo<T>(byte[] buffer, int index, T obj, //
+        public static int MarshalCopyTo<T>(byte[] buffer, int index, T obj, //
             bool is_little = true) //
             where T : class //
         {
@@ -311,7 +311,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>バッファからオブジェクトを復元する</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>
-        public static T To<T>(byte[] buffer, int index, bool is_little = true) {
+        public static T MarshalTo<T>(byte[] buffer, int index, bool is_little = true) {
             var type = typeof(T);
             if (buffer == null) {
                 throw new ArgumentNullException();
@@ -465,7 +465,5 @@ namespace ThunderEgg.BrownSugar {
                 unchecked((ulong)value & 0x000000000000ff00UL) << 40 |
                 unchecked((ulong)value) << 56)) : value;
         }
-
-
     }
 }
