@@ -95,10 +95,10 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>バッファのバイトオーダーを反転させます</summary>
         public static void Swap(byte[] buffer, int index, int length) {
             if (buffer == null) {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("buffer");
             }
             if (index < 0 || length < 0 || (index + length) > buffer.Length) {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("index or length");
             }
             unsafe
             {
@@ -116,11 +116,11 @@ namespace ThunderEgg.BrownSugar {
         /// </summary>
         public static void Swap(byte[] buffer, int index, Type type) {
             if (buffer == null || type == null) {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("buffer or type");
             }
             var length = Marshal.SizeOf(type);
             if (index < 0 || (index + length) > buffer.Length) {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("index");
             }
             unsafe
             {
