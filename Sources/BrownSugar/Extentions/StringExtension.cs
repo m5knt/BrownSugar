@@ -3,47 +3,71 @@
  */
 
 using System;
+using System.Runtime.CompilerServices;
 
 namespace ThunderEgg.BrownSugar.Extentions {
+    //        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 
+    /// <summary>Stringの拡張メソッド関係</summary>
     public static class StringExtension {
 
+        /// <summary>コピーを返す</summary>
+        /// <seealso cref="string.Copy(string)"/>
         public static string Copy(this string self) {
             return string.Copy(self);
         }
 
+        /// <summary>書式から文字列を生成する</summary>
+        /// <seealso cref="string.Format(string, object[])"/>
         public static string Format(this string format, params object[] args) {
             return string.Format(format, args);
         }
 
+        /// <summary>書式から文字列を生成する</summary>
+        /// <seealso cref="string.Format(string, object)"/>
         public static string Format(this string format, object arg0) {
             return string.Format(format, arg0);
         }
 
+        /// <summary>書式から文字列を生成する</summary>
+        /// <seealso cref="string.Format(string, object, object)"/>
         public static string Format(this string format, object arg0, object arg1) {
             return string.Format(format, arg0, arg1);
         }
 
+        /// <summary>書式から文字列を生成する</summary>
+        /// <seealso cref="string.Format(string, object, object, object)"/>
         public static string Format(this string format, object arg0, object arg1, object arg2) {
             return string.Format(format, arg0, arg1, arg2);
         }
 
+        /// <summary>インターンプールしその文字列を返します</summary>
+        /// <seealso cref="string.Intern(string)"/>
         public static string Intern(this string self) {
             return string.Intern(self);
         }
 
+        /// <summary>インターンプールされているか返します</summary>
+        /// <returns>プールされているなら文字列,プールされてなければnull</returns>
+        /// <seealso cref="string.IsInterned(string)"/>
         public static string IsInterned(this string self) {
             return string.IsInterned(self);
         }
 
+        /// <summary>ヌルもしくは空文字列であるか返します</summary>
+        /// <seealso cref="string.IsNullOrEmpty(string)"/>
         public static bool IsNullOrEmpty(this string self) {
             return string.IsNullOrEmpty(self);
         }
 
+        /// <summary>文字列を連結します</summary>
+        /// <seealso cref="string.Join(string, string[])"/>
         public static string Join(this string separator, string[] value) {
             return string.Join(separator, value);
         }
 
+        /// <summary>文字列を連結します</summary>
+        /// <seealso cref="string.Join(string, string[], int, int)"/>
         public static string Join(this string separator, string[] value, int startIndex, int count) {
             return string.Join(separator, value, startIndex, count);
         }
