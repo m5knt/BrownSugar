@@ -4,11 +4,12 @@ using System;
 using System.Net;
 using System.Runtime.InteropServices;
 using ThunderEgg.BrownSugar;
+using ThunderEgg.BrownSugar.Extentions;
 
 namespace Test {
 
     [TestClass]
-    public class Swap {
+    public class ByteOrder_ {
 
         static Int16 s16r = unchecked((Int16)0x9988);
         static Int32 s32r = unchecked((Int32)0xbbaa9988);
@@ -28,20 +29,21 @@ namespace Test {
         static UInt64 u64 = (UInt64)0x8899aabbccddeeff;
 
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-        class UnicodeType {
+        struct UnicodeType {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
             public string str = "あ";
             public char c16 = '@';
         }
 
         [TestMethod]
-        public void Premise() {
+        public void Marshal_() {
             var uni = new UnicodeType();
             // マーシャルではStructLayout情報がない文字は1byte
             Assert.AreEqual(1, Marshal.SizeOf(uni.c16));
-            // マーシャル情報(MarshalAs)はPremの型情報なので失敗する
+            // マーシャル情報(MarshalAs)はUnicodeTypeの型情報なので失敗する
             try {
                 Assert.AreEqual(10, Marshal.SizeOf(uni.str));
+                Assert.IsTrue(false);
             }
             catch (ArgumentException) {
             }
@@ -63,6 +65,23 @@ namespace Test {
             Assert.AreEqual(4, Marshal.SizeOf(1.0f));
             Assert.AreEqual(8, Marshal.SizeOf(1.1));
             Assert.AreEqual(16, Marshal.SizeOf(1.1m));
+            unsafe
+            {
+                Assert.AreEqual(1, sizeof(bool));
+                Assert.AreEqual(2, sizeof(char));
+                Assert.AreEqual(1, sizeof(sbyte));
+                Assert.AreEqual(2, sizeof(short));
+                Assert.AreEqual(4, sizeof(int));
+                Assert.AreEqual(8, sizeof(long));
+                Assert.AreEqual(1, sizeof(byte));
+                Assert.AreEqual(2, sizeof(ushort));
+                Assert.AreEqual(4, sizeof(uint));
+                Assert.AreEqual(8, sizeof(ulong));
+                Assert.AreEqual(4, sizeof(float));
+                Assert.AreEqual(8, sizeof(double));
+                Assert.AreEqual(16, sizeof(decimal));
+            }
+
         }
 
         [TestMethod]
@@ -81,7 +100,31 @@ namespace Test {
             var buf = new byte[] { 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee };
             var bufr = (byte[])buf.Clone();
             Array.Reverse(bufr);
+            Assert.IsFalse(buf.SequenceEqual(bufr));
             ByteOrder.Swap(buf, 0, buf.Length);
+            Assert.IsTrue(buf.SequenceEqual(bufr));
+        }
+
+        [TestMethod]
+        public void MarshalOffset() {
+            Assert.AreEqual(10, ByteOrder.MarshalOffset(new ClassSub(), "array"));
+            Assert.AreEqual(10, ByteOrder.MarshalOffset(typeof(ClassSub), "array"));
+        }
+
+        [TestMethod]
+        public void MarshalCount() {
+            Assert.AreEqual(10, ByteOrder.MarshalCount(new ClassSub(), "str"));
+            Assert.AreEqual(10, ByteOrder.MarshalCount(typeof(ClassSub), "str"));
+        }
+
+        [TestMethod]
+        public void MarshalExtension() {
+            Assert.AreEqual(Marshal.SizeOf(new ClassSub()), new ClassSub().MarshalSize());
+            Assert.AreEqual(Marshal.SizeOf(typeof(ClassSub)), typeof(ClassSub).MarshalSize());
+            Assert.AreEqual(10, new ClassSub().MarshalOffset("array"));
+            Assert.AreEqual(10, typeof(ClassSub).MarshalOffset("array"));
+            Assert.AreEqual(10, new Class().MarshalCount("str"));
+            Assert.AreEqual(10, typeof(Class).MarshalCount("str"));
         }
 
         //
@@ -124,6 +167,7 @@ namespace Test {
 
         }
 
+        // 10 8 8
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
         class ClassSub {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
@@ -137,15 +181,17 @@ namespace Test {
         public unsafe void SwapClass() {
             // マーシャル通して同じ結果になるか
             var src = new Class();
-            var srcbin = new byte[ByteOrder.MarshalSizeOf(src)];
+            var srcbin = new byte[Marshal.SizeOf(src)];
             ByteOrder.MarshalAssign(srcbin, 0, src);
             var ext = ByteOrder.MarshalTo<Class>(srcbin, 0);
-            var extbin = new byte[ByteOrder.MarshalSizeOf(ext)];
+            var extbin = new byte[Marshal.SizeOf(ext)];
             ByteOrder.MarshalAssign(extbin, 0, ext);
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
 
             // マーシャルで反転したものが値を反転したものと同じになるか
             ByteOrder.Swap(srcbin, 0, typeof(Class));
+            Assert.IsFalse(srcbin.SequenceEqual(extbin));
+
             ext = ByteOrder.MarshalTo<Class>(srcbin, 0);
             ByteOrder.MarshalAssign(extbin, 0, ext);
             Assert.AreEqual(src.s16, ByteOrder.Swap(ext.s16));
@@ -154,7 +200,10 @@ namespace Test {
             Assert.AreEqual(src.u16, ByteOrder.Swap(ext.u16));
             Assert.AreEqual(src.u32, ByteOrder.Swap(ext.u32));
             Assert.AreEqual(src.u64, ByteOrder.Swap(ext.u64));
-            Assert.AreEqual(src.str[0], ByteOrder.Swap(ext.str[0]));
+            var n = ByteOrder.MarshalCount(src.GetType(), "str");
+            for (var i = 0; i < n; ++i) {
+                Assert.AreEqual(src.str[i], ByteOrder.Swap(ext.str[i]));
+            }
             Assert.AreEqual(src.c16, ByteOrder.Swap(ext.c16));
         }
 
@@ -177,10 +226,10 @@ namespace Test {
             // マーシャル通して同じ結果になるか
             Struct src;
             src.Init();
-            var srcbin = new byte[ByteOrder.MarshalSizeOf(src)];
+            var srcbin = new byte[Marshal.SizeOf(src)];
             ByteOrder.MarshalAssign(srcbin, 0, src);
             var ext = ByteOrder.MarshalTo<Struct>(srcbin, 0);
-            var extbin = new byte[ByteOrder.MarshalSizeOf(ext)];
+            var extbin = new byte[Marshal.SizeOf(ext)];
             ByteOrder.MarshalAssign(extbin, 0, ext);
             Assert.IsTrue(srcbin.SequenceEqual(extbin));
 
