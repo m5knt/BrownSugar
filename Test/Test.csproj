@@ -67,12 +67,16 @@
     <Compile Include="TestBigEndian.cs" />
     <Compile Include="ByteEndian.cs" />
     <Compile Include="PerfEndian.cs" />
-    <Compile Include="Swap.cs" />
+    <Compile Include="ByteOrder.cs" />
     <Compile Include="TestCast.cs" />
     <Compile Include="TestByteSwap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sources\BrownSugarLittle\BrownSugarLittle.csproj">
+      <Project>{7b1c07ca-88d7-4f40-802a-e671bde7ff37}</Project>
+      <Name>BrownSugarLittle</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sources\BrownSugar\BrownSugar.csproj">
       <Project>{8af748ed-157e-4434-8a24-59df1d073af0}</Project>
       <Name>BrownSugar</Name>
