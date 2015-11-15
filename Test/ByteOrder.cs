@@ -29,9 +29,9 @@ namespace Test {
         static UInt64 u64 = (UInt64)0x8899aabbccddeeff;
 
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-        struct UnicodeType {
+        class UnicodeType {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
-            public string str = "あ";
+            public string str = "あいうえおかきくけこ";
             public char c16 = '@';
         }
 
@@ -139,14 +139,16 @@ namespace Test {
             // StructLayout の CharSet になる
             // 文字列はヌル終端サイズはヌル文字を含む
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
-            public string str = "あ12345678\0";
+            public string str = "あいうえおかきくけ\0";
             // 配列サイズ変更による事故防止
             const int array_size = 2;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
-            public double[] array = new double[array_size] { 1.1, 1.2 };
+            public bool[] bools = new bool[array_size] { true, false };
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
+            public double[] doubles = new double[array_size] { 1.1, 1.2 };
             // ネスト処理の確認
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = 2)]
-            ClassSub[] sub = new ClassSub[2];
+            [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
+            ClassSub[] sub = new ClassSub[array_size];
 
             /**/
             public char c16 = 'あ';
@@ -171,7 +173,7 @@ namespace Test {
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
         class ClassSub {
             [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
-            public string str = "ABCDEFGHI\0";
+            public string str = "012345678";
             const int array_size = 2;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
             public double[] array = new double[array_size] { 1.1, 1.2 };
@@ -200,15 +202,23 @@ namespace Test {
             Assert.AreEqual(src.u16, ByteOrder.Swap(ext.u16));
             Assert.AreEqual(src.u32, ByteOrder.Swap(ext.u32));
             Assert.AreEqual(src.u64, ByteOrder.Swap(ext.u64));
-            var n = ByteOrder.MarshalCount(src.GetType(), "str");
-            for (var i = 0; i < n; ++i) {
-                Assert.AreEqual(src.str[i], ByteOrder.Swap(ext.str[i]));
+            {
+                var n = ByteOrder.MarshalCount(src.GetType(), "str") - 1;
+                for (var i = 0; i < n; ++i) {
+                    Assert.AreEqual(src.str[i], ByteOrder.Swap(ext.str[i]));
+                }
+            }
+            {
+                var n = ByteOrder.MarshalCount(src.GetType(), "bools");
+                for (var i = 0; i < n; ++i) {
+                    Assert.AreEqual(src.bools[i], ext.bools[i]);
+                }
             }
             Assert.AreEqual(src.c16, ByteOrder.Swap(ext.c16));
         }
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-        public unsafe struct Struct {
+        unsafe struct Struct {
             // fixed は struct のみ
             public fixed UInt32 fix[2];
 
