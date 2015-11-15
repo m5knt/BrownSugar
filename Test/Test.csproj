@@ -61,7 +61,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Values.cs" />
     <Compile Include="Bench.cs" />
+    <Compile Include="Marshal.cs" />
     <Compile Include="TestPerf.cs" />
     <Compile Include="TestLittleEndian.cs" />
     <Compile Include="TestBigEndian.cs" />

@@ -218,17 +218,7 @@ namespace ThunderEgg.BrownSugar {
         //
         //
         //
-
-        /// <summary>マーシャル時のオフセットを返す</summary>
-        public static int MarshalOffset(Type type, string name) {
-            return Marshal.OffsetOf(type, name).ToInt32();
-        }
-
-        /// <summary>マーシャル時のオフセットを返す</summary>
-        public static int MarshalOffset<T>(T obj, string name) {
-            return Marshal.OffsetOf(typeof(T), name).ToInt32();
-        }
-
+#if false
         /// <summary>マーシャルアトリビュートのサイズカウントを返す</summary>
         public static int MarshalCount(Type type, string name) {
             var field = type.GetField(name);
@@ -252,7 +242,7 @@ namespace ThunderEgg.BrownSugar {
         public static int MarshalCount<T>(T obj, string name) {
             return MarshalCount(typeof(T), name);
         }
-
+#endif
         /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
         /// <exception cref="ArgumentNullException"></exception>
         /// <exception cref="IndexOutOfRangeException"></exception>

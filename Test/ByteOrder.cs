@@ -9,80 +9,7 @@ using ThunderEgg.BrownSugar.Extentions;
 namespace Test {
 
     [TestClass]
-    public class ByteOrder_ {
-
-        static Int16 s16r = unchecked((Int16)0x9988);
-        static Int32 s32r = unchecked((Int32)0xbbaa9988);
-        static Int64 s64r = unchecked((Int64)0xffeeddccbbaa9988);
-        static UInt16 u16r = (UInt16)0x9988;
-        static UInt32 u32r = (UInt32)0xbbaa9988;
-        static UInt64 u64r = (UInt64)0xffeeddccbbaa9988;
-        static sbyte s8 = unchecked((sbyte)0x88);
-        static Int16 s16 = unchecked((Int16)0x8899);
-        static Int32 s32 = unchecked((Int32)0x8899aabb);
-        static Int64 s64 = unchecked((Int64)0x8899aabbccddeeff);
-        static char c16r = '\x4000';
-        static char c16 = '\x40';
-        static byte u8 = unchecked((byte)0x88);
-        static UInt16 u16 = (UInt16)0x8899;
-        static UInt32 u32 = (UInt32)0x8899aabb;
-        static UInt64 u64 = (UInt64)0x8899aabbccddeeff;
-
-        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Unicode)]
-        class UnicodeType {
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
-            public string str = "あいうえおかきくけこ";
-            public char c16 = '@';
-        }
-
-        [TestMethod]
-        public void Marshal_() {
-            var uni = new UnicodeType();
-            // マーシャルではStructLayout情報がない文字は1byte
-            Assert.AreEqual(1, Marshal.SizeOf(uni.c16));
-            // マーシャル情報(MarshalAs)はUnicodeTypeの型情報なので失敗する
-            try {
-                Assert.AreEqual(10, Marshal.SizeOf(uni.str));
-                Assert.IsTrue(false);
-            }
-            catch (ArgumentException) {
-            }
-            // マーシャル情報があればutf16で扱える
-            Assert.AreEqual(22, Marshal.SizeOf(typeof(UnicodeType))); 
-            Assert.AreEqual(22, Marshal.SizeOf(uni));
-            // マーシャルでは bool は Win32 BOOL 扱い
-            Assert.AreEqual(4, Marshal.SizeOf(true));
-
-            // 普通
-            Assert.AreEqual(1, Marshal.SizeOf(s8));
-            Assert.AreEqual(2, Marshal.SizeOf(s16));
-            Assert.AreEqual(4, Marshal.SizeOf(s32));
-            Assert.AreEqual(8, Marshal.SizeOf(s64));
-            Assert.AreEqual(1, Marshal.SizeOf(u8));
-            Assert.AreEqual(2, Marshal.SizeOf(u16));
-            Assert.AreEqual(4, Marshal.SizeOf(u32));
-            Assert.AreEqual(8, Marshal.SizeOf(u64));
-            Assert.AreEqual(4, Marshal.SizeOf(1.0f));
-            Assert.AreEqual(8, Marshal.SizeOf(1.1));
-            Assert.AreEqual(16, Marshal.SizeOf(1.1m));
-            unsafe
-            {
-                Assert.AreEqual(1, sizeof(bool));
-                Assert.AreEqual(2, sizeof(char));
-                Assert.AreEqual(1, sizeof(sbyte));
-                Assert.AreEqual(2, sizeof(short));
-                Assert.AreEqual(4, sizeof(int));
-                Assert.AreEqual(8, sizeof(long));
-                Assert.AreEqual(1, sizeof(byte));
-                Assert.AreEqual(2, sizeof(ushort));
-                Assert.AreEqual(4, sizeof(uint));
-                Assert.AreEqual(8, sizeof(ulong));
-                Assert.AreEqual(4, sizeof(float));
-                Assert.AreEqual(8, sizeof(double));
-                Assert.AreEqual(16, sizeof(decimal));
-            }
-
-        }
+    public class ByteOrder_ : Values {
 
         [TestMethod]
         public void SwapValues() {
@@ -103,28 +30,6 @@ namespace Test {
             Assert.IsFalse(buf.SequenceEqual(bufr));
             ByteOrder.Swap(buf, 0, buf.Length);
             Assert.IsTrue(buf.SequenceEqual(bufr));
-        }
-
-        [TestMethod]
-        public void MarshalOffset() {
-            Assert.AreEqual(10, ByteOrder.MarshalOffset(new ClassSub(), "array"));
-            Assert.AreEqual(10, ByteOrder.MarshalOffset(typeof(ClassSub), "array"));
-        }
-
-        [TestMethod]
-        public void MarshalCount() {
-            Assert.AreEqual(10, ByteOrder.MarshalCount(new ClassSub(), "str"));
-            Assert.AreEqual(10, ByteOrder.MarshalCount(typeof(ClassSub), "str"));
-        }
-
-        [TestMethod]
-        public void MarshalExtension() {
-            Assert.AreEqual(Marshal.SizeOf(new ClassSub()), new ClassSub().MarshalSize());
-            Assert.AreEqual(Marshal.SizeOf(typeof(ClassSub)), typeof(ClassSub).MarshalSize());
-            Assert.AreEqual(10, new ClassSub().MarshalOffset("array"));
-            Assert.AreEqual(10, typeof(ClassSub).MarshalOffset("array"));
-            Assert.AreEqual(10, new Class().MarshalCount("str"));
-            Assert.AreEqual(10, typeof(Class).MarshalCount("str"));
         }
 
         //
@@ -148,7 +53,7 @@ namespace Test {
             public double[] doubles = new double[array_size] { 1.1, 1.2 };
             // ネスト処理の確認
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
-            ClassSub[] sub = new ClassSub[array_size];
+            AnsiType[] sub = new AnsiType[array_size];
 
             /**/
             public char c16 = 'あ';
@@ -167,16 +72,6 @@ namespace Test {
             public int s32 = unchecked((int)0x8899aabb);
             public long s64 = unchecked((long)0x8899aabbccddeeff);
 
-        }
-
-        // 10 8 8
-        [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
-        class ClassSub {
-            [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 10)]
-            public string str = "012345678";
-            const int array_size = 2;
-            [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
-            public double[] array = new double[array_size] { 1.1, 1.2 };
         }
 
         [TestMethod]
@@ -203,13 +98,13 @@ namespace Test {
             Assert.AreEqual(src.u32, ByteOrder.Swap(ext.u32));
             Assert.AreEqual(src.u64, ByteOrder.Swap(ext.u64));
             {
-                var n = ByteOrder.MarshalCount(src.GetType(), "str") - 1;
+                var n = src.MarshalCount("str") - 1;
                 for (var i = 0; i < n; ++i) {
                     Assert.AreEqual(src.str[i], ByteOrder.Swap(ext.str[i]));
                 }
             }
             {
-                var n = ByteOrder.MarshalCount(src.GetType(), "bools");
+                var n = src.MarshalCount("bools");
                 for (var i = 0; i < n; ++i) {
                     Assert.AreEqual(src.bools[i], ext.bools[i]);
                 }
