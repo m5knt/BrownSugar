@@ -219,13 +219,27 @@ namespace ThunderEgg.BrownSugar {
         //
         //
 
-        /// <summary>
-        /// 型のサイズを求めます
-        /// PODもしくはマーシャルアトリビュートがある型が扱えます
-        /// </summary>
-        /// <seealso cref="Marshal.SizeOf(object)"/>
-        public static int MarshalSizeOf<T>(T obj) {
-            return Marshal.SizeOf(obj);
+        /// <summary>マーシャル時のオフセットを返す</summary>
+        public static int MarshalOffset(Type type, string name) {
+            return Marshal.OffsetOf(type, name).ToInt32();
+        }
+
+        /// <summary>マーシャル時のオフセットを返す</summary>
+        public static int MarshalOffset<T>(T obj, string name) {
+            return Marshal.OffsetOf(typeof(T), name).ToInt32();
+        }
+
+        /// <summary>マーシャルアトリビュートのサイズカウントを返す</summary>
+        public static int MarshalCount(Type type, string name) {
+            var field = type.GetField(name);
+            var attribs = field.GetCustomAttributes(typeof(MarshalAsAttribute), false);
+            var attrib = (MarshalAsAttribute)attribs[0];
+            return attrib.SizeConst;
+        }
+
+        /// <summary>マーシャルアトリビュートのサイズカウントを返す</summary>
+        public static int MarshalCount<T>(T obj, string name) {
+            return MarshalCount(typeof(T), name);
         }
 
         /// <summary>オブジェクトをバイナリ化しバッファへ書き込む</summary>
@@ -235,12 +249,12 @@ namespace ThunderEgg.BrownSugar {
             bool is_little = true) //
         {
             if (buffer == null || obj == null) {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("buffer or obj");
             }
             var type = typeof(T);
             int length = Marshal.SizeOf(type);
             if (index < 0 || (index + length) > buffer.Length) {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("index");
             }
             unsafe
             {
@@ -286,23 +300,29 @@ namespace ThunderEgg.BrownSugar {
             where T : class //
         {
             if (buffer == null || obj == null) {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("buffer or obj");
             }
             var type = typeof(T);
             int length = Marshal.SizeOf(type);
             if (index < 0 || (index + length) > buffer.Length) {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("index");
             }
             unsafe
             {
-                // TODO 
-                fixed (byte* fix = (byte[])buffer.Clone())
-                {
-                    var p = fix + index;
-                    if (is_little ^ BitConverter.IsLittleEndian) {
+                if (is_little ^ BitConverter.IsLittleEndian) {
+                    fixed (byte* fix = (byte[])buffer.Clone())
+                    {
+                        var p = fix + index;
                         Swap(p, type);
+                        Marshal.PtrToStructure(new IntPtr(p), obj);
                     }
-                    Marshal.PtrToStructure(new IntPtr(p), obj);
+                }
+                else {
+                    fixed (byte* fix = buffer)
+                    {
+                        var p = fix + index;
+                        Marshal.PtrToStructure(new IntPtr(p), obj);
+                    }
                 }
             }
             return length;
@@ -314,22 +334,28 @@ namespace ThunderEgg.BrownSugar {
         public static T MarshalTo<T>(byte[] buffer, int index, bool is_little = true) {
             var type = typeof(T);
             if (buffer == null) {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("buffer");
             }
             int length = Marshal.SizeOf(type);
             if (index < 0 || (index + length) > buffer.Length) {
-                throw new IndexOutOfRangeException();
+                throw new IndexOutOfRangeException("index");
             }
             unsafe
             {
-                // TODO
-                fixed (byte* fix = (byte[])buffer.Clone())
-                {
-                    var p = fix + index;
-                    if (is_little ^ BitConverter.IsLittleEndian) {
+                if (is_little ^ BitConverter.IsLittleEndian) {
+                    fixed (byte* fix = (byte[])buffer.Clone())
+                    {
+                        var p = fix + index;
                         Swap(p, type);
+                        return (T)Marshal.PtrToStructure(new IntPtr(p), type);
                     }
-                    return (T)Marshal.PtrToStructure(new IntPtr(p), type);
+                }
+                else { 
+                    fixed (byte* fix = buffer)
+                    {
+                        var p = fix + index;
+                        return (T)Marshal.PtrToStructure(new IntPtr(p), type);
+                    }
                 }
             }
         }
@@ -465,5 +491,6 @@ namespace ThunderEgg.BrownSugar {
                 unchecked((ulong)value & 0x000000000000ff00UL) << 40 |
                 unchecked((ulong)value) << 56)) : value;
         }
+
     }
 }
