@@ -21,12 +21,12 @@ namespace ThunderEgg.BrownSugar.Extentions {
             return Marshal.SizeOf(self);
         }
 
-        /// <summary>マーシャルアトリビュートのサイズを返す</summary>
+        /// <summary>マーシャルアトリビュートのサイズカウントを返す</summary>
         public static int MarshalCount(this Type type, string name) {
             return ByteOrder.MarshalCount(type, name);
         }
 
-        /// <summary>マーシャルアトリビュートのサイズを返す</summary>
+        /// <summary>マーシャルアトリビュートのサイズカウントを返す</summary>
         public static int MarshalCount<T>(this T self, string name) {
             return ByteOrder.MarshalCount(self, name);
         }
