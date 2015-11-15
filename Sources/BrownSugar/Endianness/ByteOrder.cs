@@ -180,7 +180,7 @@ namespace ThunderEgg.BrownSugar {
                 if (ty.IsArray) {
                     var elem_type = ty.GetElementType();
                     var elem_size = Marshal.SizeOf(elem_type);
-                    // バイト配列なら何もしない
+                    // 1バイト配列なら何もしない
                     if (elem_size <= 1) {
                         continue;
                     }
@@ -232,9 +232,20 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>マーシャルアトリビュートのサイズカウントを返す</summary>
         public static int MarshalCount(Type type, string name) {
             var field = type.GetField(name);
-            var attribs = field.GetCustomAttributes(typeof(MarshalAsAttribute), false);
-            var attrib = (MarshalAsAttribute)attribs[0];
-            return attrib.SizeConst;
+            var field_type = field.FieldType;
+            if (field_type == typeof(string)) {
+                // 文字列
+                var attribs = field.GetCustomAttributes(typeof(MarshalAsAttribute), false);
+                var attrib = (MarshalAsAttribute)attribs[0];
+                return attrib.SizeConst;
+            }
+            else if (field_type.IsArray) {
+                // 配列
+                var attribs = field.GetCustomAttributes(typeof(MarshalAsAttribute), false);
+                var attrib = (MarshalAsAttribute)attribs[0];
+                return attrib.SizeConst;
+            }
+            return 0;
         }
 
         /// <summary>マーシャルアトリビュートのサイズカウントを返す</summary>
@@ -274,7 +285,7 @@ namespace ThunderEgg.BrownSugar {
         /// <exception cref="ArgumentNullException"></exception>
         public static byte[] MarshalGetBytes<T>(T obj, bool is_little = true) {
             if (obj == null) {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("obj");
             }
             var type = typeof(T);
             int length = Marshal.SizeOf(typeof(T));
