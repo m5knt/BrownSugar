@@ -193,23 +193,30 @@ namespace ThunderEgg.BrownSugar {
                     continue;
                 }
 
+                // 列挙型は基礎型にする
+                if (ty.IsEnum) {
+                    ty = Enum.GetUnderlyingType(ty);
+                }
+
                 // 1バイトなら何もしない
                 var size = Marshal.SizeOf(ty);
                 if (size <= 1) {
                     continue;
                 }
 
-                // ネストしているか確認
-                var nest_fields = ty.GetFields();
-                bool has_nest = false;
-                for (var j = nest_fields.Length; --j >= 0 && !has_nest;) {
-                    has_nest = !nest_fields[j].IsStatic;
+                if (!ty.IsEnum) {
+                    // ネストしているか確認
+                    var nest_fields = ty.GetFields();
+                    bool is_nest = false;
+                    for (var j = nest_fields.Length; --j >= 0 && !is_nest;) {
+                        is_nest = !nest_fields[j].IsStatic;
+                    }
+                    // ネストなら再帰
+                    if (is_nest) {
+                        Swap(buffer + offset, ty);
+                        continue;
+                    }
                 }
-                if (has_nest) {
-                    Swap(buffer + offset, ty);
-                    continue;
-                }
-
                 // 反転
                 Swap(buffer + offset, size);
             }

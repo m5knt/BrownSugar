@@ -4,6 +4,16 @@ using System.Runtime.InteropServices;
 namespace Test {
 
     public class Values {
+
+        protected enum EnumU8 : byte { Value = 0x88 }
+        protected enum EnumU16 : ushort { Value = 0x8899 }
+        protected enum EnumU32 : uint { Value = 0x8899aabb }
+        protected enum EnumU64 : ulong { Value = 0x8899aabbccddeeff }
+        protected enum EnumS8 : sbyte { Value = unchecked((sbyte)0x88) }
+        protected enum EnumS16 : short { Value = unchecked((short)0x8899) }
+        protected enum EnumS32 : int { Value = unchecked((int)0x8899aabb) }
+        protected enum EnumS64 : long { Value = unchecked((long)0x8899aabbccddeeff) }
+
         // 10 8 8 1
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
         protected class AnsiType {
