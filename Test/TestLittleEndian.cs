@@ -8,10 +8,10 @@ namespace Test {
 
     using Order = LittleEndianAny;
 
-    public partial class ByteEndian {
+    public partial class Endianness {
 
         [TestMethod]
-        public unsafe void TestLittleEndian() {
+        public unsafe void LittleEndian_() {
 
             // 読み込みの確認
             for (var i = 0; i < 8; ++i) {

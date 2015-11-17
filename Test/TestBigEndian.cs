@@ -6,13 +6,156 @@ using ThunderEgg.BrownSugar;
 using ThunderEgg.BrownSugar.Extentions;
 
 namespace Test {
-
+    using System.Reflection;
     using Order = BigEndianAny;
 
-    public partial class ByteEndian {
+    interface IEndianess {
+         unsafe byte ToUInt8(byte* b);
+#if false
+        unsafe sbyte ToInt8(byte* b);
+        unsafe bool ToBool(byte* b);
+        unsafe UInt16 ToUnt16(byte* b);
+        unsafe Int16 ToInt16(byte* b);
+        unsafe char ToChar(byte* b);
+
+        unsafe UInt32 ToUnt32(byte* b);
+        unsafe Int32 ToInt32(byte* b);
+        unsafe float ToSingle(byte* b);
+
+        unsafe UInt64 ToUnt64(byte* b);
+        unsafe Int64 ToInt64(byte* b);
+        unsafe double ToDouble(byte* b);
+
+        unsafe byte ToUInt8(byte[] b, int i);
+        unsafe sbyte ToInt8(byte[] b, int i);
+        unsafe bool ToBool(byte[] b, int i);
+
+        unsafe UInt16 ToUnt16(byte[] b, int i);
+        unsafe Int16 ToInt16(byte[] b, int i);
+        unsafe char ToChar(byte[] b, int i);
+
+        unsafe UInt32 ToUnt32(byte[] b, int i);
+        unsafe Int32 ToInt32(byte[] b, int i);
+        unsafe float ToSingle(byte[] b, int i);
+
+        unsafe UInt64 ToUnt64(byte[] b, int i);
+        unsafe Int64 ToInt64(byte[] b, int i);
+        unsafe double ToDouble(byte[] b, int i);
+#endif
+    }
+
+
+    public class EndiannessReflection {
+        Type Type;
+
+        public EndiannessReflection(Type type) {
+            Type = type;
+        }
+
+        public unsafe T To<T>(string name, byte[] b, int i) //
+            where T : struct //
+        {
+            // Type type = Type.GetType(inputString);
+            // object o = Activator.CreateInstance(type);
+            var ty = Type.GetType("System." + name);
+            var n = Type.GetMethod("To" + name, new Type[] { b.GetType(), i.GetType() });
+            var ret = n.Invoke(null, new object[] { b, i });
+            //return Convert.ChangeType(ret, ty);
+            return (T)ret;
+        }
+
+        public unsafe UInt16 ToUInt16(byte[] b, int i) {
+            return To<UInt16>("UInt16", b, i);
+        }
+
+        public unsafe UInt32 ToUInt32(byte[] b, int i) {
+            return To<UInt32>("UInt32", b, i);
+        }
+
+        public unsafe UInt64 ToUInt64(byte[] b, int i) {
+            return To<UInt64>("UInt64", b, i);
+        }
+
+        public unsafe Int16 ToInt16(byte[] b, int i) {
+            return To<Int16>("Int16", b, i);
+        }
+
+        public unsafe Int32 ToInt32(byte[] b, int i) {
+            return To<Int32>("Int32", b, i);
+        }
+
+        public unsafe Int64 ToInt64(byte[] b, int i) {
+            return To<Int64>("Int64", b, i);
+        }
+
+        public unsafe char ToChar(byte[] b, int i) {
+            return To<char>("Char", b, i);
+        }
+
+        public unsafe bool ToBool(byte[] b, int i) {
+            return To<bool>("Bool", b, i);
+        }
+
+        public unsafe Single ToSingle(byte[] b, int i) {
+            return To<Single>("Single", b, i);
+        }
+
+        public unsafe Double ToDouble(byte[] b, int i) {
+            return To<Double>("Double", b, i);
+        }
+    }
+
+    public partial class Endianness : Values {
+
+        byte[] MakeLittle(int pad, byte[] buffer, int take) {
+            var tmp = Enumerable.Range(0, pad).Select(x => x.CastUInt8()).ToList();
+            tmp.AddRange(buffer.Take(take).Reverse());
+            return tmp.ToArray();
+        }
+
+        byte[] MakeBig(int pad, byte[] buffer, int take) {
+            var tmp = Enumerable.Range(0, pad).Select(x => x.CastUInt8()).ToList();
+            tmp.AddRange(buffer.Take(take));
+            return tmp.ToArray();
+        }
+
+        public unsafe void Endian(Type type, Func<int, byte[], int, byte[]> fn) {
+            for (var i = 0; i < 8; ++i) {
+                var e = new EndiannessReflection(type);
+                byte[] t;
+                t = fn(i, values, 2);
+                Assert.AreEqual(u16, e.ToUInt16(t, i));
+                t = fn(i, values, 4);
+                Assert.AreEqual(u32, e.ToUInt32(t, i));
+                t = fn(i, values, 8);
+                Assert.AreEqual(u64, e.ToUInt64(t, i));
+                t = fn(i, values, 2);
+                Assert.AreEqual(s16, e.ToInt16(t, i));
+                t = fn(i, values, 4);
+                Assert.AreEqual(s32, e.ToInt32(t, i));
+                t = fn(i, values, 8);
+                Assert.AreEqual(s64, e.ToInt64(t, i));
+                t = fn(i, chars, 2);
+                Assert.AreEqual(c16, e.ToChar(t, i));
+
+                t = BitConverter.GetBytes(1.1f).Reverse().ToArray();
+                Assert.AreEqual(f32, e.ToSingle(fn(i, t, 4), i));
+                t = BitConverter.GetBytes(1.2).Reverse().ToArray();
+                Assert.AreEqual(f64, e.ToDouble(fn(i, t, 8), i));
+            }
+        }
 
         [TestMethod]
-        public unsafe void TestBigEndian() {
+        public unsafe void Endianness_() {
+            Endian(typeof(BigEndianAny), MakeBig);
+            Endian(typeof(LittleEndianAny), MakeLittle);
+            if (BitConverter.IsLittleEndian) {
+                Endian(typeof(HostOrderAligned), MakeLittle);
+            }
+        }
+
+        [TestMethod]
+        public unsafe void BigEndianAny_() {
 
             // 読み込みの確認
             for (var i = 0; i < 8; ++i) {
@@ -24,13 +167,13 @@ namespace Test {
                 fixed (byte* p = src)
                 {
                     Assert.AreEqual<byte>(Order.ToUInt8(p + i + 14), (byte)0x88);
-                    Assert.AreEqual<ushort>(Order.ToUInt16(p + i + 12), (ushort)0x9988);
-                    Assert.AreEqual<uint>(Order.ToUInt32(p + i + 8), (uint)0xbbaa9988);
-                    Assert.AreEqual<ulong>(Order.ToUInt64(p + i + 0), (ulong)0xffeeddccbbaa9988);
+                    Assert.AreEqual<UInt16>(Order.ToUInt16(p + i + 12), (UInt16)0x9988);
+                    Assert.AreEqual<UInt32>(Order.ToUInt32(p + i + 8), (UInt32)0xbbaa9988);
+                    Assert.AreEqual<UInt64>(Order.ToUInt64(p + i + 0), (UInt64)0xffeeddccbbaa9988);
                     Assert.AreEqual<sbyte>(Order.ToInt8(p + i + 14), unchecked((sbyte)0x88));
-                    Assert.AreEqual<int>(Order.ToInt32(p + i + 8), unchecked((int)0xbbaa9988));
-                    Assert.AreEqual<short>(Order.ToInt16(p + i + 12), unchecked((short)0x9988));
-                    Assert.AreEqual<long>(Order.ToInt64(p + i + 0), unchecked((long)0xffeeddccbbaa9988));
+                    Assert.AreEqual<Int16>(Order.ToInt16(p + i + 12), unchecked((Int16)0x9988));
+                    Assert.AreEqual<Int32>(Order.ToInt32(p + i + 8), unchecked((Int32)0xbbaa9988));
+                    Assert.AreEqual<Int64>(Order.ToInt64(p + i + 0), unchecked((Int64)0xffeeddccbbaa9988));
                     Assert.AreEqual<bool>(Order.ToBoolean(p + i + 15), false);
                     Assert.AreEqual<char>(Order.ToChar(p + i + 16), '@');
                     Order.Assign(p + i + 20, 1.1f);

@@ -10,7 +10,7 @@ namespace Test {
     using Order = HostOrderAligned;
 
     [TestClass]
-    public partial class ByteEndian {
+    public partial class Endianness {
 
         UInt64 UInt64 = (UInt64)0xffeeddccbbaa9988;
         UInt32 UInt32 = (UInt32)0xbbaa9988;
@@ -48,7 +48,7 @@ namespace Test {
             };
 
         [TestMethod]
-        public unsafe void TestHostOrder() {
+        public unsafe void HostOrder_() {
 
             // 読み込みの確認
             for (var i = 0; i < 8; ++i) {

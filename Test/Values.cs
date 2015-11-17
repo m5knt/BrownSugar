@@ -36,6 +36,8 @@ namespace Test {
             public char c16 = '@';
         }
 
+        protected static byte[] values = { 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
+        protected static byte[] chars = { 0x00, 0x40 };
         protected static sbyte s8 = unchecked((sbyte)0x88);
         protected static Int16 s16 = unchecked((Int16)0x8899);
         protected static Int32 s32 = unchecked((Int32)0x8899aabb);
@@ -54,5 +56,8 @@ namespace Test {
         protected static UInt32 u32r = (UInt32)0xbbaa9988;
         protected static UInt64 u64r = (UInt64)0xffeeddccbbaa9988;
         protected static char c16r = '\x4000';
+        //
+        protected static float f32 = 1.1f;
+        protected static double f64 = 1.2;
     }
 }
