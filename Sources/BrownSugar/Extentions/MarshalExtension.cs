@@ -53,6 +53,11 @@ namespace ThunderEgg.BrownSugar.Extentions {
             return Marshal.SizeOf(self);
         }
 
+        /// <summary>自動プロパティーのフィールド名を得る</summary>
+        public static string ToBackingField(this string self) {
+            return string.Format("<{0}>k__BackingField", self);
+        }
+
         /// <summary>マーシャルアトリビュートのサイズカウントを返す</summary>
         public static int MarshalCount(this Type type, string name) {
             return MarshalEgg.Count(type, name);
@@ -72,7 +77,6 @@ namespace ThunderEgg.BrownSugar.Extentions {
         public static int MarshalOffset<T>(this T self, string name) {
             return Marshal.OffsetOf(typeof(T), name).ToInt32();
         }
-
     }
 }
 
