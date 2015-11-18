@@ -4,6 +4,7 @@
  */
 
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 /*
@@ -109,6 +110,13 @@ namespace ThunderEgg.BrownSugar {
             }
         }
 
+        /// <summary>
+        /// バッファのバイトオーダーを反転させます
+        /// CharSet.Autoはサポートしていません
+        /// </summary>
+        public static void Swap<T>(byte[] buffer, int index, T obj) {
+            Swap(buffer, index, typeof(T));
+        }
 
         /// <summary>
         /// バッファのバイトオーダーを反転させます
@@ -143,7 +151,7 @@ namespace ThunderEgg.BrownSugar {
                 throw new InvalidOperationException("not support Charset.Auto");
             }
             var is_unicode = (cs == CharSet.Unicode);
-            var fields = type.GetFields();
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             for (var i = 0; i < fields.Length; ++i) {
                 var f = fields[i];
                 if (f.IsStatic) {
