@@ -82,6 +82,7 @@ namespace Test {
             }
         }
 
+
         [TestMethod]
         public void MarshalExtension() {
             // size
@@ -105,7 +106,51 @@ namespace Test {
             Assert.AreEqual(2, typeof(AnsiType).MarshalCount("array"));
         }
 
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        abstract class MarshalBase {
+            public byte bvalue0;
+            public abstract byte property0 { get; set; }
+            public byte bvalue1;
+            public abstract byte property1 { get; set; }
+            public MarshalBase() {
+                bvalue0 = 0x11;
+                bvalue1 = 0x22;
+            }
+        }
 
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+        class MarshalDerived : MarshalBase {
+            public byte dvalue0;
+            public override byte property0 { get; set; }
+            public byte dvalue1;
+            public override byte property1 { get; set; }
+            public MarshalDerived() {
+                dvalue0 = 0x33;
+                property0 = 0x44;
+                dvalue1 = 0x55;
+                property1 = 0x66;
+            }
+        }
+
+        [TestMethod]
+        public void MarshalInherit() {
+            var d = new MarshalDerived();
+            var b = (MarshalBase)d;
+            Assert.AreEqual(0, b.MarshalOffset("bvalue0"));
+            Assert.AreEqual(1, b.MarshalOffset("bvalue1"));
+            Assert.AreEqual(2, d.MarshalOffset("dvalue0"));
+            Assert.AreEqual(3, d.MarshalOffset("property0".ToBackingField()));
+            Assert.AreEqual(4, d.MarshalOffset("dvalue1"));
+            Assert.AreEqual(5, d.MarshalOffset("property1".ToBackingField()));
+            var bytes = ByteOrder.MarshalGetBytes(d);
+            ByteOrder.Swap(bytes, 0, typeof(MarshalDerived));
+            Assert.AreEqual(bytes[0], 0x11);
+            Assert.AreEqual(bytes[1], 0x22);
+            Assert.AreEqual(bytes[2], 0x33);
+            Assert.AreEqual(bytes[3], 0x44);
+            Assert.AreEqual(bytes[4], 0x55);
+            Assert.AreEqual(bytes[5], 0x66);
+        }
     }
 }
 

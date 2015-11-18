@@ -38,6 +38,7 @@ namespace Test {
 
         protected static byte[] values = { 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff };
         protected static byte[] chars = { 0x00, 0x40 };
+        protected static byte[] bools = { 0x00, 0x01 };
         protected static sbyte s8 = unchecked((sbyte)0x88);
         protected static Int16 s16 = unchecked((Int16)0x8899);
         protected static Int32 s32 = unchecked((Int32)0x8899aabb);

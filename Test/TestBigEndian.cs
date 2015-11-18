@@ -92,10 +92,6 @@ namespace Test {
             return To<char>("Char", b, i);
         }
 
-        public unsafe bool ToBool(byte[] b, int i) {
-            return To<bool>("Bool", b, i);
-        }
-
         public unsafe Single ToSingle(byte[] b, int i) {
             return To<Single>("Single", b, i);
         }
