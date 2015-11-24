@@ -61,6 +61,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ObjectPool.cs" />
     <Compile Include="Values.cs" />
     <Compile Include="Bench.cs" />
     <Compile Include="Marshal.cs" />

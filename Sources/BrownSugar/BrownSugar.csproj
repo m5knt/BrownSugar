@@ -59,6 +59,7 @@
     <OutputPath>bin\ReleaseLE\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Cache\MemoryCache.cs" />
     <Compile Include="Endianness\HostOrderAligned.cs" />
     <Compile Include="Endianness\NoOrder.cs" />
     <Compile Include="Endianness\BigEndianAny.cs" />
@@ -73,6 +74,7 @@
     <Compile Include="Extentions\MathExtension.cs" />
     <Compile Include="BrownSugar.cs" />
     <Compile Include="Endianness\ByteOrder.cs" />
+    <Compile Include="ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
