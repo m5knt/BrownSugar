@@ -19,25 +19,25 @@ namespace ThunderEgg.BrownSugar.Extentions {
 
         /// <summary>書式から文字列を生成する</summary>
         /// <seealso cref="string.Format(string, object[])"/>
-        public static string Format(this string format, params object[] args) {
+        public static string format(this string format, params object[] args) {
             return string.Format(format, args);
         }
 
         /// <summary>書式から文字列を生成する</summary>
         /// <seealso cref="string.Format(string, object)"/>
-        public static string Format(this string format, object arg0) {
+        public static string format(this string format, object arg0) {
             return string.Format(format, arg0);
         }
 
         /// <summary>書式から文字列を生成する</summary>
         /// <seealso cref="string.Format(string, object, object)"/>
-        public static string Format(this string format, object arg0, object arg1) {
+        public static string format(this string format, object arg0, object arg1) {
             return string.Format(format, arg0, arg1);
         }
 
         /// <summary>書式から文字列を生成する</summary>
         /// <seealso cref="string.Format(string, object, object, object)"/>
-        public static string Format(this string format, object arg0, object arg1, object arg2) {
+        public static string format(this string format, object arg0, object arg1, object arg2) {
             return string.Format(format, arg0, arg1, arg2);
         }
 
