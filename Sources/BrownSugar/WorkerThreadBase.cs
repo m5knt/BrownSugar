@@ -28,24 +28,28 @@ namespace ThunderEgg.BrownSugar {
     /// <summary>ワーカースレッド実装用の基底</summary>
     public abstract class WorkerThreadBase : IDisposable {
 
-        #region WorkerThread
-        // ワーカースレッドが参照変更するもの
+        #region WorkerThread // ワーカースレッドが参照変更するもの
+
         /// <summary>サービス状態</summary>
         public WorkerThreadState State {
             get { return State_; }
             private set { State_ = value; }
         }
+
         /// <summary>サービス状態</summary>
-        private volatile WorkerThreadState State_ = WorkerThreadState.Idle;
+        volatile WorkerThreadState State_ = WorkerThreadState.Idle;
 
         /// <summary>ディスポーズされているか</summary>
         public volatile bool IsDisposed = false;
+
         /// <summary>ワーカー処理開始通知用</summary>
         AutoResetEvent RunEvent = new AutoResetEvent(false);
+
         #endregion
 
         /// <summary>ワーカー処理終了通知用</summary>
         protected AutoResetEvent IdleEvent = new AutoResetEvent(false);
+
         /// <summary>ワーカーのスレッド</summary>
         Thread Thread;
 
