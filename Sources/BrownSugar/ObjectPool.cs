@@ -20,6 +20,29 @@ namespace ThunderEgg.BrownSugar {
         public WeakReference Weak;
     }
 
+    public delegate IObjectHolder ObjectHolderCreater();
+
+    /// <summary>オブジェクトプールのオブジェクトを保持するインターフェース</summary>
+    public interface IObjectHolder : IDisposable {
+        /// <summary>ディスポーズ済みかを返す</summary>
+        bool IsFakeDisposed { get; }
+        /// <summary>本当のディスポーズ</summary>
+        void RealDispose();
+
+        /// <summary>オブジェクト管理元</summary>
+        IObjectPool Pool { get; set; }
+        /// <summary>オブジェクト管理情報</summary>
+        ObjectPoolStat Stat { get; set; }
+        /// <summary>再利用</summary>
+        void Reuse();
+    }
+
+    /// <summary>オブジェクトプールのオブジェクトを保持するインターフェース</summary>
+    public interface IObjectHolder<TValue> : IObjectHolder {
+        /// <summary>オブジェクトの値</summary>
+        TValue Value { get; }
+    }
+
     /// <summary>オブジェクトプールのインターフェース</summary>
     public interface IObjectPool : IDisposable {
         /// <summary>オブジェクトを確保します</summary>
@@ -27,33 +50,26 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>プールへ戻す</summary>
         /// <returns>成否を返す</returns>
         bool Free(IObjectHolder holder);
+        /// <summary>プールしているオブジェクト数</summary>
+        int Count { get; }
     }
 
-    /// <summary>オブジェクトプールのオブジェクトを保持するインターフェース</summary>
-    public interface IObjectHolder : IDisposable {
-        /// <summary>ディスポーズ済みかを返す</summary>
-        bool IsDisposed { get; }
-        /// <summary>本当のディスポーズ</summary>
-        void RealDispose();
-        /// <summary>オブジェクト管理情報</summary>
-        ObjectPoolStat Stat {get;set;}
-    }
-
+    //
+    //
+    //    
+    
     /// <summary>オブジェクトプール用のオブジェクトを保持</summary>
-    public class ObjectHolder<TValue> : IObjectHolder //
+    public class ObjectHolder<TValue> : IObjectHolder<TValue> //
         where TValue : class //
     {
         /// <summary>保持するオブジェクト</summary>
         public TValue Value { get; protected set; }
 
         /// <summary>ディスポーズされているか</summary>
-        public bool IsDisposed {
-            get { return Value != null; }
-            set { Value = null; }
-        }
+        public bool IsFakeDisposed { get; protected set; }
 
         /// <summary>管理元プール</summary>
-        IObjectPool Pool;
+        public IObjectPool Pool { get; set; }
 
         /// <summary>管理キー</summary>
         public ObjectPoolStat Stat { get; set; }
@@ -63,23 +79,27 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>コンストラクタ</summary>
-        public ObjectHolder(IObjectPool pool, ObjectPoolStat stat, TValue val) {
-            Pool = pool;
-            Stat = stat;
-            Value = null;
+        public ObjectHolder(TValue val) {
+            IsFakeDisposed = true;
+            Value = val;
+        }
+
+        /// <summary>再利用</summary>
+        public void Reuse() {
+            IsFakeDisposed = false;
         }
 
         /// <summary>ディスポーズ</summary>
 		public void Dispose() {
-            if (IsDisposed) {
+            if (IsFakeDisposed) {
                 return;
             }
-            IsDisposed = true;
+            IsFakeDisposed = true;
             // プールがあるなら返す
             if (Pool.Free(this)) {
                 return;
             }
-            // プールがディスポーズされているならディスポーズ
+            // 実際にディスポーズ
             RealDispose();
             GC.SuppressFinalize(this);
         }
@@ -103,6 +123,17 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ディスポーズ済みかを返す</summary>
         public bool IsDisposed {
             get { return IsDisposed_; }
+            private set { IsDisposed_ = value; }
+        }
+
+        /// <summary>プールしているオブジェクト数</summary>
+        public int Count { 
+            get { 
+                lock (this) {
+                    CheckDisposed();
+                    return Pooled.Count;
+                }
+            }
         }
 
         /// <summary>ディスポーズ済みかを返す</summary>
@@ -110,34 +141,38 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>プール中</summary>
         LinkedList<ObjectPoolStat> Pooled;
-        object PooledLock = new object();
+
         /// <summary>貸出中</summary>
         LinkedList<ObjectPoolStat> Leased;
 
         /// <summary>オブジェクト生成器</summary>
-        Func<IObjectPool, IObjectHolder> Creater;
+        ObjectHolderCreater Creater;
         /// <summary>保持量</summary>
         int Limit;
 
         /// <summary>コンストラクタ</summary>
-        public ObjectPool(Func<IObjectPool, IObjectHolder> creater,
-            int limit) //
-        {
+        public ObjectPool(ObjectHolderCreater creater, int limit) {
+            IsDisposed = false;
             Pooled = new LinkedList<ObjectPoolStat>();
             Leased = new LinkedList<ObjectPoolStat>();
             Limit = limit;
             Creater = creater;
         }
 
+        void CheckDisposed() {
+            // ディスポーズ済みなら例外
+            if (IsDisposed) {
+                throw new ObjectDisposedException("disposed");
+            }
+        }
+
         /// <summary>プールからオブジェクトを確保する</summary>
-        public IObjectHolder Allocate() {
+        public IObjectHolder Allocate() //
+        {
             LinkedListNode<ObjectPoolStat> node = null;
             // プールから取得を試みる
             lock(this) {
-                // ディスポーズ済みなら例外
-                if (IsDisposed) {
-                    throw new ObjectDisposedException("disposed");
-                }
+                CheckDisposed();
                 if (Pooled.Count != 0) {
                     node = Pooled.First;
                     Pooled.RemoveFirst();
@@ -148,9 +183,12 @@ namespace ThunderEgg.BrownSugar {
                 return DoLeased(node);
             }
             // 新規に作成して貸出
-            var holder = Creater(this);
-            var weak = new WeakReference(holder);
-            var stat = new ObjectPoolStat() { Holder = holder, Weak = weak};
+            var holder = Creater();
+            var stat = new ObjectPoolStat();
+            holder.Pool = this;
+            holder.Stat = stat;
+            stat.Holder = holder;
+            stat.Weak = new WeakReference(stat.Holder);
             node = new LinkedListNode<ObjectPoolStat>(stat);
             return DoLeased(node);
         }
@@ -158,8 +196,9 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>貸出状態にする</summary>
         IObjectHolder DoLeased(LinkedListNode<ObjectPoolStat> node) {
             // 未返却対応で弱監視にする
-            var holder = node.Value.Holder;
+            var holder = (IObjectHolder)node.Value.Holder;
             node.Value.Holder = null;
+            holder.Reuse();
             // 貸出表へ登録
             lock (this) {
                 if (!IsDisposed) {
@@ -177,7 +216,7 @@ namespace ThunderEgg.BrownSugar {
                 // 貸出表から消す
                 Leased.Remove(holder.Stat);
                 // 十分な数があればプールに入れない
-                if (Pooled.Count > Limit) return false;
+                if (Pooled.Count >= Limit) return false;
                 Pooled.AddLast(holder.Stat);
                 return true;
             }
@@ -202,6 +241,23 @@ namespace ThunderEgg.BrownSugar {
             leased.Clear();
             Creater = null;
             GC.SuppressFinalize(this);
+        }
+    }
+
+
+    /// <summary>明示されたオブジェクトを管理するオブジェクトプール</summary>
+    public class ObjectPool<THolder> : ObjectPool //
+        where THolder : IObjectHolder //
+    {
+        /// <summary>コンストラクタ</summary>
+        public ObjectPool(ObjectHolderCreater creater, int limit) //
+            : base(creater, limit) //
+        {
+        }
+
+        /// <summary>プールからオブジェクトを確保する</summary>
+        public new THolder Allocate() {
+            return (THolder)base.Allocate();
         }
     }
 }
