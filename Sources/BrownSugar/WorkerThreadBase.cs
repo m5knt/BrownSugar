@@ -115,7 +115,7 @@ namespace ThunderEgg.BrownSugar {
             }
         }
 
-        /// <summary>処理を開始させます (idle から run にする)</summary>
+        /// <summary>処理を開始させます (idle から run になる)</summary>
         /// <param name="passed">開始時実行アクション</param>
         /// <exception cref="InvalidOperationException">not idle</exception>
         protected void TryRun(Action passed = null) {
@@ -127,7 +127,7 @@ namespace ThunderEgg.BrownSugar {
             RunEvent.Set();
         }
 
-        /// <summary>スレッドの処理を待ちます (終了時は run から idle にする)</summary>
+        /// <summary>スレッドの処理を待ちます (終了時は run から idle になる)</summary>
         public bool Wait(int n) {
             Check();
             return IdleEvent.WaitOne(n);
