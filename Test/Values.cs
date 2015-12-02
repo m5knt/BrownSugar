@@ -21,7 +21,7 @@ namespace Test {
             public string str = "012345678";
             const int array_size = 2;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = array_size)]
-            public double[] array = new double[array_size] { 1.1, 1.2 };
+            public double[] array = new double[array_size] { 1.1, 1.2 }; 
             public char c16 = '@';
         }
 
