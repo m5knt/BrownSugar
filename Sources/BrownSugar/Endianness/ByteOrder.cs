@@ -5,6 +5,7 @@
 
 using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 /*
@@ -105,7 +106,7 @@ namespace ThunderEgg.BrownSugar {
             {
                 fixed (byte* fix = buffer)
                 {
-                    Swap(fix, length);
+                    Swap(fix + index, length);
                 }
             }
         }
@@ -152,17 +153,19 @@ namespace ThunderEgg.BrownSugar {
             }
             var is_unicode = (cs == CharSet.Unicode);
             var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            var size = 0;
             for (var i = 0; i < fields.Length; ++i) {
                 var f = fields[i];
-                if (f.IsStatic) {
-                    continue;
-                }
                 var ty = f.FieldType;
                 var offset = Marshal.OffsetOf(type, f.Name).ToInt32();
 
+                // 列挙型は基本型にする
+                if (ty.IsEnum) {
+                    ty = Enum.GetUnderlyingType(ty);
+                }
+
                 // 文字列用処理
                 if (ty == typeof(string)) {
-                    // utf16処理
                     if (is_unicode) {
                         var attribs = f.GetCustomAttributes(typeof(MarshalAsAttribute), false);
                         var attrib = (MarshalAsAttribute)attribs[0];
@@ -178,9 +181,22 @@ namespace ThunderEgg.BrownSugar {
 
                 // 文字処理
                 if (ty == typeof(char)) {
-                    var t = buffer[offset];
-                    buffer[offset] = buffer[offset + 1];
-                    buffer[offset + 1] = t;
+                    if (is_unicode) {
+                        var t = buffer[offset];
+                        buffer[offset] = buffer[offset + 1];
+                        buffer[offset + 1] = t;
+                    }
+                    continue;
+                }
+
+                // 基本型の処理
+                if (ty.IsPrimitive) {
+                    // 1バイトなら何もしない
+                    size = Marshal.SizeOf(ty);
+                    if (size <= 1) {
+                        continue;
+                    }
+                    Swap(buffer + offset, size);
                     continue;
                 }
 
@@ -201,32 +217,27 @@ namespace ThunderEgg.BrownSugar {
                     continue;
                 }
 
-                // 列挙型は基礎型にする
-                if (ty.IsEnum) {
-                    ty = Enum.GetUnderlyingType(ty);
-                }
-
-                // 1バイトなら何もしない
-                var size = Marshal.SizeOf(ty);
-                if (size <= 1) {
-                    continue;
-                }
-
-                if (!ty.IsEnum) {
-                    // ネストしているか確認
-                    var nest_fields = ty.GetFields();
-                    bool is_nest = false;
-                    for (var j = nest_fields.Length; --j >= 0 && !is_nest;) {
-                        is_nest = !nest_fields[j].IsStatic;
-                    }
-                    // ネストなら再帰
-                    if (is_nest) {
-                        Swap(buffer + offset, ty);
+                // 固定配列用処理
+                {
+                    var attribs = f.GetCustomAttributes(typeof(FixedBufferAttribute), false);
+                    if (attribs.Length > 0) {
+                        var attrib = (FixedBufferAttribute)attribs[0];
+                        var elem_type = attrib.ElementType;
+                        // 1バイト配列なら何もしない
+                        size = Marshal.SizeOf(elem_type);
+                        if (size <= 1) {
+                            continue;
+                        }
+                        for (var j = attrib.Length; --j >= 0;) {
+                            Swap(buffer + offset, elem_type);
+                            offset += size;
+                        }
                         continue;
                     }
                 }
-                // 反転
-                Swap(buffer + offset, size);
+
+                throw new InvalidOperationException("unknown type " + ty);
+                //Swap(buffer + offset, ty);
             }
         }
 
