@@ -15,7 +15,7 @@ namespace Test {
             // fixed は struct のみ
             public fixed UInt32 fix[2];
 
-            public void Init() {
+            public Struct(int n) {
                 fixed (Struct* p = &this)
                 {
                     p->fix[0] = u32;
@@ -26,22 +26,15 @@ namespace Test {
 
         [TestMethod]
         public unsafe void SwapStruct() {
-            // マーシャル通して同じ結果になるか
-            Struct src;
-            src.Init();
+            var src = new Struct(0);
             var srcbin = new byte[Marshal.SizeOf(src)];
             ByteOrder.MarshalAssign(srcbin, 0, src);
-            var ext = ByteOrder.MarshalTo<Struct>(srcbin, 0);
-            var extbin = new byte[Marshal.SizeOf(ext)];
-            ByteOrder.MarshalAssign(extbin, 0, ext);
-            Assert.IsTrue(srcbin.SequenceEqual(extbin));
+            var extbin = (byte[])srcbin.Clone();
+            ByteOrder.Swap(extbin, 0, typeof(Struct));
+            var ext = ByteOrder.MarshalTo<Struct>(extbin, 0);
 
-            ByteOrder.Swap(srcbin, 0, typeof(Struct));
-            ext = ByteOrder.MarshalTo<Struct>(srcbin, 0);
-            ByteOrder.MarshalAssign(extbin, 0, ext);
-
-            Assert.AreEqual(src.fix[0], ByteOrder.Swap(ext.fix[0]));
-            Assert.AreEqual(ext.fix[0], u32r);
+            Assert.AreEqual(u32r, ext.fix[0]);
+            Assert.AreEqual(u32, ext.fix[1]);
         }
 
     }

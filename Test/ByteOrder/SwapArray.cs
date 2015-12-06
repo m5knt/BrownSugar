@@ -19,9 +19,9 @@ namespace Test {
             Assert.IsTrue(buf.SequenceEqual(bufr));
             //
             buf = new byte[] { 0x88, 0x99, 0xaa };
-            bufr = new byte[] { 0xee, 0xaa, 0x99 };
+            bufr = new byte[] { 0x88, 0xaa, 0x99 };
             ByteOrder.Swap(buf, 1, 2);
-            Assert.IsTrue(buf.Skip(1).Take(2).SequenceEqual(bufr.Skip(1).Take(2)));
+            Assert.IsTrue(buf.SequenceEqual(bufr));
         }
     }
 }

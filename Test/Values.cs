@@ -5,15 +5,6 @@ namespace Test {
 
     public class Values {
 
-        protected enum EnumU8 : byte { Value = 0x88 }
-        protected enum EnumU16 : ushort { Value = 0x8899 }
-        protected enum EnumU32 : uint { Value = 0x8899aabb }
-        protected enum EnumU64 : ulong { Value = 0x8899aabbccddeeff }
-        protected enum EnumS8 : sbyte { Value = unchecked((sbyte)0x88) }
-        protected enum EnumS16 : short { Value = unchecked((short)0x8899) }
-        protected enum EnumS32 : int { Value = unchecked((int)0x8899aabb) }
-        protected enum EnumS64 : long { Value = unchecked((long)0x8899aabbccddeeff) }
-
         // 10 8 8 1
         [StructLayout(LayoutKind.Sequential, Pack = 1, CharSet = CharSet.Ansi)]
         protected class AnsiType {
@@ -60,5 +51,15 @@ namespace Test {
         //
         protected static float f32 = 1.1f;
         protected static double f64 = 1.2;
+        //
+        protected enum EnumU8 : byte { Value = 0x88, Reverse = 0x88 }
+        protected enum EnumU16 : ushort { Value = 0x8899, Reverse = 0x9988 }
+        protected enum EnumU32 : uint { Value = 0x8899aabb, Reverse = 0xbbaa9988 }
+        protected enum EnumU64 : ulong { Value = 0x8899aabbccddeeff, Reverse = 0xffeeddccbbaa9988 }
+        protected enum EnumS8 : sbyte { Value = unchecked((sbyte)0x88), Reverse = unchecked((sbyte)0x88) }
+        protected enum EnumS16 : short { Value = unchecked((short)0x8899), Reverse = unchecked((short)0x8899) }
+        protected enum EnumS32 : int { Value = unchecked((int)0x8899aabb), Reverse = unchecked((int)0x8899aabb) }
+        protected enum EnumS64 : long { Value = unchecked((long)0x8899aabbccddeeff), Reverse = unchecked((long)0x8899aabbccddeeff) }
+
     }
 }

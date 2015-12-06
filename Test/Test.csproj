@@ -61,7 +61,14 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Swap\SwapNest.cs" />
+    <Compile Include="Swap\SwapString.cs" />
+    <Compile Include="Swap\SwapClass.cs" />
+    <Compile Include="Swap\SwapStruct.cs" />
+    <Compile Include="Swap\SwapPrimitive.cs" />
+    <Compile Include="ByteOrder.cs" />
     <Compile Include="ObjectPool.cs" />
+    <Compile Include="Swap\SwapArray.cs" />
     <Compile Include="WorkerThread.cs" />
     <Compile Include="TestCopyCtor.cs" />
     <Compile Include="TestStringExtension.cs" />
@@ -73,7 +80,6 @@
     <Compile Include="TestBigEndian.cs" />
     <Compile Include="ByteEndian.cs" />
     <Compile Include="PerfEndian.cs" />
-    <Compile Include="ByteOrder.cs" />
     <Compile Include="TestCast.cs" />
     <Compile Include="TestByteSwap.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

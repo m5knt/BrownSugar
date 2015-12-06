@@ -11,7 +11,7 @@ namespace Test {
     public partial class ByteOrderTest : Values {
 
         [TestMethod]
-        public void SwapValue() {
+        public void SwapPrimitive() {
             Assert.AreEqual(s16, ByteOrder.Swap(s16r));
             Assert.AreEqual(s32, ByteOrder.Swap(s32r));
             Assert.AreEqual(s64, ByteOrder.Swap(s64r));
