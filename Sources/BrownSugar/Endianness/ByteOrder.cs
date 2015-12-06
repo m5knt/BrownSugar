@@ -17,6 +17,24 @@ namespace ThunderEgg.BrownSugar {
     /// <summary>バイトオーダー操作関係</summary>
     public static class ByteOrder {
 
+        /// <summary>無駄な呼び出しです</summary>
+        [Obsolete("no effect", true)]
+        public static bool Swap(bool value) {
+            return value;
+        }
+
+        /// <summary>無駄な呼び出しです</summary>
+        [Obsolete("no effect", true)]
+        public static byte Swap(byte value) {
+            return value;
+        }
+
+        /// <summary>無駄な呼び出しです</summary>
+        [Obsolete("no effect", true)]
+        public static sbyte Swap(sbyte value) {
+            return value;
+        }
+
         /// <summary>バイトオーダーを反転させた値を返す</summary>
         public static char Swap(char value) {
             return unchecked((char)( //
@@ -235,9 +253,8 @@ namespace ThunderEgg.BrownSugar {
                         continue;
                     }
                 }
-
-                throw new InvalidOperationException("unknown type " + ty);
-                //Swap(buffer + offset, ty);
+                // その他の型
+                Swap(buffer + offset, ty);
             }
         }
 
