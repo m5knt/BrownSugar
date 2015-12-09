@@ -61,16 +61,15 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Swap\SwapNest.cs" />
-    <Compile Include="Swap\SwapString.cs" />
-    <Compile Include="Swap\SwapClass.cs" />
-    <Compile Include="Swap\SwapStruct.cs" />
-    <Compile Include="Swap\SwapPrimitive.cs" />
-    <Compile Include="ByteOrder.cs" />
+    <Compile Include="Test.cs" />
+    <Compile Include="ByteOrder\SwapArray.cs" />
+    <Compile Include="ByteOrder\SwapClass.cs" />
+    <Compile Include="ByteOrder\SwapNest.cs" />
+    <Compile Include="ByteOrder\SwapPrimitive.cs" />
+    <Compile Include="ByteOrder\SwapString.cs" />
+    <Compile Include="ByteOrder\SwapStruct.cs" />
     <Compile Include="ObjectPool.cs" />
-    <Compile Include="Swap\SwapArray.cs" />
-    <Compile Include="WorkerThread.cs" />
-    <Compile Include="TestCopyCtor.cs" />
+    <Compile Include="WorkerThreadTest.cs" />
     <Compile Include="TestStringExtension.cs" />
     <Compile Include="Values.cs" />
     <Compile Include="Bench.cs" />

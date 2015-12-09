@@ -12,7 +12,6 @@ using System.Threading;
 
 namespace ThunderEgg.BrownSugar {
 
-
     /// <summary>ワーカースレッドの同期用</summary>
     public class WorkerThreadAsyncResult : IAsyncResult {
 
@@ -33,6 +32,28 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ワーカースレッド</summary>
         public WorkerThread WorkerThread;
+
+        /// <summary>ワーカーの処理結果を返します、処理中の場合はブロックします</summary>
+        public object Result {
+            get { Wait(); return Result_; }
+            set { Result_ = value; }
+        }
+
+        /// <summary>ワーカーの処理結果</summary>
+        object Result_;
+
+        /// <summary>終了を指定時間待つ</summary>
+        /// <param name="msec">待ち時間</param>
+        public bool Wait(int msec) {
+            //if (IsCompleted) return true;
+            return AsyncWaitHandle.WaitOne(msec);
+        }
+
+        /// <summary>終了を待つ、実行中の場合はブロックします</summary>
+        public bool Wait() {
+            //if (IsCompleted) return true;
+            return AsyncWaitHandle.WaitOne();
+        }
     }
 
     /// <summary>ワーカースレッドのステート</summary>
@@ -52,7 +73,11 @@ namespace ThunderEgg.BrownSugar {
     }
 
     /// <summary>ワーカースレッドの処理</summary>
-    public delegate void WorkerThreadJob(object obj);
+    public delegate object WorkerThreadJob(object obj);
+
+    //
+    //
+    //
 
     /// <summary>ワーカースレッド実装用の基底</summary>
     public class WorkerThread : IDisposable {
@@ -78,7 +103,7 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>ワーカーのスレッドの処理</summary>
-        public event WorkerThreadJob Job;
+        protected Func<object, object> WorkerFunc;
 
         /// <summary>同期用</summary>
         protected WorkerThreadAsyncResult AsyncResult;
@@ -92,18 +117,12 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ワーカー処理終了通知用</summary>
         protected AutoResetEvent ComplateEvent;
 
-        /// <summary>ワーカー処理終了通知用</summary>
-        protected AsyncCallback AsyncCallback;
-
         //
         //
         //
 
         /// <summary>コンストラクタ</summary>
-        public WorkerThread(WorkerThreadJob job = null) {
-            if (job != null) {
-                Job += job;
-            }
+        public WorkerThread() {
             ComplateEvent = new AutoResetEvent(false);
             AsyncResult = new WorkerThreadAsyncResult();
             AsyncResult.AsyncWaitHandle = ComplateEvent;
@@ -137,31 +156,50 @@ namespace ThunderEgg.BrownSugar {
             StartEvent = null;
             using (var t = ComplateEvent as IDisposable) { }
             ComplateEvent = null;
-            Job = null;
+            WorkerFunc = null;
             State = WorkerThreadState.Disposed;
             GC.SuppressFinalize(this);
         }
 
-        /// <summary>処理を開始させます (idle から run になる) </summary>
-        /// <param name="cb">完了時に呼び出すコールバック</param>
-        /// <param name="state">IAsyncResult.State のオブジェクト</param>
-        /// <exception cref="ObjectDisposedException">ディスポーズ済み時</exception>
-        /// <exception cref="InvalidOperationException">非アイドル状態時</exception>
-        /// <returns>同期用インターフェースを返す、再利用されているので注意</returns>
-        public IAsyncResult Start(AsyncCallback cb = null, object state = null) {
+        /// <summary>処理を開始させます</summary>
+        public WorkerThreadAsyncResult StartNew(Action job) {
+            return Starter(_ => { job(); return null; }, null);
+        }
+
+        /// <summary>処理を開始させます</summary>
+        public WorkerThreadAsyncResult StartNew<TParam>(Action<TParam> job, //
+            TParam state) //
+        {
+            return Starter(_ => { job((TParam)_); return null; }, state);
+        }
+
+        /// <summary>処理を開始させます</summary>
+        public WorkerThreadAsyncResult StartNew<TResult>(Func<TResult> job) {
+            return Starter(_ => job(), null);
+        }
+
+        /// <summary>処理を開始させます</summary>
+        public WorkerThreadAsyncResult StartNew<TParam, TResult>( //
+            Func<TParam, TResult> job, TParam state) //
+        {
+            return Starter(_ => job((TParam)_), state);
+        }
+
+        /// <summary>処理を開始させます</summary>
+        WorkerThreadAsyncResult Starter(Func<object, object> func, object state) {
             if (IsDisposed) {
                 throw new ObjectDisposedException("disposed");
             }
             var st = State;
             if (st == WorkerThreadState.Init) {
                 AsyncResult.AsyncState = state;
-                AsyncCallback = cb;
+                WorkerFunc = func;
                 Thread = new Thread(Worker);
                 Thread.Start();
             }
             else if (st == WorkerThreadState.Idle) {
                 AsyncResult.AsyncState = state;
-                AsyncCallback = cb;
+                WorkerFunc = func;
                 StartEvent.Set();
             }
             else {
@@ -180,13 +218,10 @@ namespace ThunderEgg.BrownSugar {
             loop:
                 // 実行
                 State = WorkerThreadState.Run;
-                Job(AsyncResult.AsyncState);
+                AsyncResult.Result = WorkerFunc(AsyncResult.AsyncState);
                 // 終了通知
                 State = WorkerThreadState.Idle;
                 ComplateEvent.Set();
-                if (AsyncCallback != null) {
-                    AsyncCallback(AsyncResult);
-                }
                 // 次の処理を待ちます
                 StartEvent.WaitOne();
                 goto loop;
