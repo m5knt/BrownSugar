@@ -59,9 +59,10 @@ namespace ThunderEgg.BrownSugar {
 		public TResult Result {
 			get {
 				// 非ブロックを試みる
-				if (Wait(0)) return (TResult)WorkerThread.WorkerResult;
-				// ブロックする
-				Wait();
+				if (!Wait(0)) {
+					// ブロックする
+					Wait();
+				}
 				return (TResult)WorkerThread.WorkerResult;
 			}
 		}
@@ -232,6 +233,7 @@ namespace ThunderEgg.BrownSugar {
 
 			// スレッドの用意
 			WorkerFunc = func;
+	        WorkerResult = null;
             if (st == WorkerThreadStateId.Init) {
                 Thread = new Thread(Worker);
                 Thread.Start();
