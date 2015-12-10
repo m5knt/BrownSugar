@@ -3,8 +3,6 @@
  * @brief ワーカースレッド実装用
  */
 
-#define WORKERTHREAD_WITH_LOGERROR
-
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -269,11 +267,11 @@ namespace ThunderEgg.BrownSugar {
             catch (Exception e) {
                 // 想定外の例外
                 StateId = WorkerThreadStateId.UnhandleException;
+	            OutError(e.StackTrace);
             }
         }
 
 		/// <summary>エラーログ出力</summary>
-		[Conditional("WORKERTHREAD_WITH_LOGERROR")]
 		public static void OutError(string s) {
 			if (LogError == null) return;
 			LogError(s);
