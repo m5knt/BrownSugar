@@ -125,7 +125,7 @@ namespace ThunderEgg.BrownSugar {
         protected Func<object, object> WorkerFunc;
 
         /// <summary>非同期のリザルト</summary>
-		protected WorkerThreadAsyncResult AsyncResult;
+        protected WorkerThreadAsyncResult AsyncResult;
 
         /// <summary>ワーカーのリザルト</summary>
         public object WorkerResult { get; protected set; }
@@ -184,25 +184,25 @@ namespace ThunderEgg.BrownSugar {
         }
 
         /// <summary>処理を開始させます</summary>
-		/// <exception cref="ObjectDisposedException">ディスポーズ時</exception>
-		/// <exception cref="InvalidOperationException">処理出来ない状態時</exception>
-		public WorkerThreadAsyncResult<TResult> StartNew<TResult>( //
+        /// <exception cref="ObjectDisposedException">ディスポーズ時</exception>
+        /// <exception cref="InvalidOperationException">処理出来ない状態時</exception>
+        public WorkerThreadAsyncResult<TResult> StartNew<TResult>( //
             Func<TResult> job) //
         {
             return Starter<TResult>(_ => job(), null);
         }
 
         /// <summary>処理を開始させます</summary>
-		/// <exception cref="ObjectDisposedException">ディスポーズ時</exception>
-		/// <exception cref="InvalidOperationException">処理出来ない状態時</exception>
-		public WorkerThreadAsyncResult<TResult> StartNew<TParam, TResult>( //
+        /// <exception cref="ObjectDisposedException">ディスポーズ時</exception>
+        /// <exception cref="InvalidOperationException">処理出来ない状態時</exception>
+        public WorkerThreadAsyncResult<TResult> StartNew<TParam, TResult>( //
             Func<TParam, TResult> job, TParam state) //
         {
             return Starter<TResult>(_ => job((TParam)_), state);
         }
 
         /// <summary>処理を開始させます</summary>
-		WorkerThreadAsyncResult<TResult> Starter<TResult>( //
+        WorkerThreadAsyncResult<TResult> Starter<TResult>( //
             Func<object, object> func, object state) //
         {
             // 状態の確認
