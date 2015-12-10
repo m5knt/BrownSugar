@@ -13,11 +13,12 @@ namespace Test {
     [TestClass]
     public class WorkerThreadTest {
 
-        volatile int Worker0Count = 0;
-        volatile int Worker1Count = 0;
-        volatile int Worker2Count = 0;
-        volatile int Worker3Count = 0;
+        int Worker0Count = 0;
+        int Worker1Count = 0;
+        int Worker2Count = 0;
+        int Worker3Count = 0;
 
+#if false
         void Worker0() {
             Interlocked.Increment(ref Worker0Count);
             Console.WriteLine("worker0 " + Worker0Count);
@@ -29,7 +30,7 @@ namespace Test {
             Console.WriteLine("worker1 " + Worker1Count);
             Thread.Sleep(1000);
         }
-
+#endif
         int Worker2() {
             Interlocked.Increment(ref Worker2Count);
             Console.WriteLine("worker2 " + Worker2Count);
@@ -37,7 +38,7 @@ namespace Test {
             return 0;
         }
 
-        int Worker3(int state) {
+		int Worker3(int state) {
             Interlocked.Increment(ref Worker3Count);
             Console.WriteLine("worker3 " + Worker3Count);
             Thread.Sleep(1000);
@@ -48,6 +49,7 @@ namespace Test {
         public void Test() {
             var th = new WorkerThread();
             //
+#if false
             {
                 var a = th.StartNew(Worker0);
                 while (!a.Wait(0)) {
@@ -62,6 +64,7 @@ namespace Test {
                 }
                 Assert.AreEqual(1, Worker1Count);
             }
+#endif
             {
                 var a = th.StartNew(Worker2);
                 while (!a.Wait(0)) {

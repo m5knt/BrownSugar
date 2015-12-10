@@ -3,7 +3,10 @@
  * @brief ワーカースレッド実装用
  */
 
+#define WORKERTHREAD_WITH_LOGERROR
+
 using System;
+using System.Diagnostics;
 using System.Threading;
 
 /*
@@ -12,10 +15,10 @@ using System.Threading;
 
 namespace ThunderEgg.BrownSugar {
 
-    /// <summary>ワーカースレッドの同期用</summary>
+	/// <summary>ワーカー処理の非同期監視用</summary>
     public class WorkerThreadAsyncResult : IAsyncResult {
 
-        /// <summary>任意のオブジェクト</summary>
+		/// <summary>引数</summary>
         public object AsyncState { get; set; }
 
         /// <summary>同期用イベントハンドル</summary>
@@ -25,39 +28,59 @@ namespace ThunderEgg.BrownSugar {
             get { return false; }
         }
 
-        /// <summary>処理が完了したかを返す</summary>
+		/// <summary>ワーカー処理が完了したかを返す</summary>
         public bool IsCompleted {
-            get { return WorkerThread.State == WorkerThreadState.Idle; }
+            get { return WorkerThread.StateId == WorkerThreadStateId.Idle; }
         }
 
-        /// <summary>ワーカースレッド</summary>
-        public WorkerThread WorkerThread;
+		//
+		//
+		//
 
-        /// <summary>ワーカーの処理結果を返します、処理中の場合はブロックします</summary>
-        public object Result {
-            get { Wait(); return Result_; }
-            set { Result_ = value; }
-        }
+		/// <summary>ワーカースレッド</summary>
+		public WorkerThread WorkerThread;
 
-        /// <summary>ワーカーの処理結果</summary>
-        object Result_;
-
-        /// <summary>終了を指定時間待つ</summary>
+		/// <summary>終了を指定時間待つ</summary>
         /// <param name="msec">待ち時間</param>
-        public bool Wait(int msec) {
-            //if (IsCompleted) return true;
-            return AsyncWaitHandle.WaitOne(msec);
-        }
+		public bool Wait(int msec) {
+			return AsyncWaitHandle.WaitOne(msec);
+		}
 
-        /// <summary>終了を待つ、実行中の場合はブロックします</summary>
-        public bool Wait() {
-            //if (IsCompleted) return true;
-            return AsyncWaitHandle.WaitOne();
-        }
-    }
+		/// <summary>終了を指定時間待つ</summary>
+		/// <param name="span">待ち時間</param>
+		public bool Wait(TimeSpan span) {
+			return AsyncWaitHandle.WaitOne(span);
+		}
+	}
 
-    /// <summary>ワーカースレッドのステート</summary>
-    public enum WorkerThreadState {
+	/// <summary>ワーカー処理の非同期監視用</summary>
+	public class WorkerThreadAsyncResult<TResult> : WorkerThreadAsyncResult {
+
+		/// <summary>処理結果を返します、処理中の場合はブロックします</summary>
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		public TResult Result {
+			get {
+				// 非ブロックを試みる
+				if (Wait(0)) return (TResult)WorkerThread.WorkerResult;
+				// ブロックする
+				Wait();
+				return (TResult)WorkerThread.WorkerResult;
+			}
+		}
+
+		/// <summary>終了を待つ、実行中の場合はブロックします</summary>
+		protected bool Wait() {
+			WorkerThread.OutError("force blocking are you sure?");
+			return AsyncWaitHandle.WaitOne();
+		}
+	}
+
+	//
+	//
+	//
+
+	/// <summary>ワーカースレッドのステート</summary>
+    public enum WorkerThreadStateId {
         /// <summary>初期状態</summary>
         Init,
         /// <summary>サービス中</summary>
@@ -82,18 +105,15 @@ namespace ThunderEgg.BrownSugar {
     /// <summary>ワーカースレッド実装用の基底</summary>
     public class WorkerThread : IDisposable {
 
-        /// <summary>サービス状態</summary>
-        public WorkerThreadState State {
-            get { return State_; }
-            private set { State_ = value; }
-        }
+		/// <summary>エラーログ出力用</summary>
+		public static event Action<string> LogError;
 
-        /// <summary>サービス状態</summary>
-        volatile WorkerThreadState State_ = WorkerThreadState.Init;
+	    /// <summary>サービス状態</summary>
+		public volatile WorkerThreadStateId StateId = WorkerThreadStateId.Init;
 
         /// <summary>ディスポーズされているか</summary>
         public bool IsDisposed {
-            get { return State == WorkerThreadState.Disposed; }
+            get { return StateId == WorkerThreadStateId.Disposed; }
         }
 
         /// <summary>ワーカースレッドの名前</summary>
@@ -102,11 +122,17 @@ namespace ThunderEgg.BrownSugar {
             set { Thread.Name = value; }
         }
 
-        /// <summary>ワーカーのスレッドの処理</summary>
+		/// <summary>ワーカーのスレッドの処理</summary>
         protected Func<object, object> WorkerFunc;
 
-        /// <summary>同期用</summary>
-        protected WorkerThreadAsyncResult AsyncResult;
+        /// <summary>非同期のリザルト</summary>
+		protected WorkerThreadAsyncResult AsyncResult;
+
+	    /// <summary>ワーカーのリザルト</summary>
+	    public object WorkerResult { get; protected set; }
+
+	    /// <summary>リザルトの型情報</summary>
+		protected Type AsyncResultType;
 
         /// <summary>ワーカースレッド</summary>
         protected Thread Thread;
@@ -124,9 +150,6 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>コンストラクタ</summary>
         public WorkerThread() {
             ComplateEvent = new AutoResetEvent(false);
-            AsyncResult = new WorkerThreadAsyncResult();
-            AsyncResult.AsyncWaitHandle = ComplateEvent;
-            AsyncResult.WorkerThread = this;
         }
 
         /// <summary>ファイナライザ</summary>
@@ -157,55 +180,68 @@ namespace ThunderEgg.BrownSugar {
             using (var t = ComplateEvent as IDisposable) { }
             ComplateEvent = null;
             WorkerFunc = null;
-            State = WorkerThreadState.Disposed;
+            StateId = WorkerThreadStateId.Disposed;
             GC.SuppressFinalize(this);
         }
 
         /// <summary>処理を開始させます</summary>
-        public WorkerThreadAsyncResult StartNew(Action job) {
-            return Starter(_ => { job(); return null; }, null);
+		/// <exception cref="ObjectDisposedException">ディスポーズ時</exception>
+		/// <exception cref="InvalidOperationException">処理出来ない状態時</exception>
+		public WorkerThreadAsyncResult<TResult> StartNew<TResult>( //
+			Func<TResult> job) //
+		{
+			return Starter<TResult>(_ => job(), null);
         }
 
         /// <summary>処理を開始させます</summary>
-        public WorkerThreadAsyncResult StartNew<TParam>(Action<TParam> job, //
-            TParam state) //
-        {
-            return Starter(_ => { job((TParam)_); return null; }, state);
-        }
-
-        /// <summary>処理を開始させます</summary>
-        public WorkerThreadAsyncResult StartNew<TResult>(Func<TResult> job) {
-            return Starter(_ => job(), null);
-        }
-
-        /// <summary>処理を開始させます</summary>
-        public WorkerThreadAsyncResult StartNew<TParam, TResult>( //
+		/// <exception cref="ObjectDisposedException">ディスポーズ時</exception>
+		/// <exception cref="InvalidOperationException">処理出来ない状態時</exception>
+		public WorkerThreadAsyncResult<TResult> StartNew<TParam, TResult>( //
             Func<TParam, TResult> job, TParam state) //
         {
-            return Starter(_ => job((TParam)_), state);
+			return Starter<TResult>(_ => job((TParam)_), state);
         }
 
         /// <summary>処理を開始させます</summary>
-        WorkerThreadAsyncResult Starter(Func<object, object> func, object state) {
-            if (IsDisposed) {
-                throw new ObjectDisposedException("disposed");
-            }
-            var st = State;
-            if (st == WorkerThreadState.Init) {
-                AsyncResult.AsyncState = state;
-                WorkerFunc = func;
+		WorkerThreadAsyncResult<TResult> Starter<TResult>( //
+			Func<object, object> func, object state) //
+		{
+			// 状態の確認
+            var st = StateId;
+	        switch (st) {
+		        case WorkerThreadStateId.Init:
+		        case WorkerThreadStateId.Idle:
+			        break;
+		        case WorkerThreadStateId.Disposed:
+			        throw new ObjectDisposedException("disposed");
+				default:
+					throw new InvalidOperationException("not idling state");
+	        }
+
+			// リザルト関係の用意
+			var ty = typeof(WorkerThreadAsyncResult<TResult>);
+	        WorkerThreadAsyncResult<TResult> result;
+			if (ty == AsyncResultType) {
+				result = (WorkerThreadAsyncResult<TResult>)AsyncResult;
+			} else {
+				result = new WorkerThreadAsyncResult<TResult>();
+				result.AsyncWaitHandle = ComplateEvent;
+				result.WorkerThread = this;
+				AsyncResult = result;
+				AsyncResultType = ty;
+			}
+			result.AsyncState = state;
+
+			// スレッドの用意
+			WorkerFunc = func;
+            if (st == WorkerThreadStateId.Init) {
                 Thread = new Thread(Worker);
                 Thread.Start();
             }
-            else if (st == WorkerThreadState.Idle) {
-                AsyncResult.AsyncState = state;
-                WorkerFunc = func;
+            else if (st == WorkerThreadStateId.Idle) {
                 StartEvent.Set();
             }
-            else {
-                throw new InvalidOperationException("not idle");
-            }
-            return AsyncResult;
+			return result;
         }
 
         //
@@ -217,10 +253,10 @@ namespace ThunderEgg.BrownSugar {
             try {
             loop:
                 // 実行
-                State = WorkerThreadState.Run;
-                AsyncResult.Result = WorkerFunc(AsyncResult.AsyncState);
+                StateId = WorkerThreadStateId.Run;
+				WorkerResult = WorkerFunc(AsyncResult.AsyncState);
                 // 終了通知
-                State = WorkerThreadState.Idle;
+                StateId = WorkerThreadStateId.Idle;
                 ComplateEvent.Set();
                 // 次の処理を待ちます
                 StartEvent.WaitOne();
@@ -228,13 +264,20 @@ namespace ThunderEgg.BrownSugar {
             }
             catch (ThreadAbortException) {
                 // 停止要求によるアボート例外
-                State = WorkerThreadState.ShutDown;
+                StateId = WorkerThreadStateId.ShutDown;
             }
             catch (Exception e) {
                 // 想定外の例外
-                State = WorkerThreadState.UnhandleException;
+                StateId = WorkerThreadStateId.UnhandleException;
             }
         }
+
+		/// <summary>エラーログ出力</summary>
+		[Conditional("WORKERTHREAD_WITH_LOGERROR")]
+		public static void OutError(string s) {
+			if (LogError == null) return;
+			LogError(s);
+		}
     }
 }
 
