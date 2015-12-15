@@ -11,10 +11,10 @@ using System.IO;
 namespace Test {
 
     [TestClass]
-    public class Test {
+    public class VisubleMemoryTest {
 
 	    [TestMethod]
-        public void T() {
+        public void Test() {
             var b = new VisibleMemoryStream(1);
             using (var a = new StreamWriter(b)) {
                 a.Write("あ");
