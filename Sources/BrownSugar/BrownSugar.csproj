@@ -74,6 +74,7 @@
     <Compile Include="BrownSugar.cs" />
     <Compile Include="Endianness\ByteOrder.cs" />
     <Compile Include="MemoryCache.cs" />
+    <Compile Include="VisibleMemoryStream.cs" />
     <Compile Include="WorkerThread.cs" />
     <Compile Include="ObjectPool.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
