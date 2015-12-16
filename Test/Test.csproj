@@ -61,7 +61,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="VisubleMemoryTest.cs" />
+    <Compile Include="ExpandableMemoryTest.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="ByteOrder\SwapArray.cs" />
     <Compile Include="ByteOrder\SwapClass.cs" />

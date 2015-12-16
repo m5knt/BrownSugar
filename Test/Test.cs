@@ -15,7 +15,7 @@ namespace Test {
 
 	    [TestMethod]
         public void T() {
-            var b = new VisibleMemoryStream(1);
+            var b = new ExpandableMemoryStream(1);
             using (var a = new StreamWriter(b)) {
                 a.Write("あ");
                 a.Flush();
