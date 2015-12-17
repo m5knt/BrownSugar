@@ -10,22 +10,28 @@ using System.IO;
 
 namespace Test {
 
-	[TestClass]
-	public class ExpandableMemoryTest {
+    [TestClass]
+    public class ExpandableMemoryTest {
 
-		[TestMethod]
-		public void Test() {
-			var buf = new ExpandableMemoryStream(1);
-			var wr = new StreamWriter(buf);
-			wr.WriteLine("あ");
-			wr.Flush();
-			buf.Position = 0;
-			var rd = new StreamReader(buf);
-			while (!rd.EndOfStream) {
-				var s = rd.ReadLine();
-				Assert.AreEqual("あ", s);
-			}
-		}
-	}
+        [TestMethod]
+        public void Test() {
+            var buf = new ExpandableMemoryStream(1);
+            var wr = new StreamWriter(buf);
+            wr.Write("あ");
+            wr.WriteLine("あい");
+            wr.Write("う");
+            wr.WriteLine("うえ");
+            wr.Flush();
+            buf.Position = 0;
+            var rd = new StreamReader(buf);
+            while (!rd.EndOfStream) {
+                string s;
+                s = rd.ReadLine();
+                Assert.AreEqual("ああい", s);
+                s = rd.ReadLine();
+                Assert.AreEqual("ううえ", s);
+            }
+        }
+    }
 }
 
