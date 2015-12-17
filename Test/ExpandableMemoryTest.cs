@@ -14,7 +14,27 @@ namespace Test {
     public class ExpandableMemoryTest {
 
         [TestMethod]
-        public void Test() {
+        public void ByteAndSeekTest() {
+            var buf = new ExpandableMemoryStream(1);
+            buf.SetLength(0);
+            buf.WriteByte(1);
+            buf.WriteByte(2);
+            buf.WriteByte(3);
+            buf.WriteByte(4);
+            buf.Seek(0, SeekOrigin.Begin);
+            Assert.AreEqual(1, buf.ReadByte());
+            Assert.AreEqual(2, buf.ReadByte());
+            buf.Seek(-1, SeekOrigin.Current);
+            Assert.AreEqual(2, buf.ReadByte());
+            Assert.AreEqual(3, buf.ReadByte());
+            Assert.AreEqual(4, buf.ReadByte());
+            Assert.AreEqual(-1, buf.ReadByte());
+            buf.Seek(-1, SeekOrigin.End);
+            Assert.AreEqual(4, buf.ReadByte());
+        }
+
+        [TestMethod]
+        public void StreamReaderWriterTest() {
             var buf = new ExpandableMemoryStream(1);
             var wr = new StreamWriter(buf);
             wr.Write("あ");

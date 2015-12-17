@@ -119,16 +119,22 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>シーク</summary>
         /// <param name="offset">originからのオフセット</param>
         /// <param name="origin">起点位置</param>
+        /// <returns>新しいシーク位置を返す</returns>
+        /// <exception cref="IOException">シーク位置がストリームより前の時</exception>
+        /// <exception cref="ArgumentOutOfRangeException">offsetがint.MaxValueより大きい時</exception>
+        /// <exception cref="ArgumentException">originが無効</exception>
         public override long Seek(long offset, SeekOrigin origin) {
+            if (offset > int.MaxValue) throw new ArgumentOutOfRangeException("offset, too big");
             long t;
             switch (origin) {
-                default: throw new ArgumentException();
+                default: throw new ArgumentException("illigal orgin");
                 case SeekOrigin.Begin: t = offset; break;
                 case SeekOrigin.Current: t = Position_ + offset; break;
                 case SeekOrigin.End: t = Length + offset; break;
             }
-            if (t < 0) throw new IOException();
-            if (t > Length) throw new ArgumentOutOfRangeException();
+            if (t < 0) throw new IOException("illigal seek position");
+            ExpandBuffer(t);
+            Length_ = Math.Max(Length_, Position_);
             Position_ = t;
             return Position_;
         }
@@ -149,49 +155,52 @@ namespace ThunderEgg.BrownSugar {
             }
         }
 
-        /// <summary>ストリームの内容を読み込む</summary>
+        /// <summary>ストリームから読み込む</summary>
+        /// <returns>読み込めた量</returns>
+        /// <exception cref="ArgumentNullException">bufferがヌルの時</exception>
+        /// <exception cref="ArgumentOutOfRangeException">offsetかcountがマイナスの時</exception>
+        /// <exception cref="ArgumentException">count数が大きい時</exception>
         public override int Read(byte[] buffer, int offset, int count) {
-            if (buffer == null) {
-                throw new ArgumentNullException("buffer");
-            }
-            if (offset < 0 || offset > buffer.Length) {
-                throw new ArgumentOutOfRangeException("offset");
-            }
-            if (count < 0 || (offset + count) > buffer.Length) {
-                throw new ArgumentOutOfRangeException("count");
-            }
+            // 引数確認
+            if (buffer == null) throw new ArgumentNullException("buffer");
+            if (offset < 0 || count < 0) throw new ArgumentOutOfRangeException("offset or count");
+            if ((count + offset) > buffer.Length) throw new ArgumentException("count, too big");
+            // 範囲の確認
             var from = Position_;
             var to = Math.Min(Position_ + count, Length_);
             var size = (int)(to - from);
-            // 最後に到達したか
-            if (size <= 0) {
-                return 0;
-            }
+            // 最後に到達したら 0
+            if (size <= 0) return 0;
+            // ストリームの内容をバッファへ読み込む
             Buffer.BlockCopy(Buffer_, (int)from, buffer, offset, size);
             Position_ += size;
             return size;
         }
 
-        /// <summary>ストリームへデータを書き込む</summary>
+        /// <summary>ストリームから読み込む</summary>
+        /// <returns>バイトデータ/終端時は-1</returns>
+        public override int ReadByte() {
+            if (Position_ == Length_) return -1;
+            return Buffer_[Position_++];
+        }
+
+        /// <summary>ストリームへ書き込む</summary>
+        /// <exception cref="ArgumentNullException">bufferがヌルの時</exception>
+        /// <exception cref="ArgumentOutOfRangeException">offsetかcountがマイナス</exception>
+        /// <exception cref="ArgumentException">count数を大きい時</exception>
         public override void Write(byte[] buffer, int offset, int count) {
             // 引数の確認
-            if (buffer == null) {
-                throw new ArgumentNullException("buffer");
-            }
-            if (offset < 0 || offset > buffer.Length) {
-                throw new ArgumentOutOfRangeException("offset");
-            }
-            if (count < 0 || (offset + count) > buffer.Length) {
-                throw new ArgumentOutOfRangeException("count");
-            }
-            // バッファを自動拡張し書き込む
+            if (buffer == null) throw new ArgumentNullException("buffer");
+            if (offset < 0 || count < 0) throw new ArgumentOutOfRangeException("offset or count");
+            if ((count + offset) > buffer.Length) throw new ArgumentException("count, too big");
+            // 内部バッファを自動拡張し書き込む
             ExpandBuffer(Position_ + count);
             Buffer.BlockCopy(buffer, offset, Buffer_, (int)Position_, count);
             Position_ += count;
             Length_ = Math.Max(Length_, Position_);
         }
 
-        /// <summary>ストリームへデータを書き込む</summary>
+        /// <summary>ストリームへ書き込む</summary>
         public override void WriteByte(byte value) {
             ExpandBuffer(Position_ + 1);
             Buffer_[Position_++] = value;
@@ -202,7 +211,7 @@ namespace ThunderEgg.BrownSugar {
         void ExpandBuffer(long n) {
             // 大きすぎか確認する
             if (n > int.MaxValue) {
-                throw new OverflowException("huge buffer");
+                throw new OverflowException("stream, too big");
             }
             // 十分なら何もしない
             if (Buffer_ != null & Buffer_.Length > n) return;
@@ -215,7 +224,7 @@ namespace ThunderEgg.BrownSugar {
             Buffer_ = expand;
         }
 
-        /// <summary>一時バッファを書き出す、特に何もしない</summary>
+        /// <summary>一時バッファの内容をストリームへ書き出す、特に何もしない</summary>
         public override void Flush() {
         }
 
