@@ -21,6 +21,7 @@ namespace Test {
             buf.WriteByte(2);
             buf.WriteByte(3);
             buf.WriteByte(4);
+            buf.Flush();
             buf.Seek(0, SeekOrigin.Begin);
             Assert.AreEqual(1, buf.ReadByte());
             Assert.AreEqual(2, buf.ReadByte());

@@ -15,26 +15,49 @@ namespace ThunderEgg.BrownSugar {
     /// </summary>
     public class ExpandableMemoryStream : Stream {
 
-        /// <summary>ストリームバッファ</summary>
-        byte[] Buffer_;
+        /// <summary>伸長しなくて済むバッファ量を設定する</summary>
+        public long Capacity {
+            get {
+                CheckDisposed();
+                return Buffer_ == null ? 0 : Buffer_.Length;
+            }
+            set {
+                CheckDisposed();
+                ExpandBuffer(value);
+            }
+        }
+
+        /// <summary>ストリーム長を返す</summary>
+        public override long Length {
+            get { return Length_; }
+        }
 
         /// <summary>ストリーム量</summary>
         long Length_;
 
+        /// <summary>読み書き位置</summary>
+        public override long Position {
+            get { return Position_; }
+            set {
+                CheckDisposed();
+                if (value < 0 || value > Length) {
+                    throw new ArgumentOutOfRangeException();
+                }
+                Position_ = value;
+            }
+        }
+
         /// <summary>シーク位置</summary>
         long Position_;
+
+        /// <summary>ストリームバッファ</summary>
+        byte[] Buffer_;
 
         /// <summary>デフォルトのストリームバッファ量</summary>
         const int Default = 1024;
 
         /// <summary>拡張量の式</summary>
         Func<long, long> CalcExpandSize = _ => _ * 2;
-
-        /// <summary>伸長しなくて済むバッファ量を設定する</summary>
-        public long Capacity {
-            get { return Buffer_ == null ? 0 : Buffer_.Length; }
-            set { ExpandBuffer(value); }
-        }
 
         //
         //
@@ -81,6 +104,11 @@ namespace ThunderEgg.BrownSugar {
             Buffer_ = null;
         }
 
+        /// <summary>ディスポーズ済み判定</summary>
+        void CheckDisposed() {
+            if (Buffer_ == null) throw new ObjectDisposedException("");
+        }
+
         /// <summary>新規バッファを割り当てる</summary>
         /// <param name="capacity">バッファ拡張しなくても済む量</param>
         void SetBuffer(long capacity) {
@@ -103,28 +131,13 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>内部バッファを返す</summary>
         public byte[] GetBuffer() {
+            CheckDisposed();
             return Buffer_;
         }
 
         //
         //
         //
-
-        /// <summary>ストリーム長を返す</summary>
-        public override long Length {
-            get { return Length_; }
-        }
-
-        /// <summary>読み書き位置</summary>
-        public override long Position {
-            get { return Position_; }
-            set {
-                if (value < 0 || value > Length) {
-                    throw new ArgumentOutOfRangeException();
-                }
-                Position_ = value;
-            }
-        }
 
         /// <summary>シーク</summary>
         /// <param name="offset">originからのオフセット</param>
@@ -134,6 +147,7 @@ namespace ThunderEgg.BrownSugar {
         /// <exception cref="ArgumentOutOfRangeException">offsetがint.MaxValueより大きい時</exception>
         /// <exception cref="ArgumentException">originが無効</exception>
         public override long Seek(long offset, SeekOrigin origin) {
+            CheckDisposed();
             if (offset > int.MaxValue) throw new ArgumentOutOfRangeException("offset, too big");
             long t;
             switch (origin) {
@@ -152,6 +166,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ストリーム長を設定する</summary>
         /// <exception cref="ArgumentOutOfRangeException">valueがマイナスまたはint.MaxValueを超過時</exception>
         public override void SetLength(long value) {
+            CheckDisposed();
             if (value < 0 || value > int.MaxValue) {
                 throw new ArgumentOutOfRangeException();
             }
@@ -171,6 +186,7 @@ namespace ThunderEgg.BrownSugar {
         /// <exception cref="ArgumentOutOfRangeException">offsetかcountがマイナスの時</exception>
         /// <exception cref="ArgumentException">count数が大きい時</exception>
         public override int Read(byte[] buffer, int offset, int count) {
+            CheckDisposed();
             // 引数確認
             if (buffer == null) throw new ArgumentNullException("buffer");
             if (offset < 0 || count < 0) throw new ArgumentOutOfRangeException("offset or count");
@@ -190,6 +206,7 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ストリームから読み込む</summary>
         /// <returns>バイトデータ/終端時は-1</returns>
         public override int ReadByte() {
+            CheckDisposed();
             if (Position_ == Length_) return -1;
             return Buffer_[Position_++];
         }
@@ -199,6 +216,7 @@ namespace ThunderEgg.BrownSugar {
         /// <exception cref="ArgumentOutOfRangeException">offsetかcountがマイナス</exception>
         /// <exception cref="ArgumentException">count数を大きい時</exception>
         public override void Write(byte[] buffer, int offset, int count) {
+            CheckDisposed();
             // 引数の確認
             if (buffer == null) throw new ArgumentNullException("buffer");
             if (offset < 0 || count < 0) throw new ArgumentOutOfRangeException("offset or count");
@@ -212,6 +230,7 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>ストリームへ書き込む</summary>
         public override void WriteByte(byte value) {
+            CheckDisposed();
             ExpandBuffer(Position_ + 1);
             Buffer_[Position_++] = value;
             Length_ = Math.Max(Length_, Position_);
@@ -237,6 +256,5 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>一時バッファの内容をストリームへ書き出す、特に何もしない</summary>
         public override void Flush() {
         }
-
     }
 }
