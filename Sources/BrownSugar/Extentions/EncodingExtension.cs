@@ -12,7 +12,7 @@ namespace ThunderEgg.BrownSugar.Extentions {
 
 		static Encoding UTF8N_ = new UTF8Encoding(false);
 
-        public static Encoding UTF8N(this string self) {
+        public static Encoding UTF8N(this Encoding self) {
 			return UTF8N_;
         }
     }
