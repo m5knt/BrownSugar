@@ -28,6 +28,12 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>拡張量の式</summary>
         Func<long, long> CalcExpandSize = _ => _ * 2;
 
+        /// <summary>伸長しなくて済むバッファ量を設定する</summary>
+        public long Capacity {
+            get { return Buffer_ == null ? 0 : Buffer_.Length; }
+            set { ExpandBuffer(value); }
+        }
+
         //
         //
         //
@@ -95,7 +101,8 @@ namespace ThunderEgg.BrownSugar {
         //
 
         /// <summary>ストリーム長を返す</summary>
-        public override long Length { get { return Length_; }
+        public override long Length {
+            get { return Length_; }
         }
 
         /// <summary>読み書き位置</summary>
@@ -193,15 +200,18 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>バッファサイズを調整する</summary>
         void ExpandBuffer(long n) {
+            // 大きすぎか確認する
             if (n > int.MaxValue) {
-                throw new OverflowException("inner buffer");
+                throw new OverflowException("huge buffer");
             }
             // 十分なら何もしない
-            if (Buffer_.Length > n) return;
+            if (Buffer_ != null & Buffer_.Length > n) return;
             // バッファ拡張し内容をコピーする
             var size = Math.Min(CalcExpandSize(n), int.MaxValue);
             var expand = new byte[size];
-            Buffer_.CopyTo(expand, 0);
+            if (Buffer_ != null) {
+                Buffer_.CopyTo(expand, 0);
+            }
             Buffer_ = expand;
         }
 
