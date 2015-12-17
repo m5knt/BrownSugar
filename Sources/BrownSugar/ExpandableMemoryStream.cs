@@ -10,6 +10,8 @@ namespace ThunderEgg.BrownSugar {
 
     /// <summary>
     /// バッファを自動伸長しつつ内部バッファ参照可能なメモリーストリーム
+    /// System.IO.MemoryStream はバッファを与えると自動伸長動作しない
+    /// visible でインスタンスを作成した場合 GetBuffer() が利用できない
     /// </summary>
     public class ExpandableMemoryStream : Stream {
 
@@ -50,6 +52,9 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>書き込み操作可能か</summary>
         public override bool CanWrite { get { return true; } }
 
+        //
+        //
+        //
 
         /// <summary>コンストラクタ</summary>
         /// <param name="calc_expand_size">拡張量計算デリゲート</param>
@@ -69,6 +74,11 @@ namespace ThunderEgg.BrownSugar {
             if (calc_expand_size != null) {
                 CalcExpandSize = calc_expand_size;
             }
+        }
+
+        /// <summary>ディスポーズ</summary>
+        protected override void Dispose(bool disposing) {
+            Buffer_ = null;
         }
 
         /// <summary>新規バッファを割り当てる</summary>
@@ -226,11 +236,6 @@ namespace ThunderEgg.BrownSugar {
 
         /// <summary>一時バッファの内容をストリームへ書き出す、特に何もしない</summary>
         public override void Flush() {
-        }
-
-        /// <summary>ディスポーズ</summary>
-        protected override void Dispose(bool disposing) {
-            Buffer_ = null;
         }
 
     }
