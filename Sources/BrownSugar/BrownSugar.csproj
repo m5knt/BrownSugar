@@ -59,12 +59,12 @@
     <OutputPath>bin\ReleaseLE\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="EncodingTool.cs" />
     <Compile Include="Endianness\HostOrderAligned.cs" />
     <Compile Include="Endianness\NoOrder.cs" />
     <Compile Include="Endianness\BigEndianAny.cs" />
     <Compile Include="Extentions\DateTime.cs" />
     <Compile Include="Extentions\MarshalExtension.cs" />
-    <Compile Include="Extentions\EncodingExtension.cs" />
     <Compile Include="Extentions\StringExtension.cs" />
     <Compile Include="Extentions\StringBuilderExtension.cs" />
     <Compile Include="Extentions\CastExtension.cs" />
