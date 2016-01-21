@@ -166,19 +166,26 @@ namespace ThunderEgg.BrownSugar {
         /// <summary>ストリーム長を設定する</summary>
         /// <exception cref="ArgumentOutOfRangeException">valueがマイナスまたはint.MaxValueを超過時</exception>
         public override void SetLength(long value) {
-            CheckDisposed();
-            if (value < 0 || value > int.MaxValue) {
-                throw new ArgumentOutOfRangeException();
-            }
-            ExpandBuffer(value);
-            var from = (int)Length_;
-            Length_ = value;
-            Position_ = Math.Min(Position_, Length_);
-            var to = (int)Length;
-            if (from < to) {
-                Array.Clear(Buffer_, from, to - from);
-            }
+			SetLength(value, true);
         }
+
+		/// <summary>ストリーム長を設定する 拡張時のフィル制御可能版</summary>
+		/// <exception cref="ArgumentOutOfRangeException">valueがマイナスまたはint.MaxValueを超過時</exception>
+		public void SetLength(long value, bool fill) {
+			CheckDisposed();
+			if (value < 0 || value > int.MaxValue) {
+				throw new ArgumentOutOfRangeException();
+			}
+			ExpandBuffer(value);
+			var from = (int)Length_;
+			Length_ = value;
+			Position_ = Math.Min(Position_, Length_);
+			var to = (int)Length;
+			// 拡張部分をフィルする
+			if (fill && from < to) {
+				Array.Clear(Buffer_, from, to - from);
+			}
+		}
 
         /// <summary>ストリームから読み込む</summary>
         /// <returns>読み込めた量</returns>
